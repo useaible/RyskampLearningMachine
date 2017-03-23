@@ -1,0 +1,122 @@
+﻿using LogisticsGameLib;
+using RLM;
+using RLM.Enums;
+using RLM.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Tools;
+
+namespace LogisticsConsoleApp
+{
+    public class RlmLogistics
+    {
+        public static void LogisticTrain()
+        {
+            Console.WriteLine("\n\nRLM network settings:");
+
+            int sessions = Util.GetInput("\nEnter Number of Session [default 100]: ", 100); //Gets user input for the number of tries the game will play
+            int startRand = Util.GetInput("Enter Start Randomness [default 100]: ", 100); //Gets user input for start randomness
+            int endRand = Util.GetInput("Enter End Randomness [default 0]: ", 0); //Gets user input for end randomness
+
+            var dbName = $"RLM_logistic_" + Guid.NewGuid().ToString("N");
+            var networkName = "Logicstics Network";
+            LogisticSimulator simulator = null;
+
+            IEnumerable<int> customerOrders = LogisticInitialValues.CustomerOrders;
+
+            try
+            {
+                RlmNetwork network = new RlmNetwork(dbName); //Make an instance of rlm_network passing the database name as parameter
+
+                if (!network.LoadNetwork(networkName)) //
+                {
+                    var inputs = new List<RlmIO>()
+                    {
+                        new RlmIO("X", typeof(Int32).ToString(), 1, 1, RlmInputType.Distinct),
+                    };
+
+                    double minFrom = LogisticInitialValues.PlayerMinRange[0];
+                    double minTo = LogisticInitialValues.PlayerMinRange[1];
+                    double maxFrom = LogisticInitialValues.PlayerMaxRange[0];
+                    double maxTo = LogisticInitialValues.PlayerMaxRange[1];
+                    var outputs = new List<RlmIO>()
+                    {
+                       new RlmIO("Retailer_Min", typeof(Int16).ToString(), minFrom, minTo),
+                       new RlmIO("Retailer_Max", typeof(Int16).ToString(), maxFrom, maxTo),
+                       new RlmIO("WholeSaler_Min", typeof(Int16).ToString(), minFrom, minTo),
+                       new RlmIO("WholeSaler_Max", typeof(Int16).ToString(), maxFrom, maxTo),
+                       new RlmIO("Distributor_Min", typeof(Int16).ToString(), minFrom, minTo),
+                       new RlmIO("Distributor_Max", typeof(Int16).ToString(), maxFrom, maxTo),
+                       new RlmIO("Factory_Min", typeof(Int16).ToString(), minFrom, minTo),
+                       new RlmIO("Factory_Max", typeof(Int16).ToString(), maxFrom, maxTo),
+                       new RlmIO("Factory_Units_Per_Day", typeof(Int16).ToString(), LogisticInitialValues.FactoryRange[0], LogisticInitialValues.FactoryRange[1]),
+                    };
+
+                    network.NewNetwork(networkName, inputs, outputs);
+                }
+
+                network.NumSessions = sessions; // num of sessioins default 100
+                network.StartRandomness = startRand;
+                network.EndRandomness = endRand;
+
+                simulator = new LogisticSimulator(LogisticInitialValues.StorageCost, LogisticInitialValues.BacklogCost, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory);
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                Console.WriteLine("\n\nTraining:\n");
+                IEnumerable<LogisticSimulatorOutput> predictedLogisticOutputs = null;
+
+                for (int i = 0; i < sessions; i++)
+                {
+                    var sessId = network.SessionStart();
+
+                    var inputs = new List<RlmIOWithValue>();
+                    inputs.Add(new RlmIOWithValue(network.Inputs.First(), "1"));
+
+                    var cycle = new RlmCycle();
+                    var outputs = cycle.RunCycle(network, sessId, inputs, true);
+
+                    var simOutputs = outputs.CycleOutput.Outputs
+                            .Select(a => new LogisticSimulatorOutput() { Name = a.Name, Value = Convert.ToInt32(a.Value) })
+                            .ToList();
+
+                    simulator.ResetSimulationOutput();
+                    simulator.Start(simOutputs, 50, customerOrders);
+
+                    network.ScoreCycle(outputs.CycleOutput.CycleID, 0);
+                    var totalCosts = simulator.SumAllCosts();
+                    network.SessionEnd(totalCosts);
+
+                    Console.WriteLine($"Session #{i + 1} \t Score: {Math.Abs(totalCosts).ToString("$#,##0"),10}");
+
+                    if (i == sessions - 1)
+                        predictedLogisticOutputs = simOutputs;
+                }
+
+                network.TrainingDone();
+
+                watch.Stop();
+
+                Console.WriteLine("\nPredicted outputs:");
+                string resultText = "";
+                foreach (var item in predictedLogisticOutputs)
+                {
+                    resultText += "\n" + item.Name + ": " + item.Value;
+                }
+
+                Console.WriteLine(resultText);
+
+                Console.WriteLine($"\nElapsed: {watch.Elapsed}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERROR: {e.Message}");
+            }
+            Console.ReadLine();
+        }
+    }
+}

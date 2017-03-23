@@ -1,0 +1,211 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM", "Core\RLM\RLM\RLM.csproj", "{01EEC6CE-A2CA-4637-8133-6288B6E246C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Database", "Core\RLM\RLM.Database\RLM.Database.csproj", "{70CE8FE8-19D9-4472-89E1-2B61E7402B03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Memory", "Core\RLM\RLM.Memory\RLM.Memory.csproj", "{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Models", "Core\RLM\RLM.Models\RLM.Models.csproj", "{F603454E-2199-4366-9A2A-08EC30818A0C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleApps", "ExampleApps", "{AC49F9AD-6797-47AC-B081-9A204352AE6B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LunarLander", "LunarLander", "{96D7203E-DED9-488F-9DAA-E9CC277E8087}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logistics", "Logistics", "{C626F7C8-A7C5-4DDD-BA77-D520CF6D2646}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maze", "Maze", "{7993561B-46FF-4C61-822E-F68412C0505A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsGameLib", "ExampleApps\CSharp\Logistics\LogisticsGameLib\LogisticsGameLib.csproj", "{62A0A8AC-99F6-4809-9CD7-8B930647CADE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsConsoleApp", "ExampleApps\CSharp\Logistics\LogisticsConsoleApp\LogisticsConsoleApp.csproj", "{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderConsoleApp", "ExampleApps\CSharp\LunarLander\LanderConsoleApp\LanderConsoleApp.csproj", "{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderGameLib", "ExampleApps\CSharp\LunarLander\LanderGameLib\LanderGameLib.csproj", "{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "ExampleApps\Tools\Tools.csproj", "{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeConsoleApp", "ExampleApps\CSharp\Maze\MazeConsoleApp\MazeConsoleApp.csproj", "{7C75D2C8-7089-4CE3-9335-59038C0E410E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGameLib", "ExampleApps\CSharp\Maze\MazeGameLib\MazeGameLib.csproj", "{E539BFF3-43F1-4957-8586-1F10168CA5D9}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "LanderConsoleAppPython", "ExampleApps\Python\LanderConsoleAppPython\LanderConsoleAppPython.pyproj", "{C4305509-DF62-4A29-9396-2B299F743AEE}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "LogisticsConsoleAppPython", "ExampleApps\Python\LogisticsConsoleAppPython\LogisticsConsoleAppPython.pyproj", "{328B2619-121E-4932-B92F-1FA5C6EC9E90}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MazeConsoleAppPython", "ExampleApps\Python\MazeConsoleAppPython\MazeConsoleAppPython.pyproj", "{DBF4EB40-C1E7-4E79-B8D5-95F34259A07A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.WebAPI", "Core\REST\RLM.WebAPI\RLM.WebAPI.csproj", "{0EDB8BAF-919D-468C-9AE2-32CF6310C392}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4D98D38F-F309-43BD-841B-86663CCA9106}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RLM", "RLM", "{4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "REST", "REST", "{BC778B0F-E31A-4266-89FA-C203421DBA81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharp", "CSharp", "{58F58DCE-4D43-434B-821D-67B326F13924}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python", "Python", "{C1FE4540-4AC4-4833-96AF-191211B5FEC0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "REST", "REST", "{1856F408-5ABC-481F-9D30-056D7642B117}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01EEC6CE-A2CA-4637-8133-6288B6E246C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01EEC6CE-A2CA-4637-8133-6288B6E246C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01EEC6CE-A2CA-4637-8133-6288B6E246C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01EEC6CE-A2CA-4637-8133-6288B6E246C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70CE8FE8-19D9-4472-89E1-2B61E7402B03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70CE8FE8-19D9-4472-89E1-2B61E7402B03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70CE8FE8-19D9-4472-89E1-2B61E7402B03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70CE8FE8-19D9-4472-89E1-2B61E7402B03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F603454E-2199-4366-9A2A-08EC30818A0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F603454E-2199-4366-9A2A-08EC30818A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F603454E-2199-4366-9A2A-08EC30818A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F603454E-2199-4366-9A2A-08EC30818A0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62A0A8AC-99F6-4809-9CD7-8B930647CADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62A0A8AC-99F6-4809-9CD7-8B930647CADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62A0A8AC-99F6-4809-9CD7-8B930647CADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62A0A8AC-99F6-4809-9CD7-8B930647CADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C75D2C8-7089-4CE3-9335-59038C0E410E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C75D2C8-7089-4CE3-9335-59038C0E410E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C75D2C8-7089-4CE3-9335-59038C0E410E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C75D2C8-7089-4CE3-9335-59038C0E410E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E539BFF3-43F1-4957-8586-1F10168CA5D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E539BFF3-43F1-4957-8586-1F10168CA5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E539BFF3-43F1-4957-8586-1F10168CA5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E539BFF3-43F1-4957-8586-1F10168CA5D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4305509-DF62-4A29-9396-2B299F743AEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4305509-DF62-4A29-9396-2B299F743AEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{328B2619-121E-4932-B92F-1FA5C6EC9E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{328B2619-121E-4932-B92F-1FA5C6EC9E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBF4EB40-C1E7-4E79-B8D5-95F34259A07A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBF4EB40-C1E7-4E79-B8D5-95F34259A07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EDB8BAF-919D-468C-9AE2-32CF6310C392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EDB8BAF-919D-468C-9AE2-32CF6310C392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EDB8BAF-919D-468C-9AE2-32CF6310C392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EDB8BAF-919D-468C-9AE2-32CF6310C392}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{01EEC6CE-A2CA-4637-8133-6288B6E246C3} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{70CE8FE8-19D9-4472-89E1-2B61E7402B03} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{F603454E-2199-4366-9A2A-08EC30818A0C} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{96D7203E-DED9-488F-9DAA-E9CC277E8087} = {58F58DCE-4D43-434B-821D-67B326F13924}
+		{C626F7C8-A7C5-4DDD-BA77-D520CF6D2646} = {58F58DCE-4D43-434B-821D-67B326F13924}
+		{7993561B-46FF-4C61-822E-F68412C0505A} = {58F58DCE-4D43-434B-821D-67B326F13924}
+		{62A0A8AC-99F6-4809-9CD7-8B930647CADE} = {C626F7C8-A7C5-4DDD-BA77-D520CF6D2646}
+		{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0} = {C626F7C8-A7C5-4DDD-BA77-D520CF6D2646}
+		{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1} = {96D7203E-DED9-488F-9DAA-E9CC277E8087}
+		{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F} = {96D7203E-DED9-488F-9DAA-E9CC277E8087}
+		{928F7B86-F0CC-4F5C-B1B3-FCD154111E48} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
+		{7C75D2C8-7089-4CE3-9335-59038C0E410E} = {7993561B-46FF-4C61-822E-F68412C0505A}
+		{E539BFF3-43F1-4957-8586-1F10168CA5D9} = {7993561B-46FF-4C61-822E-F68412C0505A}
+		{C4305509-DF62-4A29-9396-2B299F743AEE} = {C1FE4540-4AC4-4833-96AF-191211B5FEC0}
+		{328B2619-121E-4932-B92F-1FA5C6EC9E90} = {C1FE4540-4AC4-4833-96AF-191211B5FEC0}
+		{DBF4EB40-C1E7-4E79-B8D5-95F34259A07A} = {C1FE4540-4AC4-4833-96AF-191211B5FEC0}
+		{0EDB8BAF-919D-468C-9AE2-32CF6310C392} = {BC778B0F-E31A-4266-89FA-C203421DBA81}
+		{4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83} = {4D98D38F-F309-43BD-841B-86663CCA9106}
+		{BC778B0F-E31A-4266-89FA-C203421DBA81} = {4D98D38F-F309-43BD-841B-86663CCA9106}
+		{58F58DCE-4D43-434B-821D-67B326F13924} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
+		{C1FE4540-4AC4-4833-96AF-191211B5FEC0} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
+		{1856F408-5ABC-481F-9D30-056D7642B117} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 16
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://rixryskamp.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Core\\RLM\\RLM\\RLM.csproj
+		SccProjectTopLevelParentUniqueName1 = RLM.sln
+		SccProjectName1 = Core/RLM/RLM
+		SccLocalPath1 = Core\\RLM\\RLM
+		SccProjectUniqueName2 = Core\\RLM\\RLM.Database\\RLM.Database.csproj
+		SccProjectTopLevelParentUniqueName2 = RLM.sln
+		SccProjectName2 = Core/RLM/RLM.Database
+		SccLocalPath2 = Core\\RLM\\RLM.Database
+		SccProjectUniqueName3 = Core\\RLM\\RLM.Memory\\RLM.Memory.csproj
+		SccProjectTopLevelParentUniqueName3 = RLM.sln
+		SccProjectName3 = Core/RLM/RLM.Memory
+		SccLocalPath3 = Core\\RLM\\RLM.Memory
+		SccProjectUniqueName4 = Core\\RLM\\RLM.Models\\RLM.Models.csproj
+		SccProjectTopLevelParentUniqueName4 = RLM.sln
+		SccProjectName4 = Core/RLM/RLM.Models
+		SccLocalPath4 = Core\\RLM\\RLM.Models
+		SccProjectUniqueName5 = ExampleApps\\CSharp\\Logistics\\LogisticsConsoleApp\\LogisticsConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName5 = RLM.sln
+		SccProjectName5 = ExampleApps/CSharp/Logistics/LogisticsConsoleApp
+		SccLocalPath5 = ExampleApps\\CSharp\\Logistics\\LogisticsConsoleApp
+		SccProjectUniqueName6 = ExampleApps\\CSharp\\LunarLander\\LanderGameLib\\LanderGameLib.csproj
+		SccProjectTopLevelParentUniqueName6 = RLM.sln
+		SccProjectName6 = ExampleApps/CSharp/LunarLander/LanderGameLib
+		SccLocalPath6 = ExampleApps\\CSharp\\LunarLander\\LanderGameLib
+		SccProjectUniqueName7 = ExampleApps\\Tools\\Tools.csproj
+		SccProjectTopLevelParentUniqueName7 = RLM.sln
+		SccProjectName7 = ExampleApps/Tools
+		SccLocalPath7 = ExampleApps\\Tools
+		SccProjectUniqueName8 = ExampleApps\\CSharp\\Maze\\MazeConsoleApp\\MazeConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName8 = RLM.sln
+		SccProjectName8 = ExampleApps/CSharp/Maze/MazeConsoleApp
+		SccLocalPath8 = ExampleApps\\CSharp\\Maze\\MazeConsoleApp
+		SccProjectUniqueName9 = ExampleApps\\CSharp\\Maze\\MazeGameLib\\MazeGameLib.csproj
+		SccProjectTopLevelParentUniqueName9 = RLM.sln
+		SccProjectName9 = ExampleApps/CSharp/Maze/MazeGameLib
+		SccLocalPath9 = ExampleApps\\CSharp\\Maze\\MazeGameLib
+		SccProjectUniqueName10 = ExampleApps\\Python\\LanderConsoleAppPython\\LanderConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName10 = RLM.sln
+		SccProjectName10 = ExampleApps/Python/LanderConsoleAppPython
+		SccLocalPath10 = ExampleApps\\Python\\LanderConsoleAppPython
+		SccProjectUniqueName11 = ExampleApps\\CSharp\\LunarLander\\LanderConsoleApp\\LanderConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName11 = RLM.sln
+		SccProjectName11 = ExampleApps/CSharp/LunarLander/LanderConsoleApp
+		SccLocalPath11 = ExampleApps\\CSharp\\LunarLander\\LanderConsoleApp
+		SccProjectUniqueName12 = ExampleApps\\Python\\LogisticsConsoleAppPython\\LogisticsConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName12 = RLM.sln
+		SccProjectName12 = ExampleApps/Python/LogisticsConsoleAppPython
+		SccLocalPath12 = ExampleApps\\Python\\LogisticsConsoleAppPython
+		SccProjectUniqueName13 = ExampleApps\\CSharp\\Logistics\\LogisticsGameLib\\LogisticsGameLib.csproj
+		SccProjectTopLevelParentUniqueName13 = RLM.sln
+		SccProjectName13 = ExampleApps/CSharp/Logistics/LogisticsGameLib
+		SccLocalPath13 = ExampleApps\\CSharp\\Logistics\\LogisticsGameLib
+		SccProjectUniqueName14 = ExampleApps\\Python\\MazeConsoleAppPython\\MazeConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName14 = RLM.sln
+		SccProjectName14 = ExampleApps/Python/MazeConsoleAppPython
+		SccLocalPath14 = ExampleApps\\Python\\MazeConsoleAppPython
+		SccProjectUniqueName15 = Core\\REST\\RLM.WebAPI\\RLM.WebAPI.csproj
+		SccProjectTopLevelParentUniqueName15 = RLM.sln
+		SccProjectName15 = Core/REST/RLM.WebAPI
+		SccLocalPath15 = Core\\REST\\RLM.WebAPI
+	EndGlobalSection
+EndGlobal
