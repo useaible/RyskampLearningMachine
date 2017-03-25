@@ -1,0 +1,36 @@
+﻿<Window x:Class="WPFMazeApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="582.984" Width="590.667" KeyDown="UI_Send_KeyDown" Loaded="Window_Loaded">
+
+    <StackPanel Margin="0,0,0,-4">
+        <Grid x:Name="MainGrid" Height="471">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="487*"/>
+                <RowDefinition Height="37*"/>
+            </Grid.RowDefinitions>
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" HorizontalAlignment="Left" Width="583" Background="Black">
+                <Grid x:Name="mazeGrid" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            </Border>
+            <Grid x:Name="statGrid" HorizontalAlignment="Left" Margin="0,0,0,-81" Grid.Row="1" Width="583" Visibility="Hidden">
+                <Label x:Name="label01" Content="Maze:" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblMazeName" Content="New Maze (01)" HorizontalAlignment="Left" Margin="56,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy1" Content="# of Sessions:" HorizontalAlignment="Left" Margin="210,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblTotalSession" Content="0" HorizontalAlignment="Left" Margin="298,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy" Content="Randomness left:" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblRandomness" Content="0%" HorizontalAlignment="Left" Margin="116,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy2" Content="Current session:" HorizontalAlignment="Left" Margin="210,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblCurrentSession" Content="0" HorizontalAlignment="Left" Margin="309,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy3" Content="Last session moves:" HorizontalAlignment="Left" Margin="389,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblMoves" Content="0" HorizontalAlignment="Left" Margin="507,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy4" Content="Last session score:" HorizontalAlignment="Left" Margin="389,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblScore" Content="0" HorizontalAlignment="Left" Margin="500,34,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label01_Copy5" Content="Last session % of&#xD;&#xA;bumped into wall:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblBumpedIntoWall" Content="0%" HorizontalAlignment="Left" Margin="120,65,0,0" VerticalAlignment="Top" Width="81" Height="42"/>
+            </Grid>
+            <Label x:Name="StatusText" Content="Using the arrow keys, guide the cursor through the maze and into the green goal." HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Grid.Row="1" Visibility="Hidden"/>
+
+        </Grid>
+    </StackPanel>
+</Window>

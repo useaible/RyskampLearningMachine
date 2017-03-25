@@ -48,6 +48,28 @@ namespace MazeGameLib
 
             tmr.Elapsed += Tmr_Elapsed;
         }
+        // for window version
+        public RLMMazeTraveler(MazeInfo maze, MazeGame gameref, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, SetRandomnessLeftDelegate setRandomnessLeft = null)
+            : base(gameref)
+        {
+            Learn = learn;
+            GameRef.GameStartEvent += GameRef_GameStartEvent;
+            GameRef.GameCycleEvent += GameRef_GameCycleEvent;
+            //GameRef.GameOverEvent += GameRef_GameOverEvent;
+
+            rlmNet = CreateOrLoadNetwork(maze);
+
+            // Temporary, while RFactor not yet implemented
+            rlmNet.NumSessions = numSessions;
+            rlmNet.StartRandomness = startRandomness;
+            rlmNet.EndRandomness = endRandomness;
+
+            rlmNet.CycleComplete += Rlm_net_CycleComplete;
+
+            SetRandomnessLeft = setRandomnessLeft;
+
+            tmr.Elapsed += Tmr_Elapsed;
+        }
 
         private int timeout = 0;
         private System.Timers.Timer tmr = new System.Timers.Timer();
@@ -156,6 +178,7 @@ namespace MazeGameLib
 
                 // queue AI's output - the Direction the AI will go
                 GameRef.DirectionsStack.Enqueue(aiOutput);
+            
             }
         }
 

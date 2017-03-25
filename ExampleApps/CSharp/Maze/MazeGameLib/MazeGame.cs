@@ -92,6 +92,36 @@ namespace MazeGameLib
             }
         }
 
+        public void StartGame(Traveler SpecificTraveler = null, int currentIteration = 1, bool windowless = false)
+        {
+            //Set Default Traveler
+            if (SpecificTraveler == null)
+            {
+                //Default traveler is human for now
+                //traveler = new HumanTraveler(this);
+            }
+            else
+            {
+                traveler = SpecificTraveler;
+            }
+
+            //Initial Location
+            traveler.location.X = OldLocation.X;
+            traveler.location.Y = OldLocation.Y;
+
+            //Fire GameStart Event
+            if (GameStartEvent != null) GameStartEvent(traveler, currentIteration);
+
+            Thread GameLoopThread = new Thread(() => { this.GameLoop(); });
+            GameLoopThread.Start();
+           
+        }
+
+        public void ResetGame()
+        {
+
+        }
+
         public void StartGame(EncogMaze encogMaze)
         {
             // set traveler
@@ -138,6 +168,7 @@ namespace MazeGameLib
 
                         //Event
                         if (GameOverEvent != null) GameOverEvent(FinalOutcome);
+                        
                     }
                 }
                 else

@@ -57,7 +57,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UtilityTools", "UtilityTool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TotalRecallConsoleApp", "ExampleApps\UtilityTools\TotalRecallConsoleApp\TotalRecallConsoleApp.csproj", "{975DE603-3A3A-486D-A3FD-AE8AFEB2E3E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsChecklistTool", "ExampleApps\UtilityTools\RequirementsChecklistTool\RequirementsChecklistTool.csproj", "{A6082C73-D431-4841-8815-B675E0CF7526}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsTool", "ExampleApps\UtilityTools\RequirementsChecklistTool\RequirementsTool.csproj", "{A6082C73-D431-4841-8815-B675E0CF7526}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMazeApp", "ExampleApps\CSharp\Maze\WPFMazeApp\WPFMazeApp.csproj", "{4DCE8890-5A0F-4C04-9D24-A7404844E17D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,6 +129,10 @@ Global
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,5 +164,84 @@ Global
 		{C3D5291E-BAC3-491A-A823-AD279820AFB5} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
 		{975DE603-3A3A-486D-A3FD-AE8AFEB2E3E8} = {C3D5291E-BAC3-491A-A823-AD279820AFB5}
 		{A6082C73-D431-4841-8815-B675E0CF7526} = {C3D5291E-BAC3-491A-A823-AD279820AFB5}
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D} = {7993561B-46FF-4C61-822E-F68412C0505A}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 18
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://rixryskamp.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Core\\RLM\\RLM\\RLM.csproj
+		SccProjectTopLevelParentUniqueName1 = RLM.sln
+		SccProjectName1 = Core/RLM/RLM
+		SccLocalPath1 = Core\\RLM\\RLM
+		SccProjectUniqueName2 = Core\\RLM\\RLM.Database\\RLM.Database.csproj
+		SccProjectTopLevelParentUniqueName2 = RLM.sln
+		SccProjectName2 = Core/RLM/RLM.Database
+		SccLocalPath2 = Core\\RLM\\RLM.Database
+		SccProjectUniqueName3 = Core\\RLM\\RLM.Memory\\RLM.Memory.csproj
+		SccProjectTopLevelParentUniqueName3 = RLM.sln
+		SccProjectName3 = Core/RLM/RLM.Memory
+		SccLocalPath3 = Core\\RLM\\RLM.Memory
+		SccProjectUniqueName4 = Core\\RLM\\RLM.Models\\RLM.Models.csproj
+		SccProjectTopLevelParentUniqueName4 = RLM.sln
+		SccProjectName4 = Core/RLM/RLM.Models
+		SccLocalPath4 = Core\\RLM\\RLM.Models
+		SccProjectUniqueName5 = ExampleApps\\CSharp\\Logistics\\LogisticsConsoleApp\\LogisticsConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName5 = RLM.sln
+		SccProjectName5 = ExampleApps/CSharp/Logistics/LogisticsConsoleApp
+		SccLocalPath5 = ExampleApps\\CSharp\\Logistics\\LogisticsConsoleApp
+		SccProjectUniqueName6 = ExampleApps\\CSharp\\LunarLander\\LanderGameLib\\LanderGameLib.csproj
+		SccProjectTopLevelParentUniqueName6 = RLM.sln
+		SccProjectName6 = ExampleApps/CSharp/LunarLander/LanderGameLib
+		SccLocalPath6 = ExampleApps\\CSharp\\LunarLander\\LanderGameLib
+		SccProjectUniqueName7 = ExampleApps\\Tools\\Tools.csproj
+		SccProjectTopLevelParentUniqueName7 = RLM.sln
+		SccProjectName7 = ExampleApps/Tools
+		SccLocalPath7 = ExampleApps\\Tools
+		SccProjectUniqueName8 = ExampleApps\\CSharp\\Maze\\MazeConsoleApp\\MazeConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName8 = RLM.sln
+		SccProjectName8 = ExampleApps/CSharp/Maze/MazeConsoleApp
+		SccLocalPath8 = ExampleApps\\CSharp\\Maze\\MazeConsoleApp
+		SccProjectUniqueName9 = ExampleApps\\CSharp\\Maze\\MazeGameLib\\MazeGameLib.csproj
+		SccProjectTopLevelParentUniqueName9 = RLM.sln
+		SccProjectName9 = ExampleApps/CSharp/Maze/MazeGameLib
+		SccLocalPath9 = ExampleApps\\CSharp\\Maze\\MazeGameLib
+		SccProjectUniqueName10 = ExampleApps\\Python\\LanderConsoleAppPython\\LanderConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName10 = RLM.sln
+		SccProjectName10 = ExampleApps/Python/LanderConsoleAppPython
+		SccLocalPath10 = ExampleApps\\Python\\LanderConsoleAppPython
+		SccProjectUniqueName11 = ExampleApps\\CSharp\\LunarLander\\LanderConsoleApp\\LanderConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName11 = RLM.sln
+		SccProjectName11 = ExampleApps/CSharp/LunarLander/LanderConsoleApp
+		SccLocalPath11 = ExampleApps\\CSharp\\LunarLander\\LanderConsoleApp
+		SccProjectUniqueName12 = ExampleApps\\Python\\LogisticsConsoleAppPython\\LogisticsConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName12 = RLM.sln
+		SccProjectName12 = ExampleApps/Python/LogisticsConsoleAppPython
+		SccLocalPath12 = ExampleApps\\Python\\LogisticsConsoleAppPython
+		SccProjectUniqueName13 = ExampleApps\\CSharp\\Logistics\\LogisticsGameLib\\LogisticsGameLib.csproj
+		SccProjectTopLevelParentUniqueName13 = RLM.sln
+		SccProjectName13 = ExampleApps/CSharp/Logistics/LogisticsGameLib
+		SccLocalPath13 = ExampleApps\\CSharp\\Logistics\\LogisticsGameLib
+		SccProjectUniqueName14 = ExampleApps\\Python\\MazeConsoleAppPython\\MazeConsoleAppPython.pyproj
+		SccProjectTopLevelParentUniqueName14 = RLM.sln
+		SccProjectName14 = ExampleApps/Python/MazeConsoleAppPython
+		SccLocalPath14 = ExampleApps\\Python\\MazeConsoleAppPython
+		SccProjectUniqueName15 = Core\\REST\\RLM.WebAPI\\RLM.WebAPI.csproj
+		SccProjectTopLevelParentUniqueName15 = RLM.sln
+		SccProjectName15 = Core/REST/RLM.WebAPI
+		SccLocalPath15 = Core\\REST\\RLM.WebAPI
+		SccProjectUniqueName16 = ExampleApps\\UtilityTools\\TotalRecallConsoleApp\\TotalRecallConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName16 = RLM.sln
+		SccProjectName16 = ExampleApps/UtilityTools/TotalRecallConsoleApp
+		SccLocalPath16 = ExampleApps\\UtilityTools\\TotalRecallConsoleApp
+		SccProjectUniqueName17 = ExampleApps\\UtilityTools\\RequirementsChecklistTool\\RequirementsTool.csproj
+		SccProjectTopLevelParentUniqueName17 = RLM.sln
+		SccProjectName17 = ExampleApps/UtilityTools/RequirementsChecklistTool
+		SccLocalPath17 = ExampleApps\\UtilityTools\\RequirementsChecklistTool
+		SccProjectUniqueName16 = ExampleApps\\CSharp\\Maze\\WPFMazeApp\\WPFMazeApp.csproj
+		SccProjectTopLevelParentUniqueName16 = RLM.sln
+		SccProjectName16 = ExampleApps/CSharp/Maze/WPFMazeApp
+		SccLocalPath16 = ExampleApps\\CSharp\\Maze\\WPFMazeApp
 	EndGlobalSection
 EndGlobal

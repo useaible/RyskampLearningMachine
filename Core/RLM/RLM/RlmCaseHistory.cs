@@ -10,6 +10,7 @@ namespace RLM
     public class RlmCaseHistory
     {
         public long Id { get; set; }
+        public long RowNumber { get; set; }
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeStop { get; set; }
         public double CycleScore { get; set; }
