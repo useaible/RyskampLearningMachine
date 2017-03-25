@@ -74,7 +74,10 @@ namespace RLM.Memory
 
         private CancellationTokenSource ctSourceCases;
         private CancellationToken tokenCases;
-
+        /// <summary>
+        /// Initializes memory manager
+        /// </summary>
+        /// <param name="databaseName">datbase name</param>
         public Manager(string databaseName)
         {
             DabaseName = databaseName;
@@ -92,7 +95,13 @@ namespace RLM.Memory
             ctSourceCases = new CancellationTokenSource();
             tokenCases = ctSourceCases.Token;
         }
-
+        /// <summary>
+        /// Save created network
+        /// </summary>
+        /// <param name="rnetwork">current rnetwork</param>
+        /// <param name="io_type">type of input and output</param>
+        /// <param name="inputs">List of inputs</param>
+        /// <param name="outputs">List of outputs</param>
         public void NewNetwork(Rnetwork rnetwork, Input_Output_Type io_type, List<Input> inputs, List<Output> outputs)
         {
             //todo: rnn dbmanager and save
@@ -120,9 +129,16 @@ namespace RLM.Memory
         }
 
         private System.Diagnostics.Stopwatch dbSavingTime = new System.Diagnostics.Stopwatch();
+        /// <summary>
+        /// Save the new network and send it to a task. It also starts the database workers
+        /// </summary>
+        /// <param name="rnetwork"></param>
+        /// <param name="io_types"></param>
+        /// <param name="inputs"></param>
+        /// <param name="outputs"></param>
+        /// <param name="rnn_net"></param>
         public void NewNetwork(Rnetwork rnetwork, List<Input_Output_Type> io_types, List<Input> inputs, List<Output> outputs, IRlmNetwork rnn_net)
         {
-            return;
             //todo: rnn dbmanager and save
             dbSavingTime.Start();
 
@@ -166,7 +182,12 @@ namespace RLM.Memory
             //Rneurons = new ConcurrentDictionary<long, Rneuron>();
             //Solutions = new ConcurrentDictionary<long, Solution>();
         }
-
+        /// <summary>
+        /// Add the session to queue
+        /// </summary>
+        /// <param name="key">session Id</param>
+        /// <param name="session">current session</param>
+        /// <returns></returns>
         public bool AddSessionToQueue(long key, Session session)
         {
             bool retVal = false;
@@ -181,7 +202,11 @@ namespace RLM.Memory
 
             return retVal;
         }
-
+        /// <summary>
+        /// Add session to be updated to queue
+        /// </summary>
+        /// <param name="session">current session</param>
+        /// <returns></returns>
         public bool AddSessionUpdateToQueue(Session session)
         {
             bool retVal = false;
@@ -197,7 +222,11 @@ namespace RLM.Memory
 
             return retVal;
         }
-
+        /// <summary>
+        /// Add case to queue
+        /// </summary>
+        /// <param name="key">cycle Id</param>
+        /// <param name="c_case">current case</param>
         public void AddCaseToQueue(long key, Case c_case)
         {
             Cases.Add(c_case);
@@ -206,7 +235,12 @@ namespace RLM.Memory
 
             Cases2.Enqueue(c_case);
         }
-
+        /// <summary>
+        /// Gets existing Rneuron and creates a new one if not existing
+        /// </summary>
+        /// <param name="inputs">Inputs with value</param>
+        /// <param name="rnetworkID">Current NetworkId</param>
+        /// <returns></returns>
         public GetRneuronResult GetRneuronFromInputs(IEnumerable<RlmIOWithValue> inputs, long rnetworkID)
         {
             GetRneuronResult retVal = new GetRneuronResult();
@@ -296,7 +330,10 @@ namespace RLM.Memory
 
             return retVal;
         }
-
+        /// <summary>
+        /// Sets the Rneuron
+        /// </summary>
+        /// <param name="rneuron"></param>
         public void SetRneuronWithInputs(Rneuron rneuron)
         {
             var rneuronId = rneuron.ID;
@@ -350,7 +387,13 @@ namespace RLM.Memory
 
             lastInputValue.RneuronId = rneuronId;
         }
-
+        /// <summary>
+        /// Gets best Solution
+        /// </summary>
+        /// <param name="inputs"></param>
+        /// <param name="linearTolerance"></param>
+        /// <param name="predict"></param>
+        /// <returns></returns>
         public Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double linearTolerance = 0, bool predict = false)
         {
             Solution retVal = null;
@@ -526,7 +569,10 @@ namespace RLM.Memory
 
             return retVal;
         }
-
+        /// <summary>
+        /// Sets best solution
+        /// </summary>
+        /// <param name="bestSolution"></param>
         public void SetBestSolution(BestSolution bestSolution)
         {
             Dictionary<long, BestSolution> innerBestSolutions;
@@ -541,7 +587,13 @@ namespace RLM.Memory
                 BestSolutions.TryAdd(bestSolution.RneuronId, innerBestSolutions);
             }
         }
-
+        /// <summary>
+        /// Gets a random solution from outputs or randomize 
+        /// </summary>
+        /// <param name="randomnessCurrVal"></param>
+        /// <param name="outputs"></param>
+        /// <param name="bestSolutionId"></param>
+        /// <returns></returns>
         public GetSolutionResult GetRandomSolutionFromOutput(double randomnessCurrVal, IEnumerable<RlmIO> outputs, long? bestSolutionId = null)
         {
             GetSolutionResult retVal = null;
@@ -605,7 +657,11 @@ namespace RLM.Memory
 
             return retVal;
         }
-
+        /// <summary>
+        /// Gets solution and record ideal score
+        /// </summary>
+        /// <param name="outputs"></param>
+        /// <returns></returns>
         public GetSolutionResult GetSolutionFromOutputs(IEnumerable<RlmIOWithValue> outputs)
         {
             GetSolutionResult retVal = new GetSolutionResult();
@@ -657,7 +713,10 @@ namespace RLM.Memory
 
             return retVal; 
         }
-
+        /// <summary>
+        /// Sets solution and cache
+        /// </summary>
+        /// <param name="solution">solution</param>
         public void SetSolutionWithOutputs(Solution solution)
         {
             long solutionId = solution.ID;
@@ -748,7 +807,9 @@ namespace RLM.Memory
         private Task sessionUpdateTask;
         private Task caseTask;
         private int dbSaveTaskDelay = 25;
-
+        /// <summary>
+        /// starts database workers that handle queue's
+        /// </summary>
         public void StartRlmDbWorkers()
         {
             //note: we can start multiple workers later
@@ -800,6 +861,9 @@ namespace RLM.Memory
 
         private bool sessionsDone = false;
         private int totalSessionsCount = 0;
+        /// <summary>
+        /// stops the session queue worker
+        /// </summary>
         public void StopRlmDbWorkersSessions()
         {
             session_queue.CompleteAdding();
@@ -811,7 +875,9 @@ namespace RLM.Memory
             sessionsDone = true;
             totalSessionsCount = Sessions.Count;
         }
-
+        /// <summary>
+        /// stops the cases queue worker
+        /// </summary>
         public void StopRlmDbWorkersCases()
         {
             case_queue.CompleteAdding();
@@ -831,7 +897,11 @@ namespace RLM.Memory
                 RlmDbLogger.Info("\n" + string.Format("[{0:G}]: {1} database successfully dropped...\n*** END ***\n", DateTime.Now, DabaseName), DabaseName);
             }
         }
-
+        /// <summary>
+        /// Loads the network result
+        /// </summary>
+        /// <param name="network"></param>
+        /// <returns></returns>
         public LoadRnetworkResult LoadNetwork(IRlmNetwork network)
         {
             var result = rlmDb.LoadNetwork(NetworkName, network);
@@ -841,7 +911,9 @@ namespace RLM.Memory
             }
             return result;
         }
-
+        /// <summary>
+        /// signals that training is done
+        /// </summary>
         public void TrainingDone()
         {
             rlmDb.TaskDelay = dbSaveTaskDelay;

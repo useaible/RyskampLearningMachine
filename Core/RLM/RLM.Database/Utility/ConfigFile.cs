@@ -46,14 +46,10 @@ namespace RLM.Database.Utility
             {
                 var retVal = false;
 
-                string strlogLvl = ConfigurationManager.AppSettings["rnnDropDb"];
+                string strlogLvl = ConfigurationManager.AppSettings["RLMDropDb"];
                 if (!string.IsNullOrEmpty(strlogLvl))
                 {
-                    retVal = Convert.ToBoolean(ConfigurationManager.AppSettings["rnnDropDb"]);
-                }
-                else
-                {
-                    retVal = true;
+                    retVal = Convert.ToBoolean(ConfigurationManager.AppSettings["RLMDropDb"]);
                 }
 
                 return retVal;

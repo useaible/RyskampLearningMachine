@@ -19,9 +19,37 @@ namespace RLM.Database
     [DbConfigurationType(typeof(ContextConfiguration))]
     public class RlmDbEntities : DbContext
     {
-        private const string DEFAULT_RLM_DB_NAME = "RyskampLearningMachines";
+        public const string DEFAULT_RLM_DBNAME = "RyskampLearningMachines";
         public const string MASTER_DB = "master";
+        private const string DBNAME_PLACEHOLDER = "{{dbName}}";
+        public string DatabaseName { get; private set; }
 
+        public virtual DbSet<Rnetwork> Rnetworks { get; set; }
+        public virtual DbSet<Rneuron> Rneurons { get; set; }
+        public virtual DbSet<Session> Sessions { get; set; }
+        public virtual DbSet<Case> Cases { get; set; }
+        public virtual DbSet<Solution> Solutions { get; set; }
+        public virtual DbSet<Idea_Implementation> Idea_Implementations { get; set; }
+        public virtual DbSet<Idea_Module> Idea_Modules { get; set; }
+        public virtual DbSet<RnetworkSetting> RnetworkSettings { get; set; }
+        public virtual DbSet<Input_Output_Type> Input_Output_Types { get; set; }
+        public virtual DbSet<Input> Inputs { get; set; }
+        public virtual DbSet<Input_Values_Rneuron> Input_Values_Reneurons { get; set; }
+        public virtual DbSet<Output> Outputs { get; set; }
+        public virtual DbSet<Output_Values_Solution> Output_Values_Solutions { get; set; }
+
+        #region Static
+        static RlmDbEntities()
+        {
+            if (string.IsNullOrEmpty(ConnStr))
+            {
+                connStr = DetermineSQLConnectionString();
+            }
+
+            CreateRLMFoldersIfNotExists();
+            CreateRLMTemplateDB();
+        }
+        
         public static string DefaultRLMTemplateDb
         {
             get
@@ -36,17 +64,27 @@ namespace RLM.Database
             }
         }
 
-        private static string ConnStr
+        private static string connStr;
+        public static string ConnStr
         {
             get
             {
                 var retVal = string.Empty;
+
+                // tries to get the connection string set in the config file
                 retVal = ConfigurationManager.AppSettings["RLMConnStr"];
+
                 if (string.IsNullOrEmpty(retVal))
                 {
-                    retVal = "Server=.;Database={{dbName}};Integrated Security=True;";
+                    // otherwise, we use the default
+                    retVal = connStr;
                 }
+
                 return retVal;
+            }
+            set
+            {
+                connStr = value;
             }
         }
 
@@ -78,28 +116,7 @@ namespace RLM.Database
             }
         }
 
-        public string DatabaseName { get; private set; }
 
-        public virtual DbSet<Rnetwork> Rnetworks { get; set; }
-        public virtual DbSet<Rneuron> Rneurons { get; set; }
-        public virtual DbSet<Session> Sessions { get; set; }
-        public virtual DbSet<Case> Cases { get; set; }
-        public virtual DbSet<Solution> Solutions { get; set; }
-        public virtual DbSet<Idea_Implementation> Idea_Implementations { get; set; }
-        public virtual DbSet<Idea_Module> Idea_Modules { get; set; }
-        public virtual DbSet<RnetworkSetting> RnetworkSettings { get; set; }
-        public virtual DbSet<Input_Output_Type> Input_Output_Types { get; set; }
-        public virtual DbSet<Input> Inputs { get; set; }
-        public virtual DbSet<Input_Values_Rneuron> Input_Values_Reneurons { get; set; }
-        public virtual DbSet<Output> Outputs { get; set; }
-        public virtual DbSet<Output_Values_Solution> Output_Values_Solutions { get; set; }
-
-        #region Static
-        static RlmDbEntities()
-        {
-            CreateRLMFoldersIfNotExists();
-            CreateRLMTemplateDB();
-        }
 
         public static void CreateRLMFoldersIfNotExists()
         {
@@ -122,17 +139,117 @@ namespace RLM.Database
                 db.BackupDB(DefaultRLMTemplateDb);
             }
         }
+
+        public static string DetermineDbName()
+        {
+            string retVal = DEFAULT_RLM_DBNAME;
+            string sqlExistDb = "select name from sys.databases where name like @p0 + '%'";
+            string sqlConnCount = @"
+                SELECT 
+                    DB_NAME(dbid) as Name, 
+                    COUNT(dbid) as NumConnections
+                FROM
+                    sys.sysprocesses
+                WHERE
+                    dbid > 0 and DB_NAME(dbid) like @p0 + '%'
+                GROUP BY
+                    dbid ";
+
+            using (RlmDbEntities db = new RlmDbEntities(MASTER_DB))
+            {
+                var existDbs = db.Database.SqlQuery<string>(sqlExistDb, DEFAULT_RLM_DBNAME).ToList();
+
+                if (existDbs.Count > 0)
+                {
+                    var dbConnections = db.Database.SqlQuery<RlmDBInfo>(sqlConnCount, DEFAULT_RLM_DBNAME).ToList();
+                    
+                    if (dbConnections.Count > 0)
+                    {
+                        // check for none existing connections
+                        List<string> dbWithConnections = dbConnections.Select(a => a.Name).ToList();
+                        List<string> dbWithoutConnections = existDbs.Except(dbWithConnections).ToList();
+
+                        if (dbWithoutConnections.Count > 0)
+                        {
+                            retVal = dbWithoutConnections.First();
+                            DropDb(db.Database, retVal);
+                        }
+                        else
+                        {
+                            retVal = GetPostfixedDbName(DEFAULT_RLM_DBNAME);
+                        }
+                    }
+                    else if (dbConnections.Count == 0 && existDbs.Count > 0)
+                    {
+                        retVal = existDbs.First();
+                        DropDb(db.Database, retVal);
+                    }
+                }
+            }
+
+            return retVal;
+        }
+
+        private static string GetPostfixedDbName(string dbName)
+        {
+            return dbName + "_" + Guid.NewGuid().ToString("N");
+        }
+
+        private static string DetermineSQLConnectionString()
+        {
+            string connStrSqlExpress = $"Server=.\\sqlexpress;Database={DBNAME_PLACEHOLDER};Integrated Security=True;";
+            string connStrSql = $"Server=.;Database={DBNAME_PLACEHOLDER};Integrated Security=True;";
+
+            // try SQLEXPRESS default connection string
+            string retVal = connStrSqlExpress;
+            if (!TryConnect(retVal.Replace(DBNAME_PLACEHOLDER, MASTER_DB)))
+            {
+                // try NON SQLEXPRESS
+                retVal = connStrSql;
+                if (!TryConnect(retVal.Replace(DBNAME_PLACEHOLDER, MASTER_DB)))
+                {
+                    throw new Exception("Unable to connect to the SQL Server using the default connection strings. Please provide a SQL Connection String on the application config file to override the default.");
+                }
+            }
+
+            return retVal;
+        }
+
+        private static bool TryConnect(string connString)
+        {
+            try
+            {
+                string connStringWithTimeout = connString + "Connect Timeout=5;";
+                using (var conn = new SqlConnection(connStringWithTimeout))
+                {
+                    conn.Open();
+                }
+            }
+            catch (SqlException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void DropDb(System.Data.Entity.Database databaseContext, string databaseName)
+        {
+            string sql = $@"
+                ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                DROP DATABASE [{databaseName}];";
+            databaseContext.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql);
+        }
+
         #endregion
 
         public RlmDbEntities()
-            : base(DEFAULT_RLM_DB_NAME)
         {
-            DatabaseName = DEFAULT_RLM_DB_NAME;
+            DatabaseName = DEFAULT_RLM_DBNAME;
             Initialize();
         }
 
         public RlmDbEntities(string databaseName)
-            : base(ConnStr.Replace("{{dbName}}", databaseName))
         {
             if (string.IsNullOrEmpty(databaseName))
             {
@@ -148,6 +265,16 @@ namespace RLM.Database
         {
             try
             {
+                string connString = ConnStr;
+                if (ConnStr.Contains(DBNAME_PLACEHOLDER))
+                {
+                    Database.Connection.ConnectionString = connString.Replace(DBNAME_PLACEHOLDER, DatabaseName);
+                }
+                else
+                {
+                    Database.Connection.ConnectionString = connString;
+                }
+
                 if (isMasterDb)
                 {
                     System.Data.Entity.Database.SetInitializer<RlmDbEntities>(null);
