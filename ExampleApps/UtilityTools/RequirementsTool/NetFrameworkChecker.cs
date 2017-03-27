@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
-    public class NetFrameworkChecker : FeatureChecker
+    public class NetFrameworkChecker : RegistryChecker
     {
         const string REGISTRY_BASE = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
         const int RELEASEKEY_VALUE_FOR_462 = 394802;
@@ -20,33 +20,17 @@ namespace RequirementsChecklistTool
 
         public override bool Check()
         {
-            HasCorrectVersion = false;
-            Message = $"{Name} version installed is incompatible.";
+            HasCorrectVersion = base.Check();
 
-            var local32Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            var local64Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-
-            try
-            {
-                // try 32 bit
-                CheckRegistry(local32Key);
-
-                if (!HasCorrectVersion)
-                {
-                    // try 64 bit
-                    CheckRegistry(local64Key);
-                }
-            }
-            finally
-            {
-                if (local32Key != null) local32Key.Dispose();
-                if (local64Key != null) local64Key.Dispose();
-            }
-
+            if (!HasCorrectVersion)
+                Message = $"{Name} version installed is incompatible.";
+            
             return HasCorrectVersion;
         }
 
-        private void CheckRegistry(RegistryKey localKey)
+        protected override RegistryHive BaseKey { get; set; } = RegistryHive.LocalMachine;
+
+        protected override void CheckRegistry(RegistryKey localKey)
         {
             using (var rootKey = localKey.OpenSubKey(REGISTRY_BASE))
             {

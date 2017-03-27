@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderConsoleApp", "Example
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderGameLib", "ExampleApps\CSharp\LunarLander\LanderGameLib\LanderGameLib.csproj", "{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "ExampleApps\Tools\Tools.csproj", "{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "ExampleApps\UtilityTools\Tools\Tools.csproj", "{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeConsoleApp", "ExampleApps\CSharp\Maze\MazeConsoleApp\MazeConsoleApp.csproj", "{7C75D2C8-7089-4CE3-9335-59038C0E410E}"
 EndProject
@@ -57,7 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UtilityTools", "UtilityTool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TotalRecallConsoleApp", "ExampleApps\UtilityTools\TotalRecallConsoleApp\TotalRecallConsoleApp.csproj", "{975DE603-3A3A-486D-A3FD-AE8AFEB2E3E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsTool", "ExampleApps\UtilityTools\RequirementsChecklistTool\RequirementsTool.csproj", "{A6082C73-D431-4841-8815-B675E0CF7526}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsTool", "ExampleApps\UtilityTools\RequirementsTool\RequirementsTool.csproj", "{A6082C73-D431-4841-8815-B675E0CF7526}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMazeApp", "ExampleApps\CSharp\Maze\WPFMazeApp\WPFMazeApp.csproj", "{4DCE8890-5A0F-4C04-9D24-A7404844E17D}"
 EndProject

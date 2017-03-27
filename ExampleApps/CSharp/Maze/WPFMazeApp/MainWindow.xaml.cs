@@ -127,13 +127,14 @@ namespace WPFMazeApp
             LastBumpedIntoWallData = 0;
         }
 
-        void Init(MazeInfo maze)
+        async void Init(MazeInfo maze)
         {
+            await Task.Run(() => { 
             ClosedDueToGameOver = false;
             //Setup Blink on UI Thread
             if (BlinkTimer == null)
             {
-                BlinkTimer = new System.Timers.Timer(10);
+                BlinkTimer = new System.Timers.Timer(1);
                 BlinkTimer.Elapsed += Blink_Elapsed;
                 BlinkTimer.Start();
             }
@@ -155,16 +156,19 @@ namespace WPFMazeApp
                 
                 if (Learn)
                 {
-                    lblRandomness.Content = rnn_traveler.RandomnessLeft.ToString("#0.##") + "%";
+                        RunUIThread(() => { lblRandomness.Content = rnn_traveler.RandomnessLeft.ToString("#0.##") + "%"; });
+                        
                     if (CurrentIteration > 1)
                     {
-                        lblBumpedIntoWall.Content = $"{LastBumpedIntoWallData.ToString("#0.##")}%";
+                            RunUIThread(() => { lblBumpedIntoWall.Content = $"{LastBumpedIntoWallData.ToString("#0.##")}%"; });
+                            
                     }
                 }
                 
                 rnn_traveler.MazeCycleError += mazecycle_error;
+                
                 //start game
-                           
+                
                 game.StartGame(rnn_traveler, CurrentIteration);
             }
             else if (Type == PlayerType.Encog)
@@ -176,11 +180,12 @@ namespace WPFMazeApp
             {
                 //game.StartGame();
             }
+            });
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Init(mazeInfo);
+            Init(mazeInfo);    
         }
 
         private void mazecycle_error(string networkName)
@@ -213,12 +218,15 @@ namespace WPFMazeApp
                 StatusText.Content = "The game is over.  The final score is " + final.FinalScore.ToString() + ".  It took " + final.CycleCount.ToString() + " moves to complete the game.";
 
             });
+
             RunUIThread(act);
 
-            ClosedDueToGameOver = true;
+            if (Learn == true)
+            {               
+                ClosedDueToGameOver = true;
 
-            RunUIThread(() => { this.Close(); });
-
+                RunUIThread(() => { this.Close(); });
+            }
 
 
         }

@@ -1,19 +1,8 @@
-﻿using Encog.Engine.Network.Activation;
-using Encog.ML;
-using Encog.ML.Genetic;
-using Encog.ML.Train;
-using Encog.Neural.Networks;
-using Encog.Neural.Networks.Training.Anneal;
-using Encog.Neural.Pattern;
-using LanderGameLib;
-using Tools;
-using RLM.Models.Utility;
+﻿// Copyright 2017 Ryskamp Innovations LLC
+// License Available through the RLM License Agreement
+// https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md
+
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LunarLanderConsoleApp
 {

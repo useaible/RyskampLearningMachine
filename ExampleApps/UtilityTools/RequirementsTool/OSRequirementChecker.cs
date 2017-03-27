@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
     public class OSRequirementChecker : FeatureChecker
     {
         public OSRequirementChecker()
         {
-            Name = "Windows 8 or 10 versions";
+            Name = "Windows 8 or Higher";
             Url = "https://www.microsoft.com/en-us/windows/";
         }
         public override bool Check()
@@ -31,7 +31,7 @@ namespace RequirementsChecklistTool
             if (osVer.StartsWith(win8V) || osVer.StartsWith(win10V1) || osVer.StartsWith(win10V2))
             {
                 HasCorrectVersion = true;
-                Message = $"{Name}... OK";
+                Message = $"{Name}... OK\n";
             }
 
             return HasCorrectVersion;

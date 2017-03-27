@@ -62,7 +62,7 @@
       <Project>{e539bff3-43f1-4957-8586-1f10168ca5d9}</Project>
       <Name>MazeGameLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Tools\Tools.csproj">
+    <ProjectReference Include="..\..\..\UtilityTools\Tools\Tools.csproj">
       <Project>{928f7b86-f0cc-4f5c-b1b3-fcd154111e48}</Project>
       <Name>Tools</Name>
     </ProjectReference>

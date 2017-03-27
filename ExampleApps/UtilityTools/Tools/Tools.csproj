@@ -49,7 +49,7 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\RLM\RLM.Models\RLM.Models.csproj">
+    <ProjectReference Include="..\..\..\Core\RLM\RLM.Models\RLM.Models.csproj">
       <Project>{f603454e-2199-4366-9a2a-08ec30818a0c}</Project>
       <Name>RLM.Models</Name>
     </ProjectReference>

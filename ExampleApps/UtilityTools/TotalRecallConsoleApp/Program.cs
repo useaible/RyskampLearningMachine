@@ -14,9 +14,10 @@ namespace TotalRecallConsoleApp
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine("\n\nOptions: [1] = Unfiltered Results, [2] = W/ Significant Events, [3] = Save As Html, [Esc] = Exit\n\n");
+            Console.WriteLine("\n\nOptions: \n\n[1] = All Games Played \n[2] = All Games W/ Significant Learning \n[3] = Save As Html \n[Esc] = Exit\n\n");
             ConsoleKeyInfo input = Console.ReadKey();
 
             var userInput = 0;
@@ -42,7 +43,7 @@ namespace TotalRecallConsoleApp
             getDbName:
             Console.Write("\n\nEnter database name: ");
 
-            string dbName = Console.ReadLine();
+            string dbName = "RLM_logistic_72ed88be4eaa4b8bb47ef950ee9884f7"; // Console.ReadLine();
 
             if (string.IsNullOrEmpty(dbName))
             {
@@ -80,13 +81,27 @@ namespace TotalRecallConsoleApp
 
             Console.WriteLine("\nRESULTS:\n");
 
+            var histStr = new StringBuilder();
+
+            //Sessions header
+            histStr.AppendLine(string.Format("{0}{1,15}{2,20}{3,33}{4,37}", "Session", "Score", "Start", "End", "Elapse"));
+
             foreach (var h in sessionHistory)
             {
                 Console.WriteLine($"Session: {h.SessionNumber}, Score: {h.SessionScore}, Start: {h.DateTimeStart}, End: {h.DateTimeStop}, Elapse: {h.Elapse}");
+
+                string resultsStr = string.Format("{0}{1,20}{2,30}{3,35}{4,30}", h.SessionNumber, h.SessionScore, h.DateTimeStart, h.DateTimeStop, h.Elapse);
+
+                histStr.AppendLine(resultsStr);
+            }
+
+            if (histStr.Length > 1) {
+                System.Windows.Forms.Clipboard.SetText(histStr.ToString());
+                Console.WriteLine("\n*** Results copied to clipboard! ***");
             }
 
             getSession:
-            Console.WriteLine("\n\nEnter session number to view events.\n\n");
+            Console.Write("\n\nEnter session number to view events. ");
             int session = Convert.ToInt32(Console.ReadLine());
 
             if (session > 0)
@@ -103,26 +118,47 @@ namespace TotalRecallConsoleApp
                 }
 
                 Console.WriteLine("\nEVENTS:\n\n");
+
+                var eventsStr = new StringBuilder();
+
+                //Events header
+                eventsStr.AppendLine(string.Format("{0}{1,15}{2,20}{3,25}{4,27}", "Number", "Score", "Start", "End", "Elapse"));
+
                 foreach (var evt in sessionEvents)
                 {
-                    Console.WriteLine($"Id: {evt.RowNumber}, Score: {evt.CycleScore}, Start: {evt.DateTimeStart}, End: {evt.DateTimeStop}, Elapse: {evt.Elapse}");
+                    Console.WriteLine($"Number: {evt.RowNumber}, Score: {evt.CycleScore}, Start: {evt.DateTimeStart}, End: {evt.DateTimeStop}, Elapse: {evt.Elapse}");
+
+                    string resultStr = string.Format("{0}{1,18}{2,30}{3,25}{4,20}", evt.RowNumber, evt.CycleScore, evt.DateTimeStart, evt.DateTimeStop, evt.Elapse);
+                    eventsStr.AppendLine(resultStr);
+                }
+
+                if (eventsStr.Length > 1)
+                {
+                    System.Windows.Forms.Clipboard.SetText(eventsStr.ToString());
+                    Console.WriteLine("\n*** Events copied to clipboard! ***");
                 }
 
                 getEvt:
-                Console.WriteLine("\n\nEnter event number to view input/output details.\n");
+                Console.Write("\n\nEnter event number to view input/output details. ");
                 int cycle = Convert.ToInt32(Console.ReadLine());
 
                 if (cycle > 0)
                 {
+                    var ioDetailsStr = new StringBuilder();
+
                     var currentCycle = sessionEvents.ElementAt(cycle - 1);
                     var ioDetail = sessionCaseApi.GetCaseIOHistory(currentCycle.Id, currentCycle.RneuronId, currentCycle.SolutionId);
 
                     Console.WriteLine($"\nResults for case number {cycle}");
 
                     Console.WriteLine("\nINPUTS:\n");
+
+                    ioDetailsStr.AppendLine(string.Format("{0}{0,15}", "Name", "Value"));
                     foreach (var cycleIn in ioDetail.Inputs)
                     {
                         Console.WriteLine($"Name: {cycleIn.Name}, Value: {cycleIn.Value}");
+
+                        ioDetailsStr.AppendLine(string.Format("{0}{0,12}", cycleIn.Name, cycleIn.Value));
                     }
 
                     Console.WriteLine("\nOUTPUTS:\n");
@@ -155,7 +191,7 @@ namespace TotalRecallConsoleApp
         private static void GenerateHtmlFile(SessionCaseHistory sessionCaseApi)
         {
             getMode:
-            Console.WriteLine("\nOptions: [1] = Unfiltered Results, [2] = W/ Significant Events");
+            Console.WriteLine("\nOptions: [1] = All Games, [2] = All Games W/ Significant Learning");
             ConsoleKeyInfo userInput = Console.ReadKey();
 
             int mode = 0;

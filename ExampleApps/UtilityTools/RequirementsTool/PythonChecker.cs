@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Win32;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
-    public class PythonChecker : FeatureChecker
+    public class PythonChecker : RegistryChecker
     {
         const string REGISTRY_BASE = @"SOFTWARE\Python\PythonCore";
 
-        private PythonNetChecker pythonNet;
+        public PythonNetChecker PythonNet { get; protected set; }
 
         public PythonChecker()
         {
@@ -21,40 +21,21 @@ namespace RequirementsChecklistTool
             Versions.Add("3.5.2");
             Versions.Add("3.5.3");
 
-            pythonNet = new PythonNetChecker();
+            PythonNet = new PythonNetChecker();
         }
 
         public override bool Check()
         {
-            HasCorrectVersion = false;
-            Message = $"{Name} not installed on your machine.";
+            HasCorrectVersion = base.Check();
 
-            var local32Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32);
-            var local64Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
-
-            try
-            {
-                // try 32 bit
-                CheckRegistry(local32Key);
-
-                if (!HasCorrectVersion)
-                {
-                    // try 64 bit
-                    CheckRegistry(local64Key);
-                }
-            }
-            finally
-            {
-                if (local32Key != null) local32Key.Dispose();
-                if (local64Key != null) local64Key.Dispose();
-            }
-
-            pythonNet.Check();
+            PythonNet.Check();
 
             return HasCorrectVersion;
         }
+        
+        protected override RegistryHive BaseKey { get; set; } = RegistryHive.CurrentUser;
 
-        private void CheckRegistry(RegistryKey localKey)
+        protected override void CheckRegistry(RegistryKey localKey)
         {
             using (var pythonCore = localKey.OpenSubKey(REGISTRY_BASE))
             {
@@ -69,18 +50,21 @@ namespace RequirementsChecklistTool
                             {
                                 using (var installedFeaturesKey = subKey.OpenSubKey("InstalledFeatures"))
                                 {
-                                    var value = installedFeaturesKey.GetValue("exe");
-                                    if (value != null)
+                                    if (installedFeaturesKey != null)
                                     {
-                                        var version = value.ToString().Substring(0, 5);
-                                        foreach (var reqVersion in Versions)
+                                        var value = installedFeaturesKey.GetValue("exe");
+                                        if (value != null)
                                         {
-                                            if (reqVersion == version)
+                                            var version = value.ToString().Substring(0, 5);
+                                            foreach (var reqVersion in Versions)
                                             {
-                                                HasCorrectVersion = true;
-                                                Message = $"{Name}... OK";
-                                                pythonNet.PythonKeyPath = subKeyName;
-                                                break;
+                                                if (reqVersion == version)
+                                                {
+                                                    HasCorrectVersion = true;
+                                                    Message = $"{Name}... OK";
+                                                    PythonNet.PythonKeyPath = subKeyName;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -103,7 +87,7 @@ namespace RequirementsChecklistTool
         {
             var sb = new StringBuilder();
             sb.AppendLine(base.ToString());
-            sb.AppendLine(pythonNet.ToString());
+            sb.Append(PythonNet.ToString());
             return sb.ToString();
         }
     }

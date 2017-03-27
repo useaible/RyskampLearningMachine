@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
     public class RAMRequirementChecker : FeatureChecker
     {
         public RAMRequirementChecker()
         {
-            Name = "RAM >= 2Gb";
+            Name = "RAM 2Gb or Higher";
         }
 
         public override bool Check()
@@ -28,7 +28,7 @@ namespace RequirementsChecklistTool
             if (totalMemoryGb >= 2)
             {
                 HasCorrectVersion = true;
-                Message = $"{Name}... OK";
+                Message = $"{Name}... OK\n";
             }
 
             return HasCorrectVersion;

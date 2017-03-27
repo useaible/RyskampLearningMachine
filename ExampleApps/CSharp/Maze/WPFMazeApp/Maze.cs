@@ -21,7 +21,7 @@ namespace WPFMazeApp
         {
             ParentGame = parentgame;
             grid = grd;
-
+   
             //Setup the UI Grid
             for (int x = 0; x < ParentGame.Width; x++)
             {
@@ -87,6 +87,11 @@ namespace WPFMazeApp
 
             try
             {
+                var steelblues = grid.Children.Cast<Rectangle>().Where(x => x.Fill == System.Windows.Media.Brushes.SteelBlue);
+                foreach(var blue in steelblues)
+                {
+                    blue.Fill = System.Windows.Media.Brushes.White;
+                }
                 rect = grid.Children
                      .Cast<Rectangle>()
                      .First(e => Grid.GetRow(e) == loc.Y && Grid.GetColumn(e) == loc.X);

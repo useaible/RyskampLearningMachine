@@ -18,7 +18,7 @@
                     <ComboBox x:Name="cmbPlayer" HorizontalAlignment="Left" Margin="44,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Grid.Column="1">
                         <ComboBoxItem Content="Human"/>
                         <ComboBoxItem Content="RNN"/>
-                        <ComboBoxItem Content="Encog"/>
+                        <ComboBoxItem Content="Encog" Visibility="Hidden"/>
                     </ComboBox>
                     <Label x:Name="label_Copy" Content="Choose maze:" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" IsEnabled="False" Grid.ColumnSpan="2"/>
                     <ComboBox x:Name="comboBoxMazePlay" HorizontalAlignment="Left" Margin="44,41,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" SelectionChanged="comboBoxMazePlay_SelectionChanged" Loaded="comboBoxMazePlay_Loaded" Grid.Column="1"/>
@@ -90,7 +90,7 @@
                     <Button x:Name="btnDeleteMaze" Content="Delete Maze" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" Width="100" Height="20" Grid.Column="1" Grid.Row="2" Click="btnDeleteMaze_Click"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Encog Learn" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="81" Margin="-55,0,0,0">
+            <TabItem Header="Encog Learn" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="81" Margin="-55,0,0,0" IsEnabled="False">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>

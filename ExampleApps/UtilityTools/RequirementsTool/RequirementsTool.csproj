@@ -83,10 +83,13 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FeatureChecker.cs" />
+    <Compile Include="IISChecker.cs" />
+    <Compile Include="IISExpressChecker.cs" />
     <Compile Include="NetFrameworkChecker.cs" />
     <Compile Include="OSRequirementChecker.cs" />
     <Compile Include="Program.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="PythonChecker.cs" />
     <Compile Include="RAMRequirementChecker.cs" />
     <Compile Include="PythonNetChecker.cs" />
+    <Compile Include="RegistryChecker.cs" />
     <Compile Include="SQLServerChecker.cs" />
     <Compile Include="VisualStudioChecker.cs" />
   </ItemGroup>

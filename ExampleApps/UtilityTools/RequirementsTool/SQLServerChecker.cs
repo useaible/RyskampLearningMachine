@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
-    public class SQLServerChecker : FeatureChecker
+    public class SQLServerChecker : RegistryChecker
     {
         const string REGISTRY_BASE_FOR_INSTANCES = @"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL\";
         const string REGISTRY_BASE_FOR_SQLSERVER_INSTANCE_VERSION = @"SOFTWARE\Microsoft\Microsoft SQL Server\{{instanceName}}\MSSQLServer\CurrentVersion";
@@ -19,35 +19,9 @@ namespace RequirementsChecklistTool
             Versions.Add("SQL Server 2014 or later");
         }
 
-        public override bool Check()
-        {
-            HasCorrectVersion = false;
-            Message = $"{Name} is not installed on your machine.";
+        protected override RegistryHive BaseKey { get; set; } = RegistryHive.LocalMachine;
 
-            var local32Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            var local64Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            
-            try
-            {
-                // try 32 bit
-                CheckRegistry(local32Key);
-
-                if (!HasCorrectVersion)
-                {
-                    // try 64 bit
-                    CheckRegistry(local64Key);
-                }
-            }
-            finally
-            {
-                if (local32Key != null) local32Key.Dispose();
-                if (local64Key != null) local64Key.Dispose();
-            }
-
-            return HasCorrectVersion;
-        }
-
-        private void CheckRegistry(RegistryKey localkey)
+        protected override void CheckRegistry(RegistryKey localkey)
         {
             using (var rootKey = localkey.OpenSubKey(REGISTRY_BASE_FOR_INSTANCES))
             {

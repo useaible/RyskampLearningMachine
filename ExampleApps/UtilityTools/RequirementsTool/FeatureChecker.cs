@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
     public abstract class FeatureChecker
     {

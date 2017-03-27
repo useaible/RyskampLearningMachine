@@ -5,9 +5,9 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace RequirementsChecklistTool
+namespace RequirementsTool
 {
-    public class VisualStudioChecker : FeatureChecker
+    public class VisualStudioChecker : RegistryChecker
     {
         const string REGISTRY_BASE_VS = @"SOFTWARE\Microsoft\VisualStudio";
         const string REGISTRY_VS_SETUP = @"{{versionNumber}}\Setup";
@@ -22,35 +22,9 @@ namespace RequirementsChecklistTool
             Versions.Add("2015 or later");
         }
 
-        public override bool Check()
-        {
-            HasCorrectVersion = false;
-            Message = $"{Name} is not installed on your machine.";
+        protected override RegistryHive BaseKey { get; set; } = RegistryHive.LocalMachine;
 
-            var local32Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            var local64Key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-
-            try
-            {
-                // try 32 bit
-                CheckRegistry(local32Key);
-
-                if (!HasCorrectVersion)
-                {
-                    // try 64 bit
-                    CheckRegistry(local64Key);
-                }
-            }
-            finally
-            {
-                if (local32Key != null) local32Key.Dispose();
-                if (local64Key != null) local64Key.Dispose();
-            }
-
-            return HasCorrectVersion;
-        }
-
-        private void CheckRegistry(RegistryKey localkey)
+        protected override void CheckRegistry(RegistryKey localkey)
         {
             using (var rootKey = localkey.OpenSubKey(REGISTRY_BASE_VS))
             {
