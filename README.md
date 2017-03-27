@@ -1,6 +1,6 @@
-#<center>Ryskamp Learning Machine </center>
+# <center>Ryskamp Learning Machine</center> #
 
-<center>![Seven-breakthroughs](//IntroImage.jpg)</center>
+<center>![Seven-breakthroughs](.//IntroImage.jpg)</center>
 
 
 ## Introduction ##
