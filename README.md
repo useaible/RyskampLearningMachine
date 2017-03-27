@@ -28,5 +28,5 @@ In a traditional neural network, you must often configure many settings in order
 
 
 ----------
-This is covered by the License [Here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md).
-One or more Patents are still Pending for the Methods and Systems Disclosed in this Code.
+This is covered by the license [here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md).
+One or more patents are still pending for the methods and systems disclosed in this code.
