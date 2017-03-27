@@ -43,7 +43,7 @@ namespace TotalRecallConsoleApp
             getDbName:
             Console.Write("\n\nEnter database name: ");
 
-            string dbName = "RLM_logistic_72ed88be4eaa4b8bb47ef950ee9884f7"; // Console.ReadLine();
+            string dbName = Console.ReadLine();
 
             if (string.IsNullOrEmpty(dbName))
             {
@@ -122,6 +122,7 @@ namespace TotalRecallConsoleApp
                 var eventsStr = new StringBuilder();
 
                 //Events header
+                eventsStr.AppendLine($"[Events for Session# {currentSession.SessionNumber}]\n");
                 eventsStr.AppendLine(string.Format("{0}{1,15}{2,20}{3,25}{4,27}", "Number", "Score", "Start", "End", "Elapse"));
 
                 foreach (var evt in sessionEvents)
@@ -135,10 +136,13 @@ namespace TotalRecallConsoleApp
                 if (eventsStr.Length > 1)
                 {
                     System.Windows.Forms.Clipboard.SetText(eventsStr.ToString());
-                    Console.WriteLine("\n*** Events copied to clipboard! ***");
+                    Console.WriteLine("\n*** Results copied to clipboard! ***");
                 }
 
                 getEvt:
+
+                eventsStr = new StringBuilder();
+
                 Console.Write("\n\nEnter event number to view input/output details. ");
                 int cycle = Convert.ToInt32(Console.ReadLine());
 
@@ -149,22 +153,40 @@ namespace TotalRecallConsoleApp
                     var currentCycle = sessionEvents.ElementAt(cycle - 1);
                     var ioDetail = sessionCaseApi.GetCaseIOHistory(currentCycle.Id, currentCycle.RneuronId, currentCycle.SolutionId);
 
+                    eventsStr.AppendLine($"[Session# {currentSession.SessionNumber}, Case# {currentCycle.RowNumber}]\n");
+                    eventsStr.AppendLine(string.Format("{0}{1,15}{2,20}{3,25}{4,27}", "Number", "Score", "Start", "End", "Elapse"));
+
+                    string resultStr = string.Format("{0}{1,18}{2,30}{3,25}{4,20}", currentCycle.RowNumber, currentCycle.CycleScore, currentCycle.DateTimeStart, currentCycle.DateTimeStop, currentCycle.Elapse);
+
+                    eventsStr.AppendLine(resultStr);
+
                     Console.WriteLine($"\nResults for case number {cycle}");
 
                     Console.WriteLine("\nINPUTS:\n");
+                    ioDetailsStr.AppendLine("\n\n[INPUTS:]\n");
 
-                    ioDetailsStr.AppendLine(string.Format("{0}{0,15}", "Name", "Value"));
                     foreach (var cycleIn in ioDetail.Inputs)
                     {
                         Console.WriteLine($"Name: {cycleIn.Name}, Value: {cycleIn.Value}");
 
-                        ioDetailsStr.AppendLine(string.Format("{0}{0,12}", cycleIn.Name, cycleIn.Value));
+                        ioDetailsStr.AppendLine($"Name: {cycleIn.Name}, Value: {cycleIn.Value}");
                     }
 
                     Console.WriteLine("\nOUTPUTS:\n");
+                    ioDetailsStr.AppendLine("\n\n[OUTPUTS:]\n");
+
                     foreach (var cycleOut in ioDetail.Outputs)
                     {
                         Console.WriteLine($"Name: {cycleOut.Name}, Value: {cycleOut.Value}");
+
+                        ioDetailsStr.AppendLine($"Name: {cycleOut.Name}, Value: {cycleOut.Value}");
+                    }
+
+                    eventsStr.AppendLine(ioDetailsStr.ToString());
+                    if (eventsStr.Length > 1)
+                    {
+                        System.Windows.Forms.Clipboard.SetText(eventsStr.ToString());
+                        Console.WriteLine("\n*** Results copied to clipboard! ***");
                     }
                 }
 

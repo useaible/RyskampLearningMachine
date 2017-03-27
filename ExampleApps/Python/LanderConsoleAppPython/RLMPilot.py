@@ -9,12 +9,12 @@ from System.Collections.Generic import *
 class Pilot(object):
     
     NETWORK_NAME = "lunar lander"
-    network = RlmNetwork()
-
+    network = None
     Learn = False
 
     def __init__(self, learn = False, numSessions = 50, startRandomness = 30, endRandomness = 0, maxLinearBracket = 15, minLinearBracket = 3):
         
+        network = RlmNetwork()
         self.Learn = learn
         dbName = "RLM_lander_" + str(uuid.uuid1()).replace('-', '')
         self.network = RlmNetwork(dbName)

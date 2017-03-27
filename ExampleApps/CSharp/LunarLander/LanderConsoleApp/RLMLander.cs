@@ -1,4 +1,5 @@
 ﻿using LanderGameLib;
+using RLM.Models.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,33 +27,46 @@ namespace LunarLanderConsoleApp
             int minLinearBracket = Util.GetInput("Min linear bracket value [default 3]: ", 3);
             Console.WriteLine();
 
-            var pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket);
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            Console.WriteLine();
-
-            for (int i = 0; i < sessions; i++)
+            try
             {
-                pilot.StartSimulation(i, true);
+                var pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket);
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                Console.WriteLine();
+
+                for (int i = 0; i < sessions; i++)
+                {
+                    pilot.StartSimulation(i, true);
+                }
+
+                pilot.TrainingDone();
+
+                watch.Stop();
+
+                Console.WriteLine($"\nElapsed: {watch.Elapsed}\n");
+
+                int showPredictedOutput = Util.GetInput("Show landing simulation for AI prediction? [No - 0, Yes - 1 default]: ", 1);
+                if (showPredictedOutput == 1)
+                {
+                    pilot.Learn = false;
+                    pilot.StartSimulation(sessions, true);
+
+                    Console.WriteLine("hit enter to continue...");
+                    Console.ReadLine();
+                }
             }
-
-            pilot.TrainingDone();
-
-            watch.Stop();
-
-            Console.WriteLine($"\nElapsed: {watch.Elapsed}\n");
-
-            int showPredictedOutput = Util.GetInput("Show landing simulation for AI prediction? [No - 0, Yes - 1 default]: ", 1);
-            if (showPredictedOutput == 1)
+            catch (Exception e)
             {
-                pilot.Learn = false;
-                pilot.StartSimulation(sessions, true);
-
-                Console.WriteLine("hit enter to continue...");
-                Console.ReadLine();
+                if (e.InnerException != null && e.InnerException is RlmDefaultConnectionStringException)
+                {
+                    Console.WriteLine($"Error: {e.InnerException.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"ERROR: {e.Message}");
+                }
             }
-
         }
     }
 }

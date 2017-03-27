@@ -58,6 +58,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\RLM\RLM.Models\RLM.Models.csproj">
+      <Project>{f603454e-2199-4366-9a2a-08ec30818a0c}</Project>
+      <Name>RLM.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MazeGameLib\MazeGameLib.csproj">
       <Project>{e539bff3-43f1-4957-8586-1f10168ca5d9}</Project>
       <Name>MazeGameLib</Name>

@@ -1,5 +1,6 @@
 ﻿using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -208,7 +209,7 @@ namespace RLM.Database
                 retVal = connStrSql;
                 if (!TryConnect(retVal.Replace(DBNAME_PLACEHOLDER, MASTER_DB)))
                 {
-                    throw new Exception("Unable to connect to the SQL Server using the default connection strings. Please provide a SQL Connection String on the application config file to override the default.");
+                    throw new RlmDefaultConnectionStringException("Unable to connect to the SQL Server using the default connection strings. Please provide a SQL Connection String on the application config file to override the default.");
                 }
             }
 

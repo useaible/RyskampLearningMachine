@@ -6,7 +6,7 @@
     <ProjectGuid>dbf4eb40-c1e7-4e79-b8d5-95f34259a07a</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>Program.py</StartupFile>
-    <SearchPath>..\..\..\Core\RLM\RLM\bin\Debug\;..\..\Maze\MazeGameLib\bin\Debug\</SearchPath>
+    <SearchPath>..\..\..\Core\RLM\RLM\bin\Debug\;..\..\CSharp\Maze\MazeGameLib\bin\Debug\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>MazeConsoleAppPython</Name>

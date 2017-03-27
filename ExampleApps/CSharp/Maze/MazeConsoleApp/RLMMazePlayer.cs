@@ -1,4 +1,5 @@
 ﻿using MazeGameLib;
+using RLM.Models.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,31 +27,45 @@ namespace MazeConsoleApp
 
             Console.WriteLine();
 
-            RLMMazeTraveler traveler = new RLMMazeTraveler(maze, true, randomnessThrough, startRandomness, endRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
-            traveler.SessionComplete += SesionComplete;
-
-            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-
-            //Start the training (Play the game)
-            for (int i = 0; i < randomnessThrough; i++)
+            try
             {
-                traveler.Travel(gameTimeout);
+                RLMMazeTraveler traveler = new RLMMazeTraveler(maze, true, randomnessThrough, startRandomness, endRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
+                traveler.SessionComplete += SesionComplete;
+
+                System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+                watch.Start();
+
+                //Start the training (Play the game)
+                for (int i = 0; i < randomnessThrough; i++)
+                {
+                    traveler.Travel(gameTimeout);
+                }
+
+                // set to predict instead of learn for the remaining sessions
+                traveler.Learn = false;
+
+                for (int i = 0; i < sessions - randomnessThrough; i++)
+                {
+                    traveler.Travel(gameTimeout);
+                }
+
+                traveler.TrainingDone();
+                watch.Stop();
+
+                Console.WriteLine($"Elapsed: {watch.Elapsed}");
+                Console.ReadLine();
             }
-
-            // set to predict instead of learn for the remaining sessions
-            traveler.Learn = false;
-
-            for (int i = 0; i < sessions - randomnessThrough; i++)
+            catch (Exception e)
             {
-                traveler.Travel(gameTimeout);
+                if (e.InnerException != null && e.InnerException is RlmDefaultConnectionStringException)
+                {
+                    Console.WriteLine($"Error: {e.InnerException.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"ERROR: {e.Message}");
+                }
             }
-
-            traveler.TrainingDone();
-            watch.Stop();
-
-            Console.WriteLine($"Elapsed: {watch.Elapsed}");
-            Console.ReadLine();
         }
 
         private static void SesionComplete(int cycleNum, double score, int movesCnt)

@@ -28,187 +28,183 @@ class RLMPlayer(object):
         for item in orderData:
             customerOrders.Add(item)
 
-        try:
-            network = RlmNetwork(dbName) #Create an instance of RLM network with the specified database name.
+        network = RlmNetwork(dbName) #Create an instance of RLM network with the specified database name.
 
-            print("Initializing network...\n\n")
-            if not network.LoadNetwork(networkName): #Check if the current network already exist otherwise have it created.
+        print("Initializing network...\n\n")
+        if not network.LoadNetwork(networkName): #Check if the current network already exist otherwise have it created.
 
-                print("\n\nNetwork not found...")
-                print("Creating new network...\n\n")
+            print("\n\nNetwork not found...")
+            print("Creating new network...\n\n")
 
-                inputs = List[RlmIO]()
-                outputs = List[RlmIO]()
+            inputs = List[RlmIO]()
+            outputs = List[RlmIO]()
             
-                inputX = RlmIO()
+            inputX = RlmIO()
 
-                outputRetailerMin = RlmIO()
-                outputRetailerMax = RlmIO()
-                outputWholesalerMin = RlmIO()
-                outputWholesalerMax = RlmIO()
-                outputDistributorMin = RlmIO()
-                outputDistributorMax = RlmIO()
-                outputFactoryMin = RlmIO()
-                outputFactoryMax = RlmIO()
-                outputFactoryUnitsPerDay = RlmIO()
+            outputRetailerMin = RlmIO()
+            outputRetailerMax = RlmIO()
+            outputWholesalerMin = RlmIO()
+            outputWholesalerMax = RlmIO()
+            outputDistributorMin = RlmIO()
+            outputDistributorMax = RlmIO()
+            outputFactoryMin = RlmIO()
+            outputFactoryMax = RlmIO()
+            outputFactoryUnitsPerDay = RlmIO()
 
-                #input settings
-                inputX.Name = "X"
-                inputX.DotNetType = "System.Int32"
-                inputX.Min = 1
-                inputX.Max = 1
-                inputX.Type = 0
+            #input settings
+            inputX.Name = "X"
+            inputX.DotNetType = "System.Int32"
+            inputX.Min = 1
+            inputX.Max = 1
+            inputX.Type = 0
 
-                #Add input to list
-                inputs.Add(inputX)
+            #Add input to list
+            inputs.Add(inputX)
             
-                #output settings
-                minFrom = 0
-                minTo = 50
-                maxFrom = 51
-                maxTo = 120
-                factoryMin = 1
-                factoryMax = 100
+            #output settings
+            minFrom = 0
+            minTo = 50
+            maxFrom = 51
+            maxTo = 120
+            factoryMin = 1
+            factoryMax = 100
 
-                #Retailer
-                outputRetailerMin.Name = "Retailer_Min"
-                outputRetailerMin.DotNetType = "System.Int16"
-                outputRetailerMin.Min = minFrom
-                outputRetailerMin.Max = minTo
+            #Retailer
+            outputRetailerMin.Name = "Retailer_Min"
+            outputRetailerMin.DotNetType = "System.Int16"
+            outputRetailerMin.Min = minFrom
+            outputRetailerMin.Max = minTo
 
-                outputRetailerMax.Name = "Retailer_Max"
-                outputRetailerMax.DotNetType = "System.Int16"
-                outputRetailerMax.Min = maxFrom
-                outputRetailerMax.Max = maxTo
+            outputRetailerMax.Name = "Retailer_Max"
+            outputRetailerMax.DotNetType = "System.Int16"
+            outputRetailerMax.Min = maxFrom
+            outputRetailerMax.Max = maxTo
 
-                #Wholesaler
-                outputWholesalerMin.Name = "WholeSaler_Min"
-                outputWholesalerMin.DotNetType = "System.Int16"
-                outputWholesalerMin.Min = minFrom
-                outputWholesalerMin.Max = minTo
+            #Wholesaler
+            outputWholesalerMin.Name = "WholeSaler_Min"
+            outputWholesalerMin.DotNetType = "System.Int16"
+            outputWholesalerMin.Min = minFrom
+            outputWholesalerMin.Max = minTo
 
-                outputWholesalerMax.Name = "WholeSaler_Max"
-                outputWholesalerMax.DotNetType = "System.Int16"
-                outputWholesalerMax.Min = maxFrom
-                outputWholesalerMax.Max = maxTo
+            outputWholesalerMax.Name = "WholeSaler_Max"
+            outputWholesalerMax.DotNetType = "System.Int16"
+            outputWholesalerMax.Min = maxFrom
+            outputWholesalerMax.Max = maxTo
 
-                #Distributor
-                outputDistributorMin.Name = "Distributor_Min"
-                outputDistributorMin.DotNetType = "System.Int16"
-                outputDistributorMin.Min = minFrom
-                outputDistributorMin.Max = minTo
+            #Distributor
+            outputDistributorMin.Name = "Distributor_Min"
+            outputDistributorMin.DotNetType = "System.Int16"
+            outputDistributorMin.Min = minFrom
+            outputDistributorMin.Max = minTo
 
-                outputDistributorMax.Name = "Distributor_Max"
-                outputDistributorMax.DotNetType = "System.Int16"
-                outputDistributorMax.Min = maxFrom
-                outputDistributorMax.Max = maxTo
+            outputDistributorMax.Name = "Distributor_Max"
+            outputDistributorMax.DotNetType = "System.Int16"
+            outputDistributorMax.Min = maxFrom
+            outputDistributorMax.Max = maxTo
 
-                #Factory
-                outputFactoryMin.Name = "Factory_Min"
-                outputFactoryMin.DotNetType = "System.Int16"
-                outputFactoryMin.Min = minFrom
-                outputFactoryMin.Max = minTo
+            #Factory
+            outputFactoryMin.Name = "Factory_Min"
+            outputFactoryMin.DotNetType = "System.Int16"
+            outputFactoryMin.Min = minFrom
+            outputFactoryMin.Max = minTo
 
-                outputFactoryMax.Name = "Factory_Max"
-                outputFactoryMax.DotNetType = "System.Int16"
-                outputFactoryMax.Min = maxFrom
-                outputFactoryMax.Max = maxTo
+            outputFactoryMax.Name = "Factory_Max"
+            outputFactoryMax.DotNetType = "System.Int16"
+            outputFactoryMax.Min = maxFrom
+            outputFactoryMax.Max = maxTo
 
-                #Factory Units Per Day
-                outputFactoryUnitsPerDay.Name = "Factory_Units_Per_Day"
-                outputFactoryUnitsPerDay.DotNetType = "System.Int16"
-                outputFactoryUnitsPerDay.Min = factoryMin
-                outputFactoryUnitsPerDay.Max = factoryMax
+            #Factory Units Per Day
+            outputFactoryUnitsPerDay.Name = "Factory_Units_Per_Day"
+            outputFactoryUnitsPerDay.DotNetType = "System.Int16"
+            outputFactoryUnitsPerDay.Min = factoryMin
+            outputFactoryUnitsPerDay.Max = factoryMax
 
-                #Add all outputs to list
-                outputs.Add(outputRetailerMin)
-                outputs.Add(outputRetailerMax)
-                outputs.Add(outputWholesalerMin)
-                outputs.Add(outputWholesalerMax)
-                outputs.Add(outputDistributorMin)
-                outputs.Add(outputDistributorMax)
-                outputs.Add(outputFactoryMin)
-                outputs.Add(outputFactoryMax)
-                outputs.Add(outputFactoryUnitsPerDay)
+            #Add all outputs to list
+            outputs.Add(outputRetailerMin)
+            outputs.Add(outputRetailerMax)
+            outputs.Add(outputWholesalerMin)
+            outputs.Add(outputWholesalerMax)
+            outputs.Add(outputDistributorMin)
+            outputs.Add(outputDistributorMax)
+            outputs.Add(outputFactoryMin)
+            outputs.Add(outputFactoryMax)
+            outputs.Add(outputFactoryUnitsPerDay)
 
-                #Create and save the network
-                network.NewNetwork(networkName, inputs, outputs)
-                print("\n\nNetwork created...")
+            #Create and save the network
+            network.NewNetwork(networkName, inputs, outputs)
+            print("\n\nNetwork created...")
 
-            #RLM network settings
-            network.NumSessions = sessions
-            network.StartRandomness = startRand
-            network.EndRandomness = endRand
+        #RLM network settings
+        network.NumSessions = sessions
+        network.StartRandomness = startRand
+        network.EndRandomness = endRand
 
-            #simulator settings
-            storageCost = 0.5
-            backlogCost = 1
-            initialInventory = 50
+        #simulator settings
+        storageCost = 0.5
+        backlogCost = 1
+        initialInventory = 50
 
-            #LogisticSimulator class is a c# object that process the simulation of the beer game
-            #You can create your own simulator in python to replace this one if needed, but for us, we just gonna use our existing c# simulator
-            #as it will be a big work for us to translate all of our simulator codes to python
-            simulator = LogisticSimulator(storageCost, backlogCost, initialInventory, initialInventory, initialInventory, initialInventory)
+        #LogisticSimulator class is a c# object that process the simulation of the beer game
+        #You can create your own simulator in python to replace this one if needed, but for us, we just gonna use our existing c# simulator
+        #as it will be a big work for us to translate all of our simulator codes to python
+        simulator = LogisticSimulator(storageCost, backlogCost, initialInventory, initialInventory, initialInventory, initialInventory)
 
-            #Start the training
-            print("Training started...\n\n")
-            predictedLogisticOutputs = List[LogisticSimulatorOutput]()
+        #Start the training
+        print("Training started...\n\n")
+        predictedLogisticOutputs = List[LogisticSimulatorOutput]()
 
-            for i in range(0, sessions):
-                sessId = network.SessionStart()
+        for i in range(0, sessions):
+            sessId = network.SessionStart()
 
-                inputs = List[RlmIOWithValue]()
+            inputs = List[RlmIOWithValue]()
 
-                inputXObj = next((x for x in network.Inputs if x.Name == "X"), None)
-                inputX = RlmIOWithValue(inputXObj, "1")
+            inputXObj = next((x for x in network.Inputs if x.Name == "X"), None)
+            inputX = RlmIOWithValue(inputXObj, "1")
 
-                inputs.Add(inputX)
+            inputs.Add(inputX)
 
-                cycle = RlmCycle()
-                cycleOutcome = cycle.RunCycle(network, sessId, inputs, True)
+            cycle = RlmCycle()
+            cycleOutcome = cycle.RunCycle(network, sessId, inputs, True)
 
-                simOutputs = cycleOutcome.CycleOutput.Outputs
+            simOutputs = cycleOutcome.CycleOutput.Outputs
 
-                outputs = List[LogisticSimulatorOutput]()
+            outputs = List[LogisticSimulatorOutput]()
 
-                for item in simOutputs:
+            for item in simOutputs:
 
-                    simout = LogisticSimulatorOutput()
-                    simout.Name = item.Name
-                    simout.Value = int(item.Value)
+                simout = LogisticSimulatorOutput()
+                simout.Name = item.Name
+                simout.Value = int(item.Value)
 
-                    outputs.Add(simout)
+                outputs.Add(simout)
 
-                simulationDelay = 50 #having a delay of 50ms in beer game simulation
-                simulator.ResetSimulationOutput()
-                simulator.start(outputs, simulationDelay, customerOrders)
+            simulationDelay = 50 #having a delay of 50ms in beer game simulation
+            simulator.ResetSimulationOutput()
+            simulator.start(outputs, simulationDelay, customerOrders)
 
-                network.ScoreCycle(cycleOutcome.CycleOutput.CycleID, 0)
+            network.ScoreCycle(cycleOutcome.CycleOutput.CycleID, 0)
                 
-                totalCosts = simulator.SumAllCosts() #get the total cost of the beer game simulation
+            totalCosts = simulator.SumAllCosts() #get the total cost of the beer game simulation
 
-                network.SessionEnd(totalCosts)
+            network.SessionEnd(totalCosts)
 
-                score = '${:,.2f}'.format(abs(totalCosts))
+            score = '${:,.2f}'.format(abs(totalCosts))
 
-                print("Session #"+ str(i + 1) + "\t Score: " + str(score))
+            print("Session #"+ str(i + 1) + "\t Score: " + str(score))
 
-                if i == (sessions -1):
-                    predictedLogisticOutputs = outputs
+            if i == (sessions -1):
+                predictedLogisticOutputs = outputs
 
-            network.TrainingDone()
+        network.TrainingDone()
 
-            #Printing the predicted results
-            print("\nPredicted outputs:\n")
-            resultText = ""
+        #Printing the predicted results
+        print("\nPredicted outputs:\n")
+        resultText = ""
 
-            for item in predictedLogisticOutputs:
-                resultText += "\n" + item.Name + ": " + str(item.Value)
+        for item in predictedLogisticOutputs:
+            resultText += "\n" + item.Name + ": " + str(item.Value)
 
-            print(resultText + "\n")
-
-        except Exception as e:
-            print("ERROR: " + e.NameError)
+        print(resultText + "\n")
 
         return
 
