@@ -74,7 +74,7 @@
       <Project>{3db5fec4-4ef3-4c62-9812-29f818e8a55f}</Project>
       <Name>LanderGameLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Tools\Tools.csproj">
+    <ProjectReference Include="..\..\..\UtilityTools\Tools\Tools.csproj">
       <Project>{928f7b86-f0cc-4f5c-b1b3-fcd154111e48}</Project>
       <Name>Tools</Name>
     </ProjectReference>

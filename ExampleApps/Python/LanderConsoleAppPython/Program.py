@@ -2,6 +2,8 @@ import sys
 import clr
 import RLMPilot
 
+from RLM.Models.Exceptions import *
+
 def getInput(label, defVal = 0):
 
     validInput = False
@@ -40,12 +42,18 @@ def main():
     minLinearBracket = getInput("Min linear bracket value [default 3]:", 3)
     print("\n")
 
-    pilot = RLMPilot.Pilot(True, sessions, startRand, endRand, maxLinearBracket, minLinearBracket)
+    try : 
+        pilot = RLMPilot.Pilot(True, sessions, startRand, endRand, maxLinearBracket, minLinearBracket)
 
-    for i in range(0, sessions):
-        pilot.StartSimulation(i, True)
+        for i in range(0, sessions):
+            pilot.StartSimulation(i, True)
 
-    pilot.trainingDone()
+        pilot.trainingDone()
+    except Exception as err:
+        if type(err.InnerException) == RlmDefaultConnectionStringException:
+            print("Error: " + err.InnerException.Message)
+        else:
+            print("Error: " + err)
 
     return
 

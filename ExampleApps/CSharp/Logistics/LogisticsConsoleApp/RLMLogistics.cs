@@ -2,6 +2,7 @@
 using RLM;
 using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -114,7 +115,14 @@ namespace LogisticsConsoleApp
             }
             catch (Exception e)
             {
-                Console.WriteLine($"ERROR: {e.Message}");
+                if (e.InnerException != null && e.InnerException is RlmDefaultConnectionStringException)
+                {
+                    Console.WriteLine($"Error: {e.InnerException.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"ERROR: {e.Message}");
+                }
             }
             Console.ReadLine();
         }

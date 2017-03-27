@@ -51,6 +51,7 @@
     <Compile Include="Enums\RlmInputDataType.cs" />
     <Compile Include="Enums\RlmInputType.cs" />
     <Compile Include="Enums\RlmNetworkType.cs" />
+    <Compile Include="Exceptions\RlmDefaultConnectionStringException.cs" />
     <Compile Include="Interfaces\IManager.cs" />
     <Compile Include="Interfaces\IRlmNetwork.cs" />
     <Compile Include="Models\GetSolutionResult.cs" />

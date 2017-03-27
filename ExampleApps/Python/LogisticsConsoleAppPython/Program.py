@@ -2,6 +2,8 @@ import sys
 import clr
 import RLMLogistics
 
+from RLM.Models.Exceptions import *
+
 def getInput(label, defVal = 0):
 
     validInput = False
@@ -32,8 +34,14 @@ def getInput(label, defVal = 0):
 
 def main():
 
-    logisticPlayer = RLMLogistics.RLMPlayer()
-    logisticPlayer.LogisticTrain()
+    try:
+        logisticPlayer = RLMLogistics.RLMPlayer()
+        logisticPlayer.LogisticTrain()
+    except Exception as err:
+        if type(err.InnerException) == RlmDefaultConnectionStringException:
+            print("Error: " + err.InnerException.Message)
+        else:
+            print("Error: " + err)
 
     return
 

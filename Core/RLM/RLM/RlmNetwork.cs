@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright 2017 Ryskamp Innovations LLC
+// License Available through the RLM License Agreement
+// https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
@@ -201,10 +205,11 @@ namespace RLM
 
         public string DatabaseName { get; private set; }
         
-        public IDictionary<long, RlmInputMomentum> InputMomentums { get; private set; } = new Dictionary<long, RlmInputMomentum>();        
+        public IDictionary<long, RlmInputMomentum> InputMomentums { get; private set; } = new Dictionary<long, RlmInputMomentum>();
+        public SessionCaseHistory SessionCaseHistory { get; set; }
 
         #region Static
-       
+
         public static void RestoreDB(string databaseName, bool simpleRecovery = false)
         {
             using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
@@ -284,11 +289,11 @@ namespace RLM
 
         #region Constructor
         /// <summary>
-        /// default contstructor, creates "RyskampNeuralNetworks" database
+        /// default contstructor, creates "RyskampLearningMachine" database
         /// </summary>
         public RlmNetwork()
         {
-            DatabaseName = "RyskampNeuralNetworks";
+            DatabaseName = RlmDbEntities.DetermineDbName();
             MemoryManager = new Manager(DatabaseName);
             SetDefaultMomentumSettings();
         }
@@ -597,6 +602,9 @@ namespace RLM
 
             CurrentCase = null;
         }
+
+
+
         #endregion External Methods
 
         #region Supporting Functions        
