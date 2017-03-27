@@ -1,6 +1,6 @@
 # <center>Ryskamp Learning Machine</center> #
 
-![SevenBreakthroughs](https://raw.githubusercontent.com/useaible/RyskampLearningMachine/dev-branch/IntroImage.jpg "7 Breakthroughs")
+![SevenBreakthroughs](https://raw.githubusercontent.com/useaible/RyskampLearningMachine/master/IntroImage.jpg "7 Breakthroughs")
 
 ## Introduction ##
 The **Ryskamp Learning Machine** represents a quantum leap in the world of machine learning. It breaks from the traditions of the past and uses a completely new paradigm for the core machine learning algorithm. This algorithm focuses on logic over pure mathematical solutions and specific information processing (currently associated with traditional programming) combined with categorization and pattern recognition (currently associated with machine learning) into a single algorithm and engine. Additionally, the RLM saves every decision it ever makes, making debugging simple. Neural network “black box” problems are now a thing of the past.
@@ -29,10 +29,10 @@ In a traditional neural network, you must often configure many settings in order
 
 # <center>Developer Guide</center> #
 
-We included a Developer Guide to get you started fast and easy. You can view it [here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/Documentation/DeveloperGuide.pdf).
+We included a Developer Guide to get you started fast and easy. You can view it [here](https://github.com/useaible/RyskampLearningMachine/blob/master/Documentation/DeveloperGuide.pdf).
 
-![](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/DeveloperGuidePreview.jpg?raw=true)
+![](https://github.com/useaible/RyskampLearningMachine/blob/master/DeveloperGuidePreview.jpg?raw=true)
 
 ----------
-This is covered by the license [here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md).
+This is covered by the license [here](https://github.com/useaible/RyskampLearningMachine/blob/master/License.md).
 One or more patents are still pending for the methods and systems disclosed in this code.
