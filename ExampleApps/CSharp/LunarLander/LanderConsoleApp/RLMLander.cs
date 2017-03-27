@@ -40,8 +40,6 @@ namespace LunarLanderConsoleApp
                     pilot.StartSimulation(i, true);
                 }
 
-                pilot.TrainingDone();
-
                 watch.Stop();
 
                 Console.WriteLine($"\nElapsed: {watch.Elapsed}\n");
@@ -51,10 +49,11 @@ namespace LunarLanderConsoleApp
                 {
                     pilot.Learn = false;
                     pilot.StartSimulation(sessions, true);
-
-                    Console.WriteLine("hit enter to continue...");
-                    Console.ReadLine();
                 }
+
+                Console.WriteLine("hit enter to continue...");
+                pilot.TrainingDone();
+                Console.ReadLine();
             }
             catch (Exception e)
             {

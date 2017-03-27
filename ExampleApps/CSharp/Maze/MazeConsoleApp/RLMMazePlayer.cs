@@ -49,10 +49,10 @@ namespace MazeConsoleApp
                     traveler.Travel(gameTimeout);
                 }
 
-                traveler.TrainingDone();
                 watch.Stop();
 
                 Console.WriteLine($"Elapsed: {watch.Elapsed}");
+                traveler.TrainingDone();
                 Console.ReadLine();
             }
             catch (Exception e)

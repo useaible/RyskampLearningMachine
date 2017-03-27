@@ -98,7 +98,6 @@ namespace LogisticsConsoleApp
                         predictedLogisticOutputs = simOutputs;
                 }
 
-                network.TrainingDone();
 
                 watch.Stop();
 
@@ -110,8 +109,8 @@ namespace LogisticsConsoleApp
                 }
 
                 Console.WriteLine(resultText);
-
                 Console.WriteLine($"\nElapsed: {watch.Elapsed}");
+                network.TrainingDone();
             }
             catch (Exception e)
             {
