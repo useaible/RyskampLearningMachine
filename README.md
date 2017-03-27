@@ -1,7 +1,6 @@
 # <center>Ryskamp Learning Machine</center> #
 
-<center>![Seven-breakthroughs](.//IntroImage.jpg)</center>
-
+![SevenBreakthroughs](https://raw.githubusercontent.com/useaible/RyskampLearningMachine/dev-branch/IntroImage.jpg "7 Breakthroughs")
 
 ## Introduction ##
 The **Ryskamp Learning Machine** represents a quantum leap in the world of machine learning. It breaks from the traditions of the past and uses a completely new paradigm for the core machine learning algorithm. This algorithm focuses on logic over pure mathematical solutions and specific information processing (currently associated with traditional programming) combined with categorization and pattern recognition (currently associated with machine learning) into a single algorithm and engine. Additionally, the RLM saves every decision it ever makes, making debugging simple. Neural network “black box” problems are now a thing of the past.
