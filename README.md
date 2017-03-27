@@ -1,4 +1,4 @@
-[https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md)# <center>Ryskamp Learning Machine</center> #
+# <center>Ryskamp Learning Machine</center> #
 
 ![SevenBreakthroughs](https://raw.githubusercontent.com/useaible/RyskampLearningMachine/dev-branch/IntroImage.jpg "7 Breakthroughs")
 
@@ -26,6 +26,12 @@ The Ryskamp Learning Machine natively tracks every single decision it ever makes
 ## 7. Configuration is simple. ##
 In a traditional neural network, you must often configure many settings in order to match the problem you are solving. Settings like algorithms, number of neurons, layers of neurons, activation functions, inputs, outputs, and many other settings must be carefully considered to match the design of the network to the problem being solved. The Ryskamp Learning Machine is simple. There is only one algorithm and there are no activation functions. As with any network, users are required to set up inputs and outputs, and define the number of sessions to be run. A few other optional parameters are available but not required. We invite you to view a sample application in our source code to see how easy this process really is.
 
+
+# <center>Developer Guide</center> #
+
+We included a Developer Guide to get you started fast and easy. You can view it [here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/Documentation/DeveloperGuide.pdf).
+
+![](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/DeveloperGuidePreview.jpg?raw=true)
 
 ----------
 This is covered by the license [here](https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md).
