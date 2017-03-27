@@ -180,7 +180,7 @@ class RLMPlayer(object):
 
             simulationDelay = 50 #having a delay of 50ms in beer game simulation
             simulator.ResetSimulationOutput()
-            simulator.start(outputs, simulationDelay, customerOrders)
+            simulator.Start(outputs, simulationDelay, customerOrders)
 
             network.ScoreCycle(cycleOutcome.CycleOutput.CycleID, 0)
                 
