@@ -52,14 +52,23 @@ namespace TotalRecallConsoleApp
             }
 
             var sessionCaseApi = new SessionCaseHistory(dbName);
+            bool dbOk = false;
 
             if (userInput == 1)
             {
-                getResults(sessionCaseApi, 1);
+                getResults(sessionCaseApi, 1, out dbOk);
+                if (!dbOk)
+                {
+                    goto getDbName;
+                }
             }
             else if (userInput == 2)
             {
-                getResults(sessionCaseApi, 2);
+                getResults(sessionCaseApi, 2, out dbOk);
+                if (!dbOk)
+                {
+                    goto getDbName;
+                }
             }
             else if (userInput == 3)
             {
@@ -73,11 +82,20 @@ namespace TotalRecallConsoleApp
             Console.ReadLine();
         }
 
-        private static void getResults(SessionCaseHistory sessionCaseApi, int mode)
+        private static void getResults(SessionCaseHistory sessionCaseApi, int mode, out bool dbOk)
         {
+            dbOk = true;
+
             Console.WriteLine("\nGetting results...");
 
             var sessionHistory = mode == 1? sessionCaseApi.GetSessionHistory() : sessionCaseApi.GetSignificantLearningEvents();
+
+            if(sessionHistory.Count() == 0)
+            {
+                Console.WriteLine("\nYou entered an invalid database. Try again.");
+                dbOk = false;
+                return;
+            }
 
             Console.WriteLine("\nRESULTS:\n");
 
@@ -213,6 +231,8 @@ namespace TotalRecallConsoleApp
         private static void GenerateHtmlFile(SessionCaseHistory sessionCaseApi)
         {
             getMode:
+
+            Console.WriteLine("\n\nGenerating an HTML file. Please select an option below.");
             Console.WriteLine("\nOptions: [1] = All Games, [2] = All Games W/ Significant Learning");
             ConsoleKeyInfo userInput = Console.ReadKey();
 
