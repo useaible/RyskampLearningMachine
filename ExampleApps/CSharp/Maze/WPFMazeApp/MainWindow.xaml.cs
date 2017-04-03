@@ -41,18 +41,19 @@ namespace WPFMazeApp
         public int Temp_num_sessions { get; set; }
         public int StartRandomness { get; set; }
         public int EndRandomness { get; set; }
+        public int RandomnessOver { get; set; }
         private MazeRepo mazerepo;
         private PlayerType Type { get; set; }
 
         public int CurrentIteration { get; set; }
 
-        public MainWindow(int mazeId, PlayerType type, Boolean learn = false, int temp_num_sessions = 1, int currentIteration = 1, int totalIterations = 1, int startRandomness = 1, int endRandomness = 1)
+        public MainWindow(int mazeId, PlayerType type, Boolean learn = false, int temp_num_sessions = 1, int currentIteration = 1, int totalIterations = 1, int startRandomness = 1, int endRandomness = 1, int randomnessOver=1)
         {
             InitializeComponent();
             mazerepo = new MazeRepo();
 
             mazeInfo = mazerepo.GetByID(mazeId);
-            
+            RandomnessOver = temp_num_sessions;
             ClosedDueToGameOver = false;
             Learn = learn;
             Type = type;
@@ -65,7 +66,7 @@ namespace WPFMazeApp
             {            
                 if (learn)
                 {
-                    Temp_num_sessions = temp_num_sessions;
+                    Temp_num_sessions = totalIterations;
                     StartRandomness = startRandomness;
                     EndRandomness = endRandomness;
 
@@ -130,59 +131,88 @@ namespace WPFMazeApp
 
         async void Init(MazeInfo mazeInfo)
         {
-           
+
+            if (!Learn)
+            {
+                Temp_num_sessions = 1;
+                StartRandomness = 0;
+                EndRandomness = 0;
+            }
             replayMemory = new object[Temp_num_sessions];
-            StatusText.Content = "Preparing to train...";
+            StatusText.Content = "Initializing RLM engine...";
             await Task.Run(() => {
 
-                RLMMazeTraveler traveler = new RLMMazeTraveler(mazeInfo, true, 1, StartRandomness, EndRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
+                RLMMazeTraveler traveler = new RLMMazeTraveler(mazeInfo, Learn, Temp_num_sessions, StartRandomness, EndRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
                 traveler.SessionComplete += Traveler_SessionComplete;
                 traveler.MazeCycleComplete += Traveler_MazeCycleComplete;
                 traveler.SessionStarted += Traveler_SessionStarted;
                 traveler.MazeCycleError += mazecycle_error;
-                RunUIThread(() => {                
-                    StatusText.Content = "Training started...";
-                });
-                //Start the training (Play the game)
-                for (int i = 0; i < 1; i++)
-                {
-                    locations = new List<Location>();
-                    RunUIThread(() => {
-                        lblCurrentSession.Content = 1;
-                    });
-                    traveler.Travel(5000);
-                }
+                game.traveler = traveler;
 
-                // set to predict instead of learn for the remaining sessions
-                traveler.Learn = false;
-     
-                for (int i = 0; i < Temp_num_sessions - 1; i++)
+                if(Learn)
                 {
-                    locations = new List<Location>();
                     RunUIThread(() => {
-                        StatusText.Content = $"Training started... {CurrentIteration}%";
+                        StatusText.Content = "Training started...";
                     });
-                    traveler.Travel(5000);
-                }
+                    //Start the training (Play the game)
+                    for (int i = 0; i < RandomnessOver; i++)
+                    {
+                        locations = new List<Location>();
+                        RunUIThread(() => {
+                            lblCurrentSession.Content = 1;
+                        });
+                        traveler.Travel(5000);
+                    }
 
-               
-                traveler.TrainingDone();
-                RunUIThread(() => {
-                    StatusText.Content = $"Training done... 100%";
-                });
+                    // set to predict instead of learn for the remaining sessions
+                    traveler.Learn = false;
+                    
+                    for (int i = 0; i < Temp_num_sessions - RandomnessOver; i++)
+                    {
+                        locations = new List<Location>();
+                        RunUIThread(() => {
+                            StatusText.Content = $"Training started... {CurrentIteration*100/Temp_num_sessions}%";
+                        });
+                        traveler.Travel(5000);
+                    }
+
+
+                    traveler.TrainingDone();
+                    RunUIThread(() => {
+                        StatusText.Content = $"Training done... 100%";
+                    });
+                }
+                else
+                {                 
+                    RunUIThread(() => {
+                        StatusText.Content = $"RLM preparing to play...";
+                    });
+
+                    traveler.Learn = false;
+  
+                    locations = new List<Location>();
+
+                    RunUIThread(() => {
+                        StatusText.Content = $"RLM Playing...";
+                    });
+
+                    traveler.Travel(5000);
+                    traveler.TrainingDone();
+                }
+                
 
             }).ContinueWith(async (t) => {
                 //show AI playing game
                 Stopwatch watch = new Stopwatch();
                 foreach (dynamic obj in replayMemory)
                 {
-                    
-                    RunUIThread(() => {
-                        maze.setGoalRect();
-                        lblCurrentSession.Content = (int)obj.cycleNum;
+
+                    RunUIThread(() =>
+                    {
+                        lblCurrentSession.Content = (int)obj.cycleNum + 1;
                         lblRandomness.Content = (int)obj.randomnessLeft;
                     });
-                    
+
                     watch.Start();
                     foreach (Location loc in obj.moves as List<Location>)
                     {
@@ -203,7 +233,14 @@ namespace WPFMazeApp
 
                     RunUIThread(() => {
                         lblScore.Content = (double)obj.score;
-                        lblMoves.Content = (int)obj.movesCnt;                  
+                        lblMoves.Content = (int)obj.movesCnt;
+
+                        if(!Learn)
+                            StatusText.Content = $"RLM done playing...";
+                        else
+                            StatusText.Content = $"Showing rlm replay...";
+
+                        maze.setGoalRect();
                     });
            
                 }
