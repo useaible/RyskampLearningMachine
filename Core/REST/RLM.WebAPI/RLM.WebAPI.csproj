@@ -51,6 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="M2Mqtt.Net, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\M2Mqtt.4.3.0.0\lib\net45\M2Mqtt.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -206,6 +210,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Manager\RLMApiManager.cs" />
+    <Compile Include="Manager\RLMMqttManager.cs" />
     <Compile Include="Models\CreateLoadNetworkParams.cs" />
     <Compile Include="Models\RlmIOParams.cs" />
     <Compile Include="Models\RlmNetworkWebAPI.cs" />
@@ -216,6 +221,7 @@
     <Compile Include="Models\RunCycleParams.cs" />
     <Compile Include="Models\ScoreCycleParams.cs" />
     <Compile Include="Models\SessionEndParams.cs" />
+    <Compile Include="MqttStarter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

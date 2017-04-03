@@ -483,7 +483,7 @@
         </member>
         <member name="M:RLM.WebAPI.Controllers.RLMController.GetSessions(System.String,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <summary>
-            Gets session history of games played.
+            Gets the data of games played.
             </summary>
             <param name="dbname">The database name where the record shall be taken.</param>
             <param name="w_learning">Determines which resultset to return. With Learning(True) = Displays all games played with significant learning, Without Learning (False) = Displays all games played</param>

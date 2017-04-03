@@ -59,6 +59,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\RLM\RLM.Models\RLM.Models.csproj">
+      <Project>{f603454e-2199-4366-9a2a-08ec30818a0c}</Project>
+      <Name>RLM.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\RLM\RLM\RLM.csproj">
       <Project>{01eec6ce-a2ca-4637-8133-6288b6e246c3}</Project>
       <Name>RLM</Name>

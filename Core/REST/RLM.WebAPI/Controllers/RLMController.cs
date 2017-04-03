@@ -1,4 +1,5 @@
-﻿using RLM.WebAPI.Filters;
+﻿using RLM.Models;
+using RLM.WebAPI.Filters;
 using RLM.WebAPI.Manager;
 using RLM.WebAPI.Models;
 using System;
@@ -32,7 +33,7 @@ namespace RLM.WebAPI.Controllers
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
             }
         }
-        
+
         [HttpPut]
         [Route("configure")]
         [ValidateRlmModel]
@@ -118,7 +119,7 @@ namespace RLM.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Gets session history of games played.
+        /// Gets the data of games played.
         /// </summary>
         /// <param name="dbname">The database name where the record shall be taken.</param>
         /// <param name="w_learning">Determines which resultset to return. With Learning(True) = Displays all games played with significant learning, Without Learning (False) = Displays all games played</param>
@@ -126,7 +127,7 @@ namespace RLM.WebAPI.Controllers
         /// <param name="take">The number of records to take.</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("get_sessions")]
+        [Route("sessions")]
         [ValidateRlmModel]
         public IEnumerable<RlmSessionHistory> GetSessions(string dbname, bool w_learning = false, int? skip = null, int? take = null)
         {
@@ -154,7 +155,7 @@ namespace RLM.WebAPI.Controllers
         /// <param name="take">The number of records to take.</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("get_session_cases")]
+        [Route("sessions/{session_id}/cases")]
         [ValidateRlmModel]
         public IEnumerable<RlmCaseHistory> GetSessionCases(string dbname, long session_id, int? skip = null, int? take = null)
         {
@@ -181,7 +182,7 @@ namespace RLM.WebAPI.Controllers
         /// <param name="solution_id">The unique identifier of a case along with its rneuron_id.</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("get_case_io")]
+        [Route("iodetails")]
         [ValidateRlmModel]
         public RlmCaseIOHistory GetCaseIO(string dbname, long rneuron_id, long solution_id)
         {

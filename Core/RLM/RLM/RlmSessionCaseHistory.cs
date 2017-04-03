@@ -3,6 +3,7 @@
 // https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md
 
 using RLM.Database;
+using RLM.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
