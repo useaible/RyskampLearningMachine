@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace RequirementsTool
 {
@@ -18,6 +19,37 @@ namespace RequirementsTool
 
             Versions.Add("SQL Server 2014 or later");
         }
+
+        public string GetInstancesInfo()
+        {
+            var sb = new StringBuilder();
+
+            var instances = SQLServerInstanceInfo.EnumerateSQLInstances();
+            if (instances.Count() > 0)
+            {
+                sb.AppendLine($"{Name} instances found on your machine (localhost):");
+                sb.Append("\tINSTANCE NAME\t\t");
+                sb.Append("SQL SERVER EDITION\t\t");
+                sb.Append("VERSION NUMBER\t\t");
+                sb.AppendLine("SERVER NAME (for connection string)");
+                foreach (var item in instances)
+                {
+                    sb.AppendLine($" {item.ToString()}");
+                }
+                sb.AppendLine();
+                sb.AppendLine("Connection string templates:");
+                sb.AppendLine($"\tw/ Integrated Security: {SQLServerInstanceInfo.CONN_STR_TEMPLATE}");
+                sb.AppendLine($"\tw/ User and Password: {SQLServerInstanceInfo.CONN_STR_WITH_USER_TEMPLATE}");
+                sb.AppendLine("NOTE: Replace placeholders (i.e, <your_server_name>, <your_user>, etc.) with appropriate values to connect to your SQL Server instance");
+            }
+            else
+            {
+                sb.Append("No SQL Server instances found");
+            }
+
+            return sb.ToString();
+        }
+
 
         protected override RegistryHive BaseKey { get; set; } = RegistryHive.LocalMachine;
 

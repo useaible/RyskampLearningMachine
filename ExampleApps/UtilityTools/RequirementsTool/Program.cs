@@ -115,6 +115,15 @@ namespace RequirementsTool
                 Console.WriteLine(strInfo);
                 resultsSb.AppendLine(strInfo);
 
+                if (v is SQLServerChecker && v.HasCorrectVersion)
+                {
+                    // display instances with connection strings template
+                    var sql = v as SQLServerChecker;
+                    var instancesInfo = sql.GetInstancesInfo();
+                    Console.WriteLine(instancesInfo);
+                    resultsSb.AppendLine(instancesInfo);
+                }
+
                 Console.WriteLine();
                 resultsSb.AppendLine();
             }

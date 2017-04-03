@@ -24,7 +24,17 @@ namespace RLM.Database
             this.databaseName = databaseName;
         }
 
-        public int TaskDelay { get; set; } = 50;
+        public int TaskDelay { get; private set; } = 50;
+
+        private long taskCompletedCounter = 0;
+        public long TotalTaskCompleted
+        {
+            get
+            {
+                return Interlocked.Read(ref taskCompletedCounter);
+            }
+        }
+
 
         public Task StartSessionWorkerForCreate(BlockingCollection<Session> sessionqueue, CancellationToken ct)
         {
@@ -33,6 +43,7 @@ namespace RLM.Database
                 foreach (Session session in sessionqueue.GetConsumingEnumerable())
                 {
                     createSession(session);
+                    Interlocked.Increment(ref taskCompletedCounter);
                     Task.Delay(TaskDelay).Wait();
                 }
 
@@ -48,6 +59,7 @@ namespace RLM.Database
                 foreach (Session session in sessionqueue.GetConsumingEnumerable())
                 {
                     updateSession(session);
+                    Interlocked.Increment(ref taskCompletedCounter);
                 }
             }, ct);
 
@@ -59,12 +71,12 @@ namespace RLM.Database
         {
             Task T1 = Task.Run(() =>
             {
-
                 foreach (Case theCase in casesQueue.GetConsumingEnumerable())
                 {
                     //caseBox.Enqueue(theCase);
                     saveCase(theCase);
-                    Task.Delay(50).Wait();
+                    Interlocked.Increment(ref taskCompletedCounter);
+                    Task.Delay(TaskDelay).Wait();
                 }
 
             }, ct);
@@ -269,12 +281,12 @@ namespace RLM.Database
 
                     theCase.SavedToDb = true;
 
-                    RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
+                    //RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
                 }
                 catch (Exception ex)
                 {
                     RlmDbLogger.Error(ex, databaseName, "saveCase");
-                    Task.Delay(10).Wait();
+                    Task.Delay(TaskDelay).Wait();
                     goto start;
                 }
             }

@@ -19,6 +19,14 @@ namespace RequirementsTool
             Url = "https://pypi.python.org/pypi/pythonnet";
 
             Versions.Add("2.3.0");
+
+            SetAdditionalHelpFormatted("If you have Python installed, you can get Python NET using the 'pip install' command instead:",
+                new string[] {
+                    "Open a command prompt window with Administrator privileges",
+                    "If 'pip' is registered as an Environment Variable on your machine then proceed to Step 4",
+                    "Otherwise, you will need to manually locate the 'pip.exe' file which is located in your Python's installation directory and in the 'Scripts' subdirectory",
+                    "Enter this command on the console: 'pip install pythonnet' OR '<python_installation_path>\\Scripts\\pip.exe install pythonnet'"
+                });
         }
 
         public override bool Check()

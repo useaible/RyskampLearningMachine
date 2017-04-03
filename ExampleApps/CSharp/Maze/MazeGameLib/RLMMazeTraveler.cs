@@ -83,6 +83,9 @@ namespace MazeGameLib
         public RlmNetwork CreateOrLoadNetwork(MazeInfo maze)
         {
             var rlmNet = new RlmNetwork("RLM_maze" + maze.Name + "_" + Guid.NewGuid().ToString("N"));
+            rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
+            rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
+
             if (!rlmNet.LoadNetwork(maze.Name))
             {
                 var inputs = new List<RlmIO>()
@@ -100,6 +103,16 @@ namespace MazeGameLib
             }
 
             return rlmNet;
+        }
+
+        private void RlmNet_DataPersistenceProgress(long processing, long total)
+        {
+            Console.WriteLine($"Data Persistence progress: {processing} / {total}");
+        }
+
+        private void RlmNet_DataPersistenceComplete()
+        {
+            Console.WriteLine("RLM Data Persistence done.");
         }
 
         public double RandomnessLeft

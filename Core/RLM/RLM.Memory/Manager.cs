@@ -14,6 +14,37 @@ namespace RLM.Memory
 {
     public class Manager : IManager
     {
+        private BlockingCollection<Rneuron> rneuron_queue;
+        private BlockingCollection<Session> session_queue;
+        private BlockingCollection<Session> savedSession_queue;
+        private BlockingCollection<Solution> solution_queue;
+        private BlockingCollection<Case> case_queue;
+        private List<Session> sessions = new List<Session>();
+
+        private RlmDbMgr rlmDb;
+        private RlmObjectEnqueuer rlmDbEnqueuer;
+
+        private CancellationTokenSource ctSourceSessions;
+        private CancellationToken tokenSessions;
+
+        private CancellationTokenSource ctSourceCases;
+        private CancellationToken tokenCases;
+
+        private bool trainingDone = false;
+        private bool sessionsDone = false;
+        private int totalSessionsCount = 0;
+        private Task sessionCreateTask;
+        private Task sessionUpdateTask;
+        private Task caseTask;
+        private int iConcurrencyLevel = Environment.ProcessorCount;
+        private int rneuronsBoundedCapacity;
+        private int sessionsBoundedCapacity;
+        private int solutionsBoundedCapacity;
+        private int casesBoundedCapacity;
+
+        private System.Diagnostics.Stopwatch dbSavingTime = new System.Diagnostics.Stopwatch();
+        private System.Timers.Timer progressUpdater = new System.Timers.Timer();
+
         // temp for benchmarks
         public int CacheBoxCount { get; set; } = 0;
         public List<TimeSpan> GetRneuronTimes { get; set; } = new List<TimeSpan>();
@@ -22,15 +53,11 @@ namespace RLM.Memory
         public System.Diagnostics.Stopwatch swRebuildCache = new System.Diagnostics.Stopwatch();
         // temp for benchmarks
 
-        public string DabaseName { get; set; }
-        public string NetworkName { get; set; }
+        public event DataPersistenceCompleteDelegate DataPersistenceComplete;
+        public event DataPersistenceProgressDelegate DataPersistenceProgress;
 
-        private int iConcurrencyLevel = Environment.ProcessorCount;
-        private int rneuronsBoundedCapacity;
-        private int sessionsBoundedCapacity;
-        private int solutionsBoundedCapacity;
-        private int casesBoundedCapacity;
-
+        public IRlmNetwork Network { get; private set; }
+        
         public SortedList<RlmInputKey, RlmInputValue> DynamicInputs { get; set; }
 
         //public ConcurrentDictionary<long, SortedList<double, HashSet<long>>> DynamicLinearInputs { get; set; } = new ConcurrentDictionary<long, SortedList<double, HashSet<long>>>();
@@ -59,42 +86,33 @@ namespace RLM.Memory
         public double MomentumAdjustment { get; set; } = 25;
         public double CacheBoxMargin { get; set; } = 0;
         public bool UseMomentumAvgValue { get; set; } = false;
-        
-        private BlockingCollection<Rneuron> rneuron_queue;
-        private BlockingCollection<Session> session_queue;
-        private BlockingCollection<Session> savedSession_queue;
-        private BlockingCollection<Solution> solution_queue;
-        private BlockingCollection<Case> case_queue;
-        private List<Session> sessions = new List<Session>();
 
-        private RlmDbMgr rlmDb;
-
-        private CancellationTokenSource ctSourceSessions;
-        private CancellationToken tokenSessions;
-
-        private CancellationTokenSource ctSourceCases;
-        private CancellationToken tokenCases;
         /// <summary>
         /// Initializes memory manager
         /// </summary>
         /// <param name="databaseName">datbase name</param>
-        public Manager(string databaseName)
+        public Manager(IRlmNetwork network)
         {
-            DabaseName = databaseName;
+            Network = network;
             rneuron_queue = new BlockingCollection<Rneuron>();
             session_queue = new BlockingCollection<Session>();
             savedSession_queue = new BlockingCollection<Session>();
             solution_queue = new BlockingCollection<Solution>();
             case_queue = new BlockingCollection<Case>();
 
-            rlmDb = new RlmDbMgr(DabaseName);
+            rlmDb = new RlmDbMgr(network.DatabaseName);
+            rlmDbEnqueuer = new RlmObjectEnqueuer();
 
             ctSourceSessions = new CancellationTokenSource();
             tokenSessions = ctSourceSessions.Token;
 
             ctSourceCases = new CancellationTokenSource();
             tokenCases = ctSourceCases.Token;
+
+            progressUpdater.Interval = 1000;
+            progressUpdater.Elapsed += ProgressUpdater_Elapsed;
         }
+
         /// <summary>
         /// Save created network
         /// </summary>
@@ -127,8 +145,6 @@ namespace RLM.Memory
             //Solutions = new ConcurrentDictionary<long, Solution>(iConcurrencyLevel, solutionsBoundedCapacity);
             
         }
-
-        private System.Diagnostics.Stopwatch dbSavingTime = new System.Diagnostics.Stopwatch();
         /// <summary>
         /// Save the new network and send it to a task. It also starts the database workers
         /// </summary>
@@ -142,7 +158,7 @@ namespace RLM.Memory
             //todo: rnn dbmanager and save
             dbSavingTime.Start();
 
-            RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Started saving data for {1}...", DateTime.Now, DabaseName), DabaseName);
+            RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Started saving data for {1}...", DateTime.Now, Network.DatabaseName), Network.DatabaseName);
 
             Task t1 = Task.Run(() =>
             {
@@ -737,76 +753,7 @@ namespace RLM.Memory
             }              
         }
 
-        private IEnumerable<RlmIOWithValue> GetRandomOutputValues(IEnumerable<RlmIO> outputs)
-        {
-            var retVal = new List<RlmIOWithValue>();
 
-            foreach (var item in outputs)
-            {
-                string value = GetRandomValue(item);
-
-                var output_with_value = new RlmIOWithValue(item, value);
-                retVal.Add(output_with_value);
-            }
-
-            return retVal;
-        }
-
-        private string GetRandomValue(RlmIO item)
-        {
-            string value = string.Empty;
-            
-            // TODO add checking on the types and their max and min values
-            switch (item.DotNetType)
-            {
-                case "System.Boolean":
-                    int boolMin = Convert.ToInt32(item.Min);
-                    int boolMax = Convert.ToInt32(item.Max + 1);
-                    int boolIntValue = Util.Randomizer.Next(boolMin, boolMax);
-                    if (boolIntValue > 1 && boolIntValue < 0)
-                    {
-                        throw new Exception("Boolean value can only be 1 or 0");
-                    }
-                    value = Convert.ToBoolean(boolIntValue).ToString();
-                    break;
-
-                case "System.Double":
-                case "System.Decimal":
-                    double doubleMin = Convert.ToDouble(item.Min);
-                    double doubleMax = Convert.ToDouble(item.Max);
-                    value = Util.Randomizer.NextDouble(doubleMin, doubleMax).ToString();                    
-                    break;
-
-                default:
-                    int min = Convert.ToInt32(item.Min);
-                    int max = Convert.ToInt32(item.Max + 1);
-                    if (item.Idea != null)
-                    {
-                        max = item.Idea.IndexMax + 1;
-                        int ideaIndex = Util.Randomizer.Next(min, max);
-                        if (item.Idea.GetIndexEquivalent != null)
-                        {
-                            value = item.Idea.GetIndexEquivalent(ideaIndex).ToString();
-                        }
-                        else
-                        {
-                            value = ideaIndex.ToString();
-                        }
-                    }
-                    else
-                    {
-                        value = Util.Randomizer.Next(min, max).ToString();
-                    }
-                    break;
-            }
-
-            return value;
-        }
-
-        private Task sessionCreateTask;
-        private Task sessionUpdateTask;
-        private Task caseTask;
-        private int dbSaveTaskDelay = 25;
         /// <summary>
         /// starts database workers that handle queue's
         /// </summary>
@@ -814,53 +761,19 @@ namespace RLM.Memory
         {
             //note: we can start multiple workers later
             sessionCreateTask = rlmDb.StartSessionWorkerForCreate(session_queue, tokenSessions); //start session thread for create
-            Task.Run(() => { RlmObjectEnqueuer.QueueObjects<Session>(Sessions2, session_queue); }); //queue sessions for create to blocking collections
+            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Session>(Sessions2, session_queue); }); //queue sessions for create to blocking collections
 
             sessionUpdateTask = rlmDb.StartSessionWorkerForUpdate(savedSession_queue, tokenSessions); //start session thread for update
-            Task.Run(() => { RlmObjectEnqueuer.QueueObjects<Session>(Sessions3, savedSession_queue); }); //queue sessions for update to blocking collections
+            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Session>(Sessions3, savedSession_queue); }); //queue sessions for update to blocking collections
 
             caseTask = rlmDb.StartCaseWorker(case_queue, tokenCases); //start case thread to save (Rneuron, Solution, Case) to db
-            Task.Run(() => { RlmObjectEnqueuer.QueueObjects<Case>(Cases2, case_queue); }); //queue case values to blocking collections
+            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Case>(Cases2, case_queue); }); //queue case values to blocking collections                     
 
-            //background thread to stop session db workers when done
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    bool processing = Sessions.Any(a => a.Value.CreatedToDb == false || a.Value.UpdatedToDb == false);
-                    if (!processing && Sessions.Count > 0 && rlmDb.TaskDelay == dbSaveTaskDelay)
-                    {
-                        StopRlmDbWorkersSessions();
-                        break;
-                    }
-
-                    Task.Delay(5 * 1000).Wait();
-                }
-
-            });
-
-            //background thread to stop case db workers when done
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    bool processing = Cases.Any(a => a.SavedToDb == false);
-                    if (!processing && Cases.Count > 0 && rlmDb.TaskDelay == dbSaveTaskDelay && sessionsDone && rlmDb.DistinctCaseSessionsCount() == totalSessionsCount)
-                    {
-                        StopRlmDbWorkersCases();
-                        break;
-                    }
-
-                    Task.Delay(5 * 1000).Wait();
-                }
-
-            });
+            progressUpdater.Start();
 
             //rnnDb.StartCaseWorker(tokenCases);
         }
 
-        private bool sessionsDone = false;
-        private int totalSessionsCount = 0;
         /// <summary>
         /// stops the session queue worker
         /// </summary>
@@ -887,36 +800,153 @@ namespace RLM.Memory
 
             dbSavingTime.Stop();
 
-            RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Data successfully saved to the database in {1}", DateTime.Now, dbSavingTime.Elapsed), DabaseName);
+            RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Data successfully saved to the database in {1}", DateTime.Now, dbSavingTime.Elapsed), Network.DatabaseName);
             if (ConfigFile.DropDb)
             {
                 Task.Delay(5000).Wait();
 
                 rlmDb.DropDB();
 
-                RlmDbLogger.Info("\n" + string.Format("[{0:G}]: {1} database successfully dropped...\n*** END ***\n", DateTime.Now, DabaseName), DabaseName);
+                RlmDbLogger.Info("\n" + string.Format("[{0:G}]: {1} database successfully dropped...\n*** END ***\n", DateTime.Now, Network.DatabaseName), Network.DatabaseName);
             }
+
+            // notify parent network that db background workers are done
+            DataPersistenceComplete?.Invoke();
+            progressUpdater.Stop();
         }
         /// <summary>
         /// Loads the network result
         /// </summary>
         /// <param name="network"></param>
         /// <returns></returns>
-        public LoadRnetworkResult LoadNetwork(IRlmNetwork network)
+        public LoadRnetworkResult LoadNetwork(string networkName)
         {
-            var result = rlmDb.LoadNetwork(NetworkName, network);
+            var result = rlmDb.LoadNetwork(networkName, Network);
             if (result.Loaded)
             {
                 StartRlmDbWorkers();
             }
             return result;
         }
+
         /// <summary>
         /// signals that training is done
         /// </summary>
         public void TrainingDone()
         {
-            rlmDb.TaskDelay = dbSaveTaskDelay;
+            trainingDone = true;
+
+            //background thread to stop session db workers when done
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    bool processing = Sessions.Any(a => a.Value.CreatedToDb == false || a.Value.UpdatedToDb == false);
+                    if (!processing && Sessions.Count > 0 && trainingDone)
+                    {
+                        StopRlmDbWorkersSessions();
+                        System.Diagnostics.Debug.WriteLine("Worker Session done");
+                        break;
+                    }
+
+                    Task.Delay(5 * 1000).Wait();
+                }
+
+            });
+
+            //background thread to stop case db workers when done
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    bool processing = Cases.Any(a => a.SavedToDb == false);
+                    if (!processing && Cases.Count > 0 && trainingDone && sessionsDone && rlmDb.DistinctCaseSessionsCount() == totalSessionsCount)
+                    {
+                        StopRlmDbWorkersCases();
+                        System.Diagnostics.Debug.WriteLine("Worker Cases done");
+                        break;
+                    }
+
+                    Task.Delay(5 * 1000).Wait();
+                }
+
+            });
+        }
+
+        public void SetProgressInterval(int interval)
+        {
+            progressUpdater.Interval = interval;
+        }
+
+        private void ProgressUpdater_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            DataPersistenceProgress?.Invoke(rlmDb.TotalTaskCompleted, rlmDbEnqueuer.TotalTaskEnqueued);
+        }
+
+        private IEnumerable<RlmIOWithValue> GetRandomOutputValues(IEnumerable<RlmIO> outputs)
+        {
+            var retVal = new List<RlmIOWithValue>();
+
+            foreach (var item in outputs)
+            {
+                string value = GetRandomValue(item);
+
+                var output_with_value = new RlmIOWithValue(item, value);
+                retVal.Add(output_with_value);
+            }
+
+            return retVal;
+        }
+
+        private string GetRandomValue(RlmIO item)
+        {
+            string value = string.Empty;
+
+            // TODO add checking on the types and their max and min values
+            switch (item.DotNetType)
+            {
+                case "System.Boolean":
+                    int boolMin = Convert.ToInt32(item.Min);
+                    int boolMax = Convert.ToInt32(item.Max + 1);
+                    int boolIntValue = Util.Randomizer.Next(boolMin, boolMax);
+                    if (boolIntValue > 1 && boolIntValue < 0)
+                    {
+                        throw new Exception("Boolean value can only be 1 or 0");
+                    }
+                    value = Convert.ToBoolean(boolIntValue).ToString();
+                    break;
+
+                case "System.Double":
+                case "System.Decimal":
+                    double doubleMin = Convert.ToDouble(item.Min);
+                    double doubleMax = Convert.ToDouble(item.Max);
+                    value = Util.Randomizer.NextDouble(doubleMin, doubleMax).ToString();
+                    break;
+
+                default:
+                    int min = Convert.ToInt32(item.Min);
+                    int max = Convert.ToInt32(item.Max + 1);
+                    if (item.Idea != null)
+                    {
+                        max = item.Idea.IndexMax + 1;
+                        int ideaIndex = Util.Randomizer.Next(min, max);
+                        if (item.Idea.GetIndexEquivalent != null)
+                        {
+                            value = item.Idea.GetIndexEquivalent(ideaIndex).ToString();
+                        }
+                        else
+                        {
+                            value = ideaIndex.ToString();
+                        }
+                    }
+                    else
+                    {
+                        value = Util.Randomizer.Next(min, max).ToString();
+                    }
+                    break;
+            }
+
+            return value;
         }
     }
 }
