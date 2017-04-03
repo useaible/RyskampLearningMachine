@@ -153,24 +153,24 @@ namespace WPFMazeApp
                 else // with window
                 {
                     this.Visibility = System.Windows.Visibility.Hidden;
-                    for (int i = 0; i < totalIterations; i++)
-                    {
-                        if (i != 0)
-                        {
-                            GC.Collect();
-                            System.Threading.Thread.Sleep(100);
-                        }
+                    //for (int i = 0; i < totalIterations; i++)
+                    //{
+                        //if (i != 0)
+                        //{
+                            //GC.Collect();
+                            //System.Threading.Thread.Sleep(100);
+                        //}
 
-                        using (var win = new MainWindow(MazeId, PlayerType.RNN, true, randomSessions, i + 1, totalIterations, Convert.ToInt32(slRfactorStartValue.Value), Convert.ToInt32(slRfactorEndValue.Value)))
+                        using (var win = new MainWindow(MazeId, PlayerType.RNN, true, randomSessions, 1, totalIterations, Convert.ToInt32(slRfactorStartValue.Value), Convert.ToInt32(slRfactorEndValue.Value)))
                         {
                             win.Show();
                             await win.WhenClosed();
-                            if (!win.ClosedDueToGameOver)
-                            {
-                                break;
-                            }
+                            //if (!win.ClosedDueToGameOver)
+                            //{
+                            //    break;
+                            //}
                         }
-                    }
+                    //}
                     this.Visibility = Visibility.Visible;
                 }
             }

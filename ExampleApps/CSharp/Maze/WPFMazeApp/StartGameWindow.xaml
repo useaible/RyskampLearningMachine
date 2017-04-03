@@ -59,8 +59,8 @@
                         <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorEndValue" IsDirectionReversed="True" Width="172" />
                     </DockPanel>
                     <DockPanel Grid.Row="5" Margin="5,0,0,0">
-                        <Label DockPanel.Dock="Top" Content="Change Rfactor Over"></Label>
-                        <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="100" Minimum="1" Maximum="100" Width="156" Validation.Error="On_Error"/>
+                        <Label DockPanel.Dock="Top" Content="Randomness Over"></Label>
+                        <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="1" Minimum="1" Maximum="100" Width="156" Validation.Error="On_Error"/>
                         <Label DockPanel.Dock="Left" Content="Sessions" Width="102"/>
                     </DockPanel>
                     <CheckBox x:Name="chkWindowless" Content="" HorizontalAlignment="Left" Margin="120,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.324,-0.133" Height="20" Grid.Row="6" Width="20"/>

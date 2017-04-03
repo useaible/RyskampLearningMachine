@@ -1,7 +1,7 @@
 ﻿<Window x:Class="WPFMazeApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="582.984" Width="590.667" Loaded="Window_Loaded">
+        Title="MainWindow" Height="582.984" Width="590.667" Loaded="Window_Loaded" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <StackPanel Margin="0,0,0,-4">
         <Grid x:Name="MainGrid" Height="471">
