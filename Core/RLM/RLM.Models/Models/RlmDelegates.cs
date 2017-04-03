@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace RLM.Models
 {
     public delegate void DataPersistenceCompleteDelegate();
-    public delegate void DataPersistenceProgressDelegate(long processing, long total);        
+    public delegate void DataPersistenceProgressDelegate(long processed, long total);        
 }

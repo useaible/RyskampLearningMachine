@@ -132,9 +132,9 @@ namespace LogisticsConsoleApp
         {
             Console.WriteLine("RLM data persistence done.");
         }
-        private static void Network_DataPersistenceProgress(long processing, long total)
+        private static void Network_DataPersistenceProgress(long processed, long total)
         {
-            Console.WriteLine($"Data Persistence progress: {processing} / {total}");
+            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
         }
     }
 }

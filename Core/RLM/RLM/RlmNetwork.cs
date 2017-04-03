@@ -615,7 +615,7 @@ namespace RLM
         }
 
         /// <summary>
-        /// Changes the interval time that the DataPersistencePrgoress event is triggered. Default time is 1000ms (1 second)
+        /// Changes the interval time that the DataPersistenceProgress event is triggered. Default time is 1000ms (1 second)
         /// </summary>
         /// <param name="milliseconds">The amount of time for the interval in milliseconds (ms)</param>
         public void SetDataPersistenceProgressInterval(int milliseconds)

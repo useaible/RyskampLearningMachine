@@ -105,9 +105,9 @@ namespace MazeGameLib
             return rlmNet;
         }
 
-        private void RlmNet_DataPersistenceProgress(long processing, long total)
+        private void RlmNet_DataPersistenceProgress(long processed, long total)
         {
-            Console.WriteLine($"Data Persistence progress: {processing} / {total}");
+            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
         }
 
         private void RlmNet_DataPersistenceComplete()
