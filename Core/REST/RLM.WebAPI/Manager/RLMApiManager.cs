@@ -139,7 +139,47 @@ namespace RLM.WebAPI.Manager
             RlmNetworkWebAPI network = LoadNetworkFromCache(data);
             network.SessionEnd(data.SessionScore);
         }
-        
+
+        public IEnumerable<RlmSessionHistory> GetSessions(bool withLearning, RlmFilterResultParams data)
+        {
+            if(withLearning)
+            {
+                return getSessionsWithSignificantLearning(data);
+            }
+            else
+            {
+                return getSessionHistory(data);
+            }
+        }
+
+        private IEnumerable<RlmSessionHistory> getSessionHistory(RlmFilterResultParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+
+            return hist.GetSessionHistory(data.Skip, data.Take);
+        }
+
+        private IEnumerable<RlmSessionHistory> getSessionsWithSignificantLearning(RlmFilterResultParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+
+            return hist.GetSignificantLearningEvents(data.Skip, data.Take);
+        }
+
+        public IEnumerable<RlmCaseHistory> GetSessionCases(RlmGetSessionCaseParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+
+            return hist.GetSessionCaseHistory(data.SessionId, data.Skip, data.Take);
+        }
+
+        public RlmCaseIOHistory GetCaseInputOutputDetails(RlmGetCaseIOParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+
+            return hist.GetCaseIOHistory(data.CaseId, data.RneuronId, data.SolutionId);
+        }
+
         private RlmNetworkWebAPI LoadNetworkFromCache(RlmParams data)
         {
             RlmNetworkWebAPI retVal = null;

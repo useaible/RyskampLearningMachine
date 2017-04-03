@@ -14,6 +14,16 @@ namespace RequirementsTool
         {
             Name = "Visual Studio Python Tools";
             Url = "https://microsoft.github.io/PTVS/";
+
+            Versions.Add("2.2.0 or later");
+
+            SetAdditionalHelpFormatted("If you have Visual Studio installed, you can get Python Tools through the Extension manager instead:",
+                new string[] {
+                    "On Visual Studio, go to the 'Tools' menu",
+                    "Then, to the 'Extensions and Updates' submenu",
+                    "Click on the 'Online' side tab and type in 'Python Tools' on the Search box",
+                    "On the listed results, find 'Python Tools for Visual Studio' and hit Download"
+                });
         }
 
         public string VSVersionNum { get; set; }

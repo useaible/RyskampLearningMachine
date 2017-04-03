@@ -27,6 +27,7 @@ namespace RLM
 
     public delegate void CycleCompleteDelegate(RlmCyclecompleteArgs e);
 
+
     //Core Network Class, this is used by client programs to access all network functions
     public class RlmNetwork : IRlmNetwork
     {
@@ -37,6 +38,8 @@ namespace RLM
         //Events
         public event SessionCompleteDelegate SessionComplete;
         public event CycleCompleteDelegate CycleComplete;
+        public event DataPersistenceCompleteDelegate DataPersistenceComplete;
+        public event DataPersistenceProgressDelegate DataPersistenceProgress;
 
         public IManager MemoryManager { get; private set; }
 
@@ -206,7 +209,7 @@ namespace RLM
         public string DatabaseName { get; private set; }
         
         public IDictionary<long, RlmInputMomentum> InputMomentums { get; private set; } = new Dictionary<long, RlmInputMomentum>();
-        public SessionCaseHistory SessionCaseHistory { get; set; }
+        public RlmSessionCaseHistory SessionCaseHistory { get; set; }
 
         #region Static
 
@@ -294,8 +297,7 @@ namespace RLM
         public RlmNetwork()
         {
             DatabaseName = RlmDbEntities.DetermineDbName();
-            MemoryManager = new Manager(DatabaseName);
-            SetDefaultMomentumSettings();
+            Initialize();
         }
         /// <summary>
         /// sets your preferred database name
@@ -304,8 +306,7 @@ namespace RLM
         public RlmNetwork(string databaseName)
         {
             DatabaseName = databaseName;
-            MemoryManager = new Manager(DatabaseName);
-            SetDefaultMomentumSettings();
+            Initialize();
             //MemoryManager.StartRnnDbWorkers();
 
             //using (RnnDbEntities db = new RnnDbEntities(DatabaseName))
@@ -316,7 +317,7 @@ namespace RLM
 
         #endregion Constructor
 
-        #region External Methods
+        #region Core Methods
         /// <summary>
         /// Sets up a new network and sets the network as current network to use in training.
         /// </summary>
@@ -333,9 +334,7 @@ namespace RLM
 
             // initialize Case Order
             CaseOrder = 0; 
-
-            MemoryManager.NetworkName = CurrentNetworkName;
-
+            
             Console.WriteLine("Create new network: " + newnet.Name);
 
             //Inputs
@@ -419,8 +418,7 @@ namespace RLM
         /// <returns>Returns true if network is successfully loaded</returns>
         public bool LoadNetwork(string name)
         {
-            MemoryManager.NetworkName = name;
-            var result = MemoryManager.LoadNetwork(this);
+            var result = MemoryManager.LoadNetwork(name);
 
             if (result.Loaded)
             {
@@ -604,10 +602,27 @@ namespace RLM
         }
 
 
-
         #endregion External Methods
 
-        #region Supporting Functions        
+        #region Supporting Functions
+        /// <summary>
+        /// Notifies the RLM that the current training/prediction sessions are finished and you will no longer use the RLM Network instance. 
+        /// Also, it allows the DataPersistence events to work properly so this must be called at the very end.
+        /// </summary>   
+        public void TrainingDone()
+        {
+            MemoryManager.TrainingDone();
+        }
+
+        /// <summary>
+        /// Changes the interval time that the DataPersistenceProgress event is triggered. Default time is 1000ms (1 second)
+        /// </summary>
+        /// <param name="milliseconds">The amount of time for the interval in milliseconds (ms)</param>
+        public void SetDataPersistenceProgressInterval(int milliseconds)
+        {
+            MemoryManager.SetProgressInterval(milliseconds);
+        }
+
         //Process new inputs/outputs during create new network
         private object ProcessNewIO(Rnetwork net, RlmIO io, Boolean ProcessAsOutput = false)
         {
@@ -618,7 +633,7 @@ namespace RLM
             iot = new Input_Output_Type() { ID = Util.GenerateHashKey(io.DotNetType), Name = io.DotNetType, DotNetTypeName = io.DotNetType };
             Console.WriteLine("Creating new Input_Output_Type: " + io.DotNetType);
 
-            if(!ProcessAsOutput)
+            if (!ProcessAsOutput)
             {
                 //ToDo: Check for unique names
 
@@ -633,7 +648,7 @@ namespace RLM
                 //ToDo: Check for unique names
 
                 //Create Output
-                Output newio = new Output() {ID = Util.GenerateHashKey(io.Name), Name=io.Name, Rnetwork_ID = net.ID, Input_Output_Type_ID = iot.ID, Input_Output_Type =iot,Min=io.Min,Max=io.Max};                
+                Output newio = new Output() { ID = Util.GenerateHashKey(io.Name), Name = io.Name, Rnetwork_ID = net.ID, Input_Output_Type_ID = iot.ID, Input_Output_Type = iot, Min = io.Min, Max = io.Max };
                 io.ID = newio.ID;
                 retVal = newio;
                 Console.WriteLine("Create new Output: " + newio.Name);
@@ -642,17 +657,25 @@ namespace RLM
             return retVal;
         }
 
-        private void SetDefaultMomentumSettings()
+        private void Initialize()
         {
+            MemoryManager = new Manager(this);
+            MemoryManager.DataPersistenceComplete += MemoryManager_DataPersistenceComplete;
+            MemoryManager.DataPersistenceProgress += MemoryManager_DataPersistenceProgress;
+
             // default 
             MemoryManager.UseMomentumAvgValue = USE_MOM_AVG;
             MemoryManager.MomentumAdjustment = MOMENTUM_ADJUSTMENT;
             MemoryManager.CacheBoxMargin = CACHE_MARGIN;
         }
-
-        public void TrainingDone()
+        
+        private void MemoryManager_DataPersistenceComplete()
         {
-            MemoryManager.TrainingDone();
+            DataPersistenceComplete?.Invoke();
+        }
+        private void MemoryManager_DataPersistenceProgress(long processing, long total)
+        {
+            DataPersistenceProgress?.Invoke(processing, total);
         }
         #endregion Supporting Functions
     }

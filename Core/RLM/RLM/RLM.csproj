@@ -69,7 +69,7 @@
     <Compile Include="RlmSessionHistory.cs" />
     <Compile Include="RlmStats.cs" />
     <Compile Include="RlmUtils.cs" />
-    <Compile Include="SessionCaseHistory.cs" />
+    <Compile Include="RlmSessionCaseHistory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

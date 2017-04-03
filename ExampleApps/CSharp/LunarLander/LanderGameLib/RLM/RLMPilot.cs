@@ -18,6 +18,8 @@ namespace LanderGameLib
         {
             string dbName = "RLM_lander_" + Guid.NewGuid().ToString("N");
             network = new RlmNetwork(dbName);
+            network.DataPersistenceComplete += Network_DataPersistenceComplete;
+            network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
             if (!network.LoadNetwork(NETWORK_NAME))
             {
@@ -38,6 +40,16 @@ namespace LanderGameLib
             network.EndRandomness = endRandomness;
             network.MaxLinearBracket = maxLinearBracket;
             network.MinLinearBracket = minLinearBracket;
+        }
+
+        private void Network_DataPersistenceProgress(long processed, long total)
+        {
+            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+        }
+
+        private void Network_DataPersistenceComplete()
+        {
+            Console.WriteLine("RLM Data Persistence done.");
         }
 
         public bool Learn { get; set; }

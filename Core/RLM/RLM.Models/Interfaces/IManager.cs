@@ -16,8 +16,10 @@ namespace RLM.Models.Interfaces
         List<TimeSpan> RebuildCacheboxTimes { get; set; }
         // temp for benchmar only
 
-        string DabaseName { get; set; }
-        string NetworkName { get; set; }
+        event DataPersistenceCompleteDelegate DataPersistenceComplete;
+        event DataPersistenceProgressDelegate DataPersistenceProgress;
+
+        IRlmNetwork Network { get; }
         ConcurrentDictionary<long, Rneuron> Rneurons { get; set; }
         //key: Input.ID
         SortedList<RlmInputKey, RlmInputValue> DynamicInputs { get; set; }
@@ -35,7 +37,7 @@ namespace RLM.Models.Interfaces
         bool UseMomentumAvgValue { get; set; }
         void NewNetwork(Rnetwork rnetwork, Input_Output_Type io_type, List<Input> inputs, List<Output> outputs);
         void NewNetwork(Rnetwork rnetwork, List<Input_Output_Type> io_types, List<Input> inputs, List<Output> outputs, IRlmNetwork rnn_net);
-        LoadRnetworkResult LoadNetwork(IRlmNetwork rnetwork);
+        LoadRnetworkResult LoadNetwork(string networkName);
         bool AddSessionToQueue(long key, Session session);
         bool AddSessionUpdateToQueue(Session session);
         void AddCaseToQueue(long key, Case c_case);
@@ -49,6 +51,7 @@ namespace RLM.Models.Interfaces
         void StartRlmDbWorkers();
         void TrainingDone();
         void InitStorage(List<Input> inputs, List<Output> outputs);
+        void SetProgressInterval(int milliseconds);
         //todo: Manage  Collections, garbage collect?
     }
 }

@@ -32,6 +32,8 @@ namespace LogisticsConsoleApp
             try
             {
                 RlmNetwork network = new RlmNetwork(dbName); //Make an instance of rlm_network passing the database name as parameter
+                network.DataPersistenceComplete += Network_DataPersistenceComplete;
+                network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
                 if (!network.LoadNetwork(networkName)) //
                 {
@@ -110,7 +112,7 @@ namespace LogisticsConsoleApp
 
                 Console.WriteLine(resultText);
                 Console.WriteLine($"\nElapsed: {watch.Elapsed}");
-                network.TrainingDone();
+                network.TrainingDone();                
             }
             catch (Exception e)
             {
@@ -124,6 +126,15 @@ namespace LogisticsConsoleApp
                 }
             }
             Console.ReadLine();
+        }
+        
+        private static void Network_DataPersistenceComplete()
+        {
+            Console.WriteLine("RLM data persistence done.");
+        }
+        private static void Network_DataPersistenceProgress(long processed, long total)
+        {
+            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
         }
     }
 }

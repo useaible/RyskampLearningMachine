@@ -70,6 +70,7 @@
     <Compile Include="Models\EF\RnetworkSetting.cs" />
     <Compile Include="Models\EF\Rneuron.cs" />
     <Compile Include="Models\LoadRnetworkResult.cs" />
+    <Compile Include="Models\RlmDelegates.cs" />
     <Compile Include="Models\RneuronInputSet.cs" />
     <Compile Include="Models\SolutionOutputSet.cs" />
     <Compile Include="Models\RlmIdea.cs" />

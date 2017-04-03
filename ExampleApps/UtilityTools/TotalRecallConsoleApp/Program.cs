@@ -51,7 +51,7 @@ namespace TotalRecallConsoleApp
                 goto getDbName;
             }
 
-            var sessionCaseApi = new SessionCaseHistory(dbName);
+            var sessionCaseApi = new RlmSessionCaseHistory(dbName);
             bool dbOk = false;
 
             if (userInput == 1)
@@ -82,7 +82,7 @@ namespace TotalRecallConsoleApp
             Console.ReadLine();
         }
 
-        private static void getResults(SessionCaseHistory sessionCaseApi, int mode, out bool dbOk)
+        private static void getResults(RlmSessionCaseHistory sessionCaseApi, int mode, out bool dbOk)
         {
             dbOk = true;
 
@@ -228,7 +228,7 @@ namespace TotalRecallConsoleApp
             }
         }
         
-        private static void GenerateHtmlFile(SessionCaseHistory sessionCaseApi)
+        private static void GenerateHtmlFile(RlmSessionCaseHistory sessionCaseApi)
         {
             getMode:
 
