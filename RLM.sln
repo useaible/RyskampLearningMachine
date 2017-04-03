@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TotalRecallConsoleApp", "Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsTool", "ExampleApps\UtilityTools\RequirementsTool\RequirementsTool.csproj", "{A6082C73-D431-4841-8815-B675E0CF7526}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMazeApp", "ExampleApps\CSharp\Maze\WPFMazeApp\WPFMazeApp.csproj", "{4DCE8890-5A0F-4C04-9D24-A7404844E17D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6082C73-D431-4841-8815-B675E0CF7526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,5 +164,6 @@ Global
 		{C3D5291E-BAC3-491A-A823-AD279820AFB5} = {AC49F9AD-6797-47AC-B081-9A204352AE6B}
 		{975DE603-3A3A-486D-A3FD-AE8AFEB2E3E8} = {C3D5291E-BAC3-491A-A823-AD279820AFB5}
 		{A6082C73-D431-4841-8815-B675E0CF7526} = {C3D5291E-BAC3-491A-A823-AD279820AFB5}
+		{4DCE8890-5A0F-4C04-9D24-A7404844E17D} = {7993561B-46FF-4C61-822E-F68412C0505A}
 	EndGlobalSection
 EndGlobal
