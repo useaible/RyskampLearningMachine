@@ -70,59 +70,59 @@ namespace WPFMazeApp
             this.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        private void btnPlay_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                // Human
-                if (cmbPlayer.SelectedIndex == 0)
-                {
-                    win = new MainWindow(MazeId, PlayerType.Human);
-                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-                    win.Show();
-                    this.Visibility = System.Windows.Visibility.Hidden;
-                }
-                else if (cmbPlayer.SelectedIndex == 1) // RNN AI
-                {
-                    var selectedMaze = mazeRepo.GetByID(MazeId);
+        //private void btnPlay_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        // Human
+        //        if (cmbPlayer.SelectedIndex == 0)
+        //        {
+        //            win = new MainWindow(MazeId, PlayerType.Human);
+        //            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+        //            win.Show();
+        //            this.Visibility = System.Windows.Visibility.Hidden;
+        //        }
+        //        else if (cmbPlayer.SelectedIndex == 1) // RNN AI
+        //        {
+        //            var selectedMaze = mazeRepo.GetByID(MazeId);
 
-                    if (selectedMaze != null)
-                    {
-                        var hasLearned = true;//rnn_utils.NeuralNetworkExisting(selectedMaze.Name);
-                        if (hasLearned)
-                        {
-                            win = new MainWindow(MazeId, PlayerType.RNN, false);
-                            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-                            win.Show();
-                            this.Visibility = System.Windows.Visibility.Hidden;
-                        }
-                        else
-                            Xceed.Wpf.Toolkit.MessageBox.Show("You must first train the AI with the selected maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //            if (selectedMaze != null)
+        //            {
+        //                var hasLearned = true;//rnn_utils.NeuralNetworkExisting(selectedMaze.Name);
+        //                if (hasLearned)
+        //                {
+        //                    win = new MainWindow(MazeId, PlayerType.RNN, false);
+        //                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+        //                    win.Show();
+        //                    this.Visibility = System.Windows.Visibility.Hidden;
+        //                }
+        //                else
+        //                    Xceed.Wpf.Toolkit.MessageBox.Show("You must first train the AI with the selected maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
-                    }
-                    else
-                        Xceed.Wpf.Toolkit.MessageBox.Show("You must select a maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                }
-                else // Encog AI
-                {
-                    win = new MainWindow(MazeId, PlayerType.Encog);
-                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-                    win.Show();
-                    this.Visibility = System.Windows.Visibility.Hidden;
-                }
-            }
-            catch (Exception err)
-            {
-                if (err.InnerException != null && err.InnerException is RlmDefaultConnectionStringException)
-                {
-                    Xceed.Wpf.Toolkit.MessageBox.Show($"Error: {err.InnerException.Message}");
-                }
-                else
-                {
-                    Xceed.Wpf.Toolkit.MessageBox.Show($"ERROR: {err.Message}");
-                }
-            }
-        }
+        //            }
+        //            else
+        //                Xceed.Wpf.Toolkit.MessageBox.Show("You must select a maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //        }
+        //        else // Encog AI
+        //        {
+        //            win = new MainWindow(MazeId, PlayerType.Encog);
+        //            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+        //            win.Show();
+        //            this.Visibility = System.Windows.Visibility.Hidden;
+        //        }
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        if (err.InnerException != null && err.InnerException is RlmDefaultConnectionStringException)
+        //        {
+        //            Xceed.Wpf.Toolkit.MessageBox.Show($"Error: {err.InnerException.Message}");
+        //        }
+        //        else
+        //        {
+        //            Xceed.Wpf.Toolkit.MessageBox.Show($"ERROR: {err.Message}");
+        //        }
+        //    }
+        //}
 
         private async void btnLearn_Click(object sender, RoutedEventArgs e)
         {
@@ -155,21 +155,21 @@ namespace WPFMazeApp
                     this.Visibility = System.Windows.Visibility.Hidden;
                     //for (int i = 0; i < totalIterations; i++)
                     //{
-                        //if (i != 0)
-                        //{
-                            //GC.Collect();
-                            //System.Threading.Thread.Sleep(100);
-                        //}
+                    //if (i != 0)
+                    //{
+                    //GC.Collect();
+                    //System.Threading.Thread.Sleep(100);
+                    //}
 
-                        using (var win = new MainWindow(MazeId, PlayerType.RNN, true, randomSessions, 1, totalIterations, Convert.ToInt32(slRfactorStartValue.Value), Convert.ToInt32(slRfactorEndValue.Value)))
-                        {
-                            win.Show();
-                            await win.WhenClosed();
-                            //if (!win.ClosedDueToGameOver)
-                            //{
-                            //    break;
-                            //}
-                        }
+                    using (var win = new MainWindow(MazeId, PlayerType.RNN, true, randomSessions, 1, totalIterations, Convert.ToInt32(slRfactorStartValue.Value), Convert.ToInt32(slRfactorEndValue.Value)))
+                    {
+                        win.Show();
+                        await win.WhenClosed();
+                        //if (!win.ClosedDueToGameOver)
+                        //{
+                        //    break;
+                        //}
+                    }
                     //}
                     this.Visibility = Visibility.Visible;
                 }
@@ -271,14 +271,14 @@ namespace WPFMazeApp
                 btnEditMaze.IsEnabled = true;
                 btnDeleteMaze.IsEnabled = true;
                 btnLearn.IsEnabled = true;
-                btnPlay.IsEnabled = true;
+                //btnPlay.IsEnabled = true;
             }
             else
             {
                 btnEditMaze.IsEnabled = false;
                 btnDeleteMaze.IsEnabled = false;
                 btnLearn.IsEnabled = false;
-                btnPlay.IsEnabled = false;
+                //btnPlay.IsEnabled = false;
 
             }
         }
@@ -330,37 +330,37 @@ namespace WPFMazeApp
             btnLearn.IsEnabled = errorCount == 0;
         }
 
-        private void btnLearnEncog_Click(object sender, RoutedEventArgs e)
-        {
-            int totalIterations = 1;
-            int.TryParse(txtSessions.Text, out totalIterations);
+        //private void btnLearnEncog_Click(object sender, RoutedEventArgs e)
+        //{
+        //    int totalIterations = 1;
+        //    int.TryParse(txtSessions.Text, out totalIterations);
 
-            int maxTemp = 10;
-            int.TryParse(txtEncMaxTemp.Text, out maxTemp);
+        //    int maxTemp = 10;
+        //    int.TryParse(txtEncMaxTemp.Text, out maxTemp);
 
-            int minTemp = 10;
-            int.TryParse(txtEncMinTemp.Text, out minTemp);
+        //    int minTemp = 10;
+        //    int.TryParse(txtEncMinTemp.Text, out minTemp);
 
-            int cycle = 100;
-            int.TryParse(txtEncCyclesPerIteration.Text, out cycle);
+        //    int cycle = 100;
+        //    int.TryParse(txtEncCyclesPerIteration.Text, out cycle);
 
-            if (maxTemp < minTemp)
-            {
-                Xceed.Wpf.Toolkit.MessageBox.Show("Max Temp must be greater than or equal to Min Temp", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
+        //    if (maxTemp < minTemp)
+        //    {
+        //        Xceed.Wpf.Toolkit.MessageBox.Show("Max Temp must be greater than or equal to Min Temp", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //        return;
+        //    }
 
-            if (totalIterations < 1 || maxTemp < 1 || minTemp < 1 || cycle < 1)
-            {
-                Xceed.Wpf.Toolkit.MessageBox.Show("The inputs must be greater or equal to 1.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
+        //    if (totalIterations < 1 || maxTemp < 1 || minTemp < 1 || cycle < 1)
+        //    {
+        //        Xceed.Wpf.Toolkit.MessageBox.Show("The inputs must be greater or equal to 1.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //        return;
+        //    }
             
-            windowless = new WindowLessTraining(MazeId, totalIterations, maxTemp, minTemp, cycle);
-            windowless.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-            windowless.Show();
-            this.Visibility = System.Windows.Visibility.Hidden;
-        }
+        //    windowless = new WindowLessTraining(MazeId, totalIterations, maxTemp, minTemp, cycle);
+        //    windowless.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+        //    windowless.Show();
+        //    this.Visibility = System.Windows.Visibility.Hidden;
+        //}
 
         private void On_Error(object sender, ValidationErrorEventArgs e)
         {
@@ -388,6 +388,14 @@ namespace WPFMazeApp
         private void On_Error(object sender, Xceed.Wpf.Toolkit.Core.Input.InputValidationErrorEventArgs e)
         {
             
+        }
+
+        private void RfactorOverSessions_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var tb = (IntegerUpDown)sender;
+
+            if (tb.Value.Value > txtSessions.Value.Value)
+                tb.Value = txtSessions.Value.Value;
         }
     }
 }

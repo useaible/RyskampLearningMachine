@@ -8,15 +8,15 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <TabControl x:Name="tabControl" Margin="0,0,6,0">
-            <TabItem Header="Play">
+            <!--<TabItem Header="Play">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="59*"/>
                         <ColumnDefinition Width="186*"/>
                     </Grid.ColumnDefinitions>
                     <Label x:Name="label" Content="Choose player:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                    <ComboBox x:Name="cmbPlayer" HorizontalAlignment="Left" Margin="44,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Grid.Column="1">
-                        <ComboBoxItem Content="Human"/>
+                    <ComboBox x:Name="cmbPlayer" HorizontalAlignment="Left" Margin="44,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="1" Grid.Column="1">
+                        <ComboBoxItem Content="Human" Visibility="Hidden"/>
                         <ComboBoxItem Content="RNN"/>
                         <ComboBoxItem Content="Encog" Visibility="Hidden"/>
                     </ComboBox>
@@ -24,7 +24,7 @@
                     <ComboBox x:Name="comboBoxMazePlay" HorizontalAlignment="Left" Margin="44,41,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" SelectionChanged="comboBoxMazePlay_SelectionChanged" Loaded="comboBoxMazePlay_Loaded" Grid.Column="1"/>
                     <Button x:Name="btnPlay" Content="Start game" HorizontalAlignment="Left" Margin="56,82,0,0" VerticalAlignment="Top" Width="120" Click="btnPlay_Click" Grid.Column="1"/>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="RNN Learn">
                 <Grid Background="#FFE5E5E5" Margin="0,0,0,1">
                     <Grid.ColumnDefinitions>
@@ -59,12 +59,12 @@
                         <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorEndValue" IsDirectionReversed="True" Width="172" />
                     </DockPanel>
                     <DockPanel Grid.Row="5" Margin="5,0,0,0">
-                        <Label DockPanel.Dock="Top" Content="Randomness Over"></Label>
-                        <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="1" Minimum="1" Maximum="100" Width="156" Validation.Error="On_Error"/>
+                        <Label DockPanel.Dock="Top" Content="Change Rfactor Over"></Label>
+                        <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="1" Minimum="1" Width="156" Validation.Error="On_Error" Maximum="100" ValueChanged="RfactorOverSessions_ValueChanged"/>
                         <Label DockPanel.Dock="Left" Content="Sessions" Width="102"/>
                     </DockPanel>
-                    <CheckBox x:Name="chkWindowless" Content="" HorizontalAlignment="Left" Margin="120,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.324,-0.133" Height="20" Grid.Row="6" Width="20"/>
-                    <Label x:Name="label1_Copy" Content="Windowless training:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="29" Grid.Row="6" Width="120" Margin="0,38,0,0"/>
+                    <CheckBox x:Name="chkWindowless" Content="" HorizontalAlignment="Left" Margin="120,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.324,-0.133" Height="20" Grid.Row="6" Width="20" Visibility="Hidden"/>
+                    <Label x:Name="label1_Copy" Content="Windowless training:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="29" Grid.Row="6" Width="120" Margin="0,38,0,0" Visibility="Hidden"/>
                     <Label x:Name="label3" Content="100%" HorizontalAlignment="Left" Margin="5,43,0,0" Grid.Row="3" VerticalAlignment="Top" FontSize="6.667" Height="19" Width="26" Grid.RowSpan="2"/>
                     <Label x:Name="label3_Copy" Content="0%" HorizontalAlignment="Left" Margin="177,39,0,0" Grid.Row="3" VerticalAlignment="Top" FontSize="6.667" RenderTransformOrigin="6.398,0.459" Height="19" Width="19" Grid.RowSpan="2"/>
                     <Label x:Name="label3_Copy1" Content="100%" HorizontalAlignment="Left" Margin="5,45,0,0" Grid.Row="4" VerticalAlignment="Top" FontSize="6.667" Height="19" Width="26" Grid.RowSpan="2"/>
@@ -73,7 +73,7 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Maze" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55" Margin="81,0,-81,0">
+            <TabItem Header="Maze" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="127*"/>
@@ -90,7 +90,7 @@
                     <Button x:Name="btnDeleteMaze" Content="Delete Maze" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" Width="100" Height="20" Grid.Column="1" Grid.Row="2" Click="btnDeleteMaze_Click"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Encog Learn" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="81" Margin="-55,0,0,0" IsEnabled="False">
+            <!--<TabItem Header="Encog Learn" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="81" Margin="-55,0,0,0" IsEnabled="False">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -103,11 +103,11 @@
                     <TextBox x:Name="txtEncMaxTemp" HorizontalAlignment="Left" Height="23" Margin="102,72,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
                     <Label x:Name="label2_Copy2" Content="Max temp:" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top"/>
                     <Label x:Name="label2_Copy3" Content="Min temp:" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
-                    <Label x:Name="label2_Copy4" Content="Cycles per &#xD;&#xA;Iteration:" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label2_Copy4" Content="Cycles per &#xA;Iteration:" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="txtEncMinTemp" HorizontalAlignment="Left" Height="23" Margin="102,102,0,0" TextWrapping="Wrap" Text="2" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
                     <TextBox x:Name="txtEncCyclesPerIteration" HorizontalAlignment="Left" Height="23" Margin="102,139,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
 
     </Grid>

@@ -47,7 +47,7 @@ namespace WPFMazeApp
 
         public int CurrentIteration { get; set; }
 
-        public MainWindow(int mazeId, PlayerType type, Boolean learn = false, int temp_num_sessions = 1, int currentIteration = 1, int totalIterations = 1, int startRandomness = 1, int endRandomness = 1, int randomnessOver=1)
+        public MainWindow(int mazeId, PlayerType type, Boolean learn = false, int temp_num_sessions = 1, int currentIteration = 1, int totalIterations = 1, int startRandomness = 1, int endRandomness = 1)
         {
             InitializeComponent();
             mazerepo = new MazeRepo();
@@ -138,18 +138,20 @@ namespace WPFMazeApp
                 StartRandomness = 0;
                 EndRandomness = 0;
             }
+
             replayMemory = new object[Temp_num_sessions];
             StatusText.Content = "Initializing RLM engine...";
             await Task.Run(() => {
 
                 RLMMazeTraveler traveler = new RLMMazeTraveler(mazeInfo, Learn, Temp_num_sessions, StartRandomness, EndRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
+
                 traveler.SessionComplete += Traveler_SessionComplete;
                 traveler.MazeCycleComplete += Traveler_MazeCycleComplete;
                 traveler.SessionStarted += Traveler_SessionStarted;
                 traveler.MazeCycleError += mazecycle_error;
                 game.traveler = traveler;
 
-                if(Learn)
+                if (Learn)
                 {
                     RunUIThread(() => {
                         StatusText.Content = "Training started...";
@@ -163,15 +165,15 @@ namespace WPFMazeApp
                         });
                         traveler.Travel(5000);
                     }
-
+              
                     // set to predict instead of learn for the remaining sessions
-                    traveler.Learn = false;
-                    
+                    //traveler.Learn = false;
+
                     for (int i = 0; i < Temp_num_sessions - RandomnessOver; i++)
                     {
                         locations = new List<Location>();
                         RunUIThread(() => {
-                            StatusText.Content = $"Training started... {CurrentIteration*100/Temp_num_sessions}%";
+                            StatusText.Content = $"Training started... {CurrentIteration * 100 / Temp_num_sessions}%";
                         });
                         traveler.Travel(5000);
                     }
@@ -183,27 +185,29 @@ namespace WPFMazeApp
                     });
                 }
                 else
-                {                 
+                {
                     RunUIThread(() => {
                         StatusText.Content = $"RLM preparing to play...";
                     });
 
-                    traveler.Learn = false;
-  
-                    locations = new List<Location>();
+                    
+                   
 
+                    locations = new List<Location>();
+                    traveler.Travel(5000);
                     RunUIThread(() => {
                         StatusText.Content = $"RLM Playing...";
                     });
-
+                    traveler.Learn = false;
                     traveler.Travel(5000);
                     traveler.TrainingDone();
                 }
-                
+
 
             }).ContinueWith(async (t) => {
                 //show AI playing game
                 Stopwatch watch = new Stopwatch();
+                
                 foreach (dynamic obj in replayMemory)
                 {
 
@@ -216,36 +220,41 @@ namespace WPFMazeApp
                     watch.Start();
                     foreach (Location loc in obj.moves as List<Location>)
                     {
-                       
+
                         var x = loc.X;
                         var y = loc.Y;
                         RunUIThread(() =>
                         {
-                            maze.ChangeCellColor(new TravelerLocation() { X = loc.X, Y=loc.Y }, true);            
+                            maze.ChangeCellColor(new TravelerLocation() { X = loc.X, Y = loc.Y }, true);
                         });
                         await Task.Delay(TimeSpan.FromMilliseconds(1));
                         //If game is not solved within 5s, go to the next session.
-                        if (watch.Elapsed.TotalSeconds >= 5) 
+                        if (watch.Elapsed.TotalSeconds >= 5)
                             break;
                     }
-                    
+
                     watch.Reset();
 
                     RunUIThread(() => {
                         lblScore.Content = (double)obj.score;
                         lblMoves.Content = (int)obj.movesCnt;
 
-                        if(!Learn)
+                        if (!Learn)
                             StatusText.Content = $"RLM done playing...";
                         else
                             StatusText.Content = $"Showing rlm replay...";
 
                         maze.setGoalRect();
                     });
-           
+
                 }
-            },TaskContinuationOptions.OnlyOnRanToCompletion);
-           
+
+                RunUIThread(() => {
+                    StatusText.Content = $"Done. Close the window to return back to the menu and train again...";
+                });
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+
+     
         }
 
         private void Traveler_SessionStarted(double randomnessLeft)
