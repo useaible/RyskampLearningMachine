@@ -1,4 +1,4 @@
-# <center>Ryskamp Learning Machine</center> #
+# <center>Ryskamp Learning Machine</center>[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-96762732-1&cid=2694f2bc-4816-4f47-b08c-351061284434&dl=https%253A%252F%252Fgithub.com%252Fuseaible%252FRyskampLearningMachine)]()
 
 ![SevenBreakthroughs](https://raw.githubusercontent.com/useaible/RyskampLearningMachine/master/IntroImage.jpg "7 Breakthroughs")
 
