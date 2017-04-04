@@ -1,0 +1,114 @@
+﻿<Window x:Class="WPFMazeApp.StartGameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="ML Analysis Tool" Height="429.142" Width="265">
+    <Grid Margin="0,0,0,1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TabControl x:Name="tabControl" Margin="0,0,6,0">
+            <TabItem Header="Play">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="59*"/>
+                        <ColumnDefinition Width="186*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="label" Content="Choose player:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                    <ComboBox x:Name="cmbPlayer" HorizontalAlignment="Left" Margin="44,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="1" Grid.Column="1">
+                        <ComboBoxItem Content="Human" Visibility="Hidden"/>
+                        <ComboBoxItem Content="RLM"/>
+                        <ComboBoxItem Content="Encog" Visibility="Hidden"/>
+                    </ComboBox>
+                    <Label x:Name="label_Copy" Content="Choose maze:" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" IsEnabled="False" Grid.ColumnSpan="2"/>
+                    <ComboBox x:Name="comboBoxMazePlay" HorizontalAlignment="Left" Margin="44,41,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" SelectionChanged="comboBoxMazePlay_SelectionChanged" Loaded="comboBoxMazePlay_Loaded" Grid.Column="1"/>
+                    <Button x:Name="btnPlay" Content="Start game" HorizontalAlignment="Left" Margin="56,82,0,0" VerticalAlignment="Top" Width="120" Click="btnPlay_Click" Grid.Column="1"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="RLM Learn">
+                <Grid Background="#FFE5E5E5" Margin="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="36*"/>
+                        <RowDefinition Height="39*"/>
+                        <RowDefinition Height="26*"/>
+                        <RowDefinition Height="55*"/>
+                        <RowDefinition Height="59*"/>
+                        <RowDefinition Height="52*"/>
+                        <RowDefinition Height="70*"/>
+                        <RowDefinition Height="31*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" x:Name="label1" Content="Choose maze:" HorizontalAlignment="Left" Margin="5,6,0,0" VerticalAlignment="Top" Height="26" Width="84" RenderTransformOrigin="0.485,0.076"/>
+                    <ComboBox Grid.Row="0" x:Name="comboBox_Copy1" HorizontalAlignment="Left" Margin="102,10,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" Loaded="comboBox_Copy1_Loaded" SelectionChanged="comboBox_Copy1_SelectionChanged" Height="22"/>
+                    <Button Grid.Row="7" x:Name="btnLearn" Content="Start learning" HorizontalAlignment="Left" Margin="103,8,0,0" VerticalAlignment="Top" Width="132" Click="btnLearn_Click" Height="20"/>
+
+                    <Label Grid.Row="1" x:Name="label2" Content="# of Sessions:" HorizontalAlignment="Left" Margin="10,9,0,0" VerticalAlignment="Top" Height="23" RenderTransformOrigin="0.459,-0.911" Width="82"/>
+                    <Label x:Name="label2_Copy" Content="Randomness:" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Height="26" Grid.Row="2" Width="240" FontWeight="Bold"/>
+                    <xctk:IntegerUpDown x:Name="txtSessions"  Grid.Row="1" Margin="102,12,23,5"  Text="{Binding Value, ElementName=txtSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" Value="100" Minimum="1" Maximum="1000"  IsReadOnly="False" DefaultValue="104" Validation.Error="On_Error" UpdateValueOnEnterKey="True" IsUndoEnabled="False" DisplayDefaultValueOnEmptyText="True" InputValidationError="On_Error"/>
+                    <DockPanel Grid.Row="3" VerticalAlignment="Center" Margin="10,1,10,8" Height="46">
+                        <Label DockPanel.Dock="Top" Content="Start randomness"></Label>
+                        <TextBox x:Name="txtBoxRfactorStartValue" Text="{Binding Value, ElementName=slRfactorStartValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DockPanel.Dock="Right" TextAlignment="Right" Width="40" Validation.Error="On_Error" />
+                        <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorStartValue" IsDirectionReversed="True" Width="169" Value="100" />
+                    </DockPanel>
+                    <DockPanel Grid.Row="4" VerticalAlignment="Center" Margin="5,8,10,1" Height="50">
+                        <Label DockPanel.Dock="Top" Content="End randomness"></Label>
+                        <TextBox x:Name="txtBoxRfactorEndValue" Text="{Binding Value, ElementName=slRfactorEndValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" Validation.Error="On_Error" DockPanel.Dock="Right" TextAlignment="Right" Width="40" />
+                        <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorEndValue" IsDirectionReversed="True" Width="172" />
+                    </DockPanel>
+                    <DockPanel Grid.Row="5" Margin="5,0,0,0">
+                        <Label DockPanel.Dock="Top" Content="Change randomness over"></Label>
+                        <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="1" Minimum="1" Width="156" Validation.Error="On_Error" Maximum="100" ValueChanged="RfactorOverSessions_ValueChanged"/>
+                        <Label DockPanel.Dock="Left" Content="Sessions" Width="102"/>
+                    </DockPanel>
+                    <CheckBox x:Name="chkWindowless" Content="" HorizontalAlignment="Left" Margin="120,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.324,-0.133" Height="20" Grid.Row="6" Width="20" Visibility="Hidden"/>
+                    <Label x:Name="label1_Copy" Content="Windowless training:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="29" Grid.Row="6" Width="120" Margin="0,38,0,0" Visibility="Hidden"/>
+                    <Label x:Name="label3" Content="100%" HorizontalAlignment="Left" Margin="5,43,0,0" Grid.Row="3" VerticalAlignment="Top" FontSize="6.667" Height="19" Width="26" Grid.RowSpan="2"/>
+                    <Label x:Name="label3_Copy" Content="0%" HorizontalAlignment="Left" Margin="177,39,0,0" Grid.Row="3" VerticalAlignment="Top" FontSize="6.667" RenderTransformOrigin="6.398,0.459" Height="19" Width="19" Grid.RowSpan="2"/>
+                    <Label x:Name="label3_Copy1" Content="100%" HorizontalAlignment="Left" Margin="5,45,0,0" Grid.Row="4" VerticalAlignment="Top" FontSize="6.667" Height="19" Width="26" Grid.RowSpan="2"/>
+                    <Label x:Name="label3_Copy2" Content="0%" HorizontalAlignment="Left" Margin="177,47,0,0" Grid.Row="4" VerticalAlignment="Top" FontSize="6.667" Height="19" Width="26" RenderTransformOrigin="1.055,0.43" Grid.RowSpan="2"/>
+                    <TextBlock x:Name="txtBlockCompletedSessions" HorizontalAlignment="Left" Margin="5,10,0,0" Grid.Row="6" TextWrapping="Wrap" Text="Sessions completed for this maze:" VerticalAlignment="Top" Width="230" Height="32"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Maze" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="127*"/>
+                        <ColumnDefinition Width="118*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="56*"/>
+                        <RowDefinition Height="36*"/>
+                        <RowDefinition Height="277*"/>
+                    </Grid.RowDefinitions>
+                    <ListBox x:Name="listBoxMazes" HorizontalAlignment="Left" Height="206" Margin="10,10,0,0" VerticalAlignment="Top" Width="117" Loaded="listBoxMazes_Loaded" Grid.RowSpan="3" SelectedIndex="0"/>
+                    <Button Height="20" Margin="8,36,0,0" x:Name="btnMazeDesigner" VerticalAlignment="Top" Click="btnCreateMaze_Click"  HorizontalAlignment="Left" Width="99" Content="Create New Maze" Grid.Column="1" RenderTransformOrigin="0.474,0.282"/>
+                    <Button x:Name="btnEditMaze" Content="Edit Maze" Grid.Column="1" HorizontalAlignment="Left" Margin="8,8,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Height="20" Click="btnEditMaze_Click"/>
+                    <Button x:Name="btnDeleteMaze" Content="Delete Maze" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" Width="100" Height="20" Grid.Column="1" Grid.Row="2" Click="btnDeleteMaze_Click"/>
+                </Grid>
+            </TabItem>
+            <!--<TabItem Header="Encog Learn" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="81" Margin="-55,0,0,0" IsEnabled="False">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="label1_Copy1" Content="Choose maze:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="cmbEncMaze" HorizontalAlignment="Left" Margin="102,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" Loaded="comboBox_Copy1_Loaded" SelectionChanged="comboBox_Copy1_SelectionChanged"/>
+                    <Button x:Name="btnEncLearn" Content="Start learning" HorizontalAlignment="Left" Margin="103,185,0,0" VerticalAlignment="Top" Width="132" Click="btnLearnEncog_Click"/>
+                    <Label x:Name="label2_Copy1" Content="# of Iterations:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtEncIterations" HorizontalAlignment="Left" Height="23" Margin="102,44,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
+                    <TextBox x:Name="txtEncMaxTemp" HorizontalAlignment="Left" Height="23" Margin="102,72,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
+                    <Label x:Name="label2_Copy2" Content="Max temp:" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label2_Copy3" Content="Min temp:" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label2_Copy4" Content="Cycles per &#xA;Iteration:" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtEncMinTemp" HorizontalAlignment="Left" Height="23" Margin="102,102,0,0" TextWrapping="Wrap" Text="2" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
+                    <TextBox x:Name="txtEncCyclesPerIteration" HorizontalAlignment="Left" Height="23" Margin="102,139,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120" PreviewTextInput="txtBox_PreviewTextInput"/>
+                </Grid>
+            </TabItem>-->
+        </TabControl>
+
+    </Grid>
+</Window>

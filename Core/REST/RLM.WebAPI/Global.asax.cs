@@ -13,6 +13,8 @@ namespace RLM.WebAPI
     {
         protected void Application_Start()
         {
+            MqttStarter.Start(); //To make mqtt calls ready for rlm network functions.
+
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

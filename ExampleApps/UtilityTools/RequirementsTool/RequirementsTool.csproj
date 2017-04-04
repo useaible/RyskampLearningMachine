@@ -99,7 +99,9 @@
     <Compile Include="PythonNetChecker.cs" />
     <Compile Include="RegistryChecker.cs" />
     <Compile Include="SQLServerChecker.cs" />
+    <Compile Include="SQLServerInstanceInfo.cs" />
     <Compile Include="VisualStudioChecker.cs" />
+    <Compile Include="VSPythonToolsChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

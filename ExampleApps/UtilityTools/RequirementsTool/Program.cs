@@ -16,11 +16,12 @@ namespace RequirementsTool
                 new RAMRequirementChecker()
             };
 
+            var vsChecker = new VisualStudioChecker();
             List<FeatureChecker> softwareCheckers = new List<FeatureChecker>()
             {
                 new NetFrameworkChecker(),
                 new SQLServerChecker(),
-                new VisualStudioChecker()
+                vsChecker
             };
 
             StringBuilder resultsSb = new StringBuilder();
@@ -37,6 +38,7 @@ namespace RequirementsTool
             {
                 case ConsoleKey.Y:
                     softwareCheckers.Add(new PythonChecker());
+                    vsChecker.CheckPythonTools = true;
                     break;
                 case ConsoleKey.N:
                     break;
@@ -112,6 +114,15 @@ namespace RequirementsTool
                 var strInfo = v.ToString();
                 Console.WriteLine(strInfo);
                 resultsSb.AppendLine(strInfo);
+
+                if (v is SQLServerChecker && v.HasCorrectVersion)
+                {
+                    // display instances with connection strings template
+                    var sql = v as SQLServerChecker;
+                    var instancesInfo = sql.GetInstancesInfo();
+                    Console.WriteLine(instancesInfo);
+                    resultsSb.AppendLine(instancesInfo);
+                }
 
                 Console.WriteLine();
                 resultsSb.AppendLine();

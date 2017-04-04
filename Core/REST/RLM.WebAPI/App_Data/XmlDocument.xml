@@ -481,5 +481,34 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:RLM.WebAPI.Controllers.RLMController.GetSessions(System.String,System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Gets the data of games played.
+            </summary>
+            <param name="dbname">The database name where the record shall be taken.</param>
+            <param name="w_learning">Determines which resultset to return. With Learning(True) = Displays all games played with significant learning, Without Learning (False) = Displays all games played</param>
+            <param name="skip">The number of records to exclude.</param>
+            <param name="take">The number of records to take.</param>
+            <returns></returns>
+        </member>
+        <member name="M:RLM.WebAPI.Controllers.RLMController.GetSessionCases(System.String,System.Int64,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Gets the events(cases) of the specified game(session) identified by its session_id.
+            </summary>
+            <param name="dbname">The database name where the record shall be taken.</param>
+            <param name="session_id">The game where the events shall be taken.</param>
+            <param name="skip">The number of records to exclude.</param>
+            <param name="take">The number of records to take.</param>
+            <returns></returns>
+        </member>
+        <member name="M:RLM.WebAPI.Controllers.RLMController.GetCaseIO(System.String,System.Int64,System.Int64)">
+            <summary>
+            Gets the inputs and outputs details of a certain case specified by its RNeuronID and SolutionId
+            </summary>
+            <param name="dbname">The database name where the record shall be taken.</param>
+            <param name="rneuron_id">The unique identifier of a case along with its solution_id.</param>
+            <param name="solution_id">The unique identifier of a case along with its rneuron_id.</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

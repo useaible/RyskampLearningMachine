@@ -20,8 +20,43 @@ namespace RequirementsTool
             Url = "https://www.visualstudio.com/downloads/";
 
             Versions.Add("2015 or later");
+
+            CheckPythonTools = false;
+            VSPythonTools = new VSPythonToolsChecker();
         }
 
+        public bool CheckPythonTools { get; set; }
+
+        public VSPythonToolsChecker VSPythonTools { get; protected set; }
+        
+        public override bool Check()
+        {
+            HasCorrectVersion = base.Check();
+
+            if (CheckPythonTools)
+            {
+                VSPythonTools.VSVersionNum = VS_VERSION_IDENTIFIER.ToString("##.0");
+                VSPythonTools.Check();
+            }
+
+            return HasCorrectVersion;
+        }
+
+        public override string ToString()
+        {
+            if (CheckPythonTools)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine(base.ToString());
+                sb.Append(VSPythonTools.ToString());
+                return sb.ToString();
+            }
+            else
+            {
+                return base.ToString();
+            }
+        }
+        
         protected override RegistryHive BaseKey { get; set; } = RegistryHive.LocalMachine;
 
         protected override void CheckRegistry(RegistryKey localkey)

@@ -57,19 +57,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RlmCaseIOHistory.cs" />
-    <Compile Include="RlmCaseHistory.cs" />
-    <Compile Include="RlmCyclecompleteEventArgs.cs" />
     <Compile Include="RlmCerebralCortex.cs" />
-    <Compile Include="RlmDatatypeDescription.cs" />
     <Compile Include="RlmNetwork.cs" />
     <Compile Include="RlmCycle.cs" />
     <Compile Include="RlmNetworkLegacy.cs" />
-    <Compile Include="RlmScoreInfo.cs" />
-    <Compile Include="RlmSessionHistory.cs" />
-    <Compile Include="RlmStats.cs" />
+    <Compile Include="RlmSessionCaseHistory.cs" />
     <Compile Include="RlmUtils.cs" />
-    <Compile Include="SessionCaseHistory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

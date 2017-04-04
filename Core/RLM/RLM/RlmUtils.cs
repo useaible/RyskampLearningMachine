@@ -234,6 +234,30 @@ namespace RLM
 
             return retVal.ToList();
         }
+
+        public static bool RLMHasTrainingData(string dbName)
+        {
+            bool retVal = false;
+
+            using (RlmDbEntities master = new RlmDbEntities("master"))
+            {
+                if (master.DBExists(dbName))
+                {
+                    using (RlmDbEntities db = new RlmDbEntities(dbName))
+                    {
+                        if (db.Sessions.Count() > 0)
+                        {
+                            if (db.Cases.Count() > 0)
+                            {
+                                retVal = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return retVal;
+        }
         #endregion
     }
 }

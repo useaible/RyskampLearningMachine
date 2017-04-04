@@ -3,6 +3,7 @@
 // https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md
 
 using RLM.Database;
+using RLM.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,37 +12,36 @@ using System.Threading.Tasks;
 
 namespace RLM
 {
-    public class SessionCaseHistory
+    public class RlmSessionCaseHistory
     {
         public string DatabaseName { get; private set; }
-        public SessionCaseHistory(string databaseName)
+        public RlmSessionCaseHistory(string databaseName)
         {
             this.DatabaseName = databaseName;
         }
-        public IEnumerable<RlmSessionHistory> GetSessionHistory(int pageFrom = 0, int pageTo = 0)
+        public IEnumerable<RlmSessionHistory> GetSessionHistory(int? pageFrom = null, int? pageTo = null)
         {
-            var resultCount = pageTo - pageFrom;
             IEnumerable<RlmSessionHistory> retVal = null;
             using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
             {
                 string query = "SELECT Id, SessionScore, DateTimeStart, DateTimeStop, ROW_NUMBER() over (order by DateTimeStart asc) as [SessionNumber] from [Sessions];";
 
-                if (pageFrom == 0 && pageTo == 0)
+                if (pageFrom == null || pageTo == null)
                 {
                     retVal = db.Database.SqlQuery<RlmSessionHistory>(query).ToList();
                 }
                 else
                 {
-                    retVal = db.Database.SqlQuery<RlmSessionHistory>(query).Skip(pageFrom).Take(resultCount).ToList();
+                    var resultCount = pageTo - pageFrom;
+                    retVal = db.Database.SqlQuery<RlmSessionHistory>(query).Skip(pageFrom.Value).Take(resultCount.Value).ToList();
                 }
             }
 
             return retVal;
         }
 
-        public IEnumerable<RlmSessionHistory> GetSignificantLearningEvents(int pageFrom = 0, int pageTo = 0)
+        public IEnumerable<RlmSessionHistory> GetSignificantLearningEvents(int? pageFrom = null, int? pageTo = null)
         {
-            var resultCount = pageTo - pageFrom;
             IEnumerable<RlmSessionHistory> retVal = null;
             using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
             {
@@ -62,34 +62,35 @@ namespace RLM
                                 ) b ON a.SessionScore = b.SessionScore AND a.[Order] = b.[order]
                                 ORDER BY a.[SessionScore] DESC;";
 
-                if (pageFrom == 0 && pageTo == 0)
+                if (pageFrom == null || pageTo == null)
                 {
                     retVal = db.Database.SqlQuery<RlmSessionHistory>(query).ToList();
                 }
                 else
                 {
-                    retVal = db.Database.SqlQuery<RlmSessionHistory>(query).Skip(pageFrom).Take(resultCount).ToList();
+                    var resultCount = pageTo - pageFrom;
+                    retVal = db.Database.SqlQuery<RlmSessionHistory>(query).Skip(pageFrom.Value).Take(resultCount.Value).ToList();
                 }
             }
 
             return retVal;
         }
 
-        public IEnumerable<RlmCaseHistory> GetSessionCaseHistory(long sessionId, int pageFrom = 0, int pageTo = 50)
+        public IEnumerable<RlmCaseHistory> GetSessionCaseHistory(long sessionId, int? pageFrom = null, int? pageTo = null)
         {
-            var resultCount = pageTo - pageFrom;
             IEnumerable<RlmCaseHistory> retVal = null;
             using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
             {
                 string query = $"SELECT Id, ROW_NUMBER() OVER (ORDER BY CycleStartTime ASC) AS [RowNumber], CycleStartTime AS DateTimeStart, CycleEndTime AS DateTimeStop, CycleScore, Session_Id AS SessionId, Rneuron_Id AS RneuronId, Solution_Id AS SolutionId FROM Cases where Session_ID = {sessionId};";
 
-                if (pageFrom == 0 && pageTo == 0)
+                if (pageFrom == null || pageTo == null)
                 {
                     retVal = db.Database.SqlQuery<RlmCaseHistory>(query).ToList();
                 }
                 else
                 {
-                    retVal = db.Database.SqlQuery<RlmCaseHistory>(query).Skip(pageFrom).Take(resultCount).ToList();
+                    var resultCount = pageTo - pageFrom;
+                    retVal = db.Database.SqlQuery<RlmCaseHistory>(query).Skip(pageFrom.Value).Take(resultCount.Value).ToList();
                 }
             }
 

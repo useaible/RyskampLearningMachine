@@ -4,13 +4,14 @@
 
 using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RLM
+namespace RLM.Models
 {
     public class RlmCycleOutput
     {
@@ -65,7 +66,7 @@ namespace RLM
         /// <param name="cycleOutput"></param>
         /// <param name="network">current RLM Network</param>
         /// <param name="rnnType">current RLM Network Type</param>
-        public RlmCyclecompleteArgs(RlmCycleOutput cycleOutput, RlmNetwork network, RlmNetworkType rnnType)
+        public RlmCyclecompleteArgs(RlmCycleOutput cycleOutput, IRlmNetwork network, RlmNetworkType rnnType)
         {
             CycleOutput = cycleOutput;
             RlmNetwork = network;
@@ -73,7 +74,7 @@ namespace RLM
         }
         
         public RlmNetworkType RlmType { get; set; }
-        public RlmNetwork RlmNetwork { get; set; }
+        public IRlmNetwork RlmNetwork { get; set; }
         //public Case CurrentCase { get; set; }
         public RlmCycleOutput CycleOutput { get; set; }
     }

@@ -4,13 +4,23 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RLM.Database
 {
-    public static class RlmObjectEnqueuer
+    public class RlmObjectEnqueuer
     {
-        public static void QueueObjects<T>(ConcurrentQueue<T> cache, BlockingCollection<T> bc)
+        private long taskEnqueuedCounter = 0;
+        public long TotalTaskEnqueued
+        {
+            get
+            {
+                return Interlocked.Read(ref taskEnqueuedCounter);
+            }
+        }
+
+        public void QueueObjects<T>(ConcurrentQueue<T> cache, BlockingCollection<T> bc)
         {
             int index = 0;
             while (true)
@@ -41,7 +51,10 @@ namespace RLM.Database
                     T item;
                     if (cache.TryDequeue(out item))
                     {
-                        bc.TryAdd(item);
+                        if (bc.TryAdd(item))
+                        {
+                            Interlocked.Increment(ref taskEnqueuedCounter);
+                        }
                     }
                 }
 

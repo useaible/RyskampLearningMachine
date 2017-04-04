@@ -70,6 +70,13 @@
     <Compile Include="Models\EF\RnetworkSetting.cs" />
     <Compile Include="Models\EF\Rneuron.cs" />
     <Compile Include="Models\LoadRnetworkResult.cs" />
+    <Compile Include="Models\RlmCaseHistory.cs" />
+    <Compile Include="Models\RlmCaseIOHistory.cs" />
+    <Compile Include="Models\RlmDatatypeDescription.cs" />
+    <Compile Include="Models\RlmDelegates.cs" />
+    <Compile Include="Models\RlmScoreInfo.cs" />
+    <Compile Include="Models\RlmSessionHistory.cs" />
+    <Compile Include="Models\RlmStats.cs" />
     <Compile Include="Models\RneuronInputSet.cs" />
     <Compile Include="Models\SolutionOutputSet.cs" />
     <Compile Include="Models\RlmIdea.cs" />
@@ -77,6 +84,7 @@
     <Compile Include="Models\EF\Session.cs" />
     <Compile Include="Models\EF\Solution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\RlmCyclecompleteEventArgs.cs" />
     <Compile Include="Utility\RlmBenchmarkStats.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
