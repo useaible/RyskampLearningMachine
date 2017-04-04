@@ -8,7 +8,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <TabControl x:Name="tabControl" Margin="0,0,6,0">
-            <!--<TabItem Header="Play">
+            <TabItem Header="Play">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="59*"/>
@@ -17,15 +17,15 @@
                     <Label x:Name="label" Content="Choose player:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
                     <ComboBox x:Name="cmbPlayer" HorizontalAlignment="Left" Margin="44,14,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="1" Grid.Column="1">
                         <ComboBoxItem Content="Human" Visibility="Hidden"/>
-                        <ComboBoxItem Content="RNN"/>
+                        <ComboBoxItem Content="RLM"/>
                         <ComboBoxItem Content="Encog" Visibility="Hidden"/>
                     </ComboBox>
                     <Label x:Name="label_Copy" Content="Choose maze:" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" IsEnabled="False" Grid.ColumnSpan="2"/>
                     <ComboBox x:Name="comboBoxMazePlay" HorizontalAlignment="Left" Margin="44,41,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" IsEnabled="True" SelectionChanged="comboBoxMazePlay_SelectionChanged" Loaded="comboBoxMazePlay_Loaded" Grid.Column="1"/>
                     <Button x:Name="btnPlay" Content="Start game" HorizontalAlignment="Left" Margin="56,82,0,0" VerticalAlignment="Top" Width="120" Click="btnPlay_Click" Grid.Column="1"/>
                 </Grid>
-            </TabItem>-->
-            <TabItem Header="RNN Learn">
+            </TabItem>
+            <TabItem Header="RLM Learn">
                 <Grid Background="#FFE5E5E5" Margin="0,0,0,1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -49,17 +49,17 @@
                     <Label x:Name="label2_Copy" Content="Randomness:" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Height="26" Grid.Row="2" Width="240" FontWeight="Bold"/>
                     <xctk:IntegerUpDown x:Name="txtSessions"  Grid.Row="1" Margin="102,12,23,5"  Text="{Binding Value, ElementName=txtSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" Value="100" Minimum="1" Maximum="1000"  IsReadOnly="False" DefaultValue="104" Validation.Error="On_Error" UpdateValueOnEnterKey="True" IsUndoEnabled="False" DisplayDefaultValueOnEmptyText="True" InputValidationError="On_Error"/>
                     <DockPanel Grid.Row="3" VerticalAlignment="Center" Margin="10,1,10,8" Height="46">
-                        <Label DockPanel.Dock="Top" Content="Start with Rfactor of"></Label>
+                        <Label DockPanel.Dock="Top" Content="Start randomness"></Label>
                         <TextBox x:Name="txtBoxRfactorStartValue" Text="{Binding Value, ElementName=slRfactorStartValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DockPanel.Dock="Right" TextAlignment="Right" Width="40" Validation.Error="On_Error" />
                         <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorStartValue" IsDirectionReversed="True" Width="169" Value="100" />
                     </DockPanel>
                     <DockPanel Grid.Row="4" VerticalAlignment="Center" Margin="5,8,10,1" Height="50">
-                        <Label DockPanel.Dock="Top" Content="End with Rfactor of"></Label>
+                        <Label DockPanel.Dock="Top" Content="End randomness"></Label>
                         <TextBox x:Name="txtBoxRfactorEndValue" Text="{Binding Value, ElementName=slRfactorEndValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" Validation.Error="On_Error" DockPanel.Dock="Right" TextAlignment="Right" Width="40" />
                         <Slider Maximum="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True" x:Name="slRfactorEndValue" IsDirectionReversed="True" Width="172" />
                     </DockPanel>
                     <DockPanel Grid.Row="5" Margin="5,0,0,0">
-                        <Label DockPanel.Dock="Top" Content="Change Rfactor Over"></Label>
+                        <Label DockPanel.Dock="Top" Content="Change randomness over"></Label>
                         <xctk:IntegerUpDown x:Name="RfactorOverSessions" Text="{Binding Value, ElementName=RfactorOverSessions, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" DefaultValue="1" Minimum="1" Width="156" Validation.Error="On_Error" Maximum="100" ValueChanged="RfactorOverSessions_ValueChanged"/>
                         <Label DockPanel.Dock="Left" Content="Sessions" Width="102"/>
                     </DockPanel>

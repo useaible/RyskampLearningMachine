@@ -4,6 +4,7 @@ using RLM.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,13 +33,14 @@ namespace MazeGameLib
         public event MazeCycleErrorDelegate MazeCycleError;
         public event SessionStartedDelegate SessionStarted;
         public event SessionCompleteDelegate SessionComplete;
-
-
+        public RlmNetwork CurrentNetwork { get; set; }
+        private MemoryCache rlmNetCache;
         // for windowless version
         public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1)
         {
             this.maze = maze;
             Learn = learn;
+            rlmNetCache = MemoryCache.Default;
 
             rlmNet = CreateOrLoadNetwork(maze);
 
@@ -63,7 +65,7 @@ namespace MazeGameLib
             rlmNet.NumSessions = numSessions;
             rlmNet.StartRandomness = startRandomness;
             rlmNet.EndRandomness = endRandomness;
-
+            
             rlmNet.CycleComplete += Rlm_net_CycleComplete;
 
             SetRandomnessLeft = setRandomnessLeft;
@@ -82,9 +84,17 @@ namespace MazeGameLib
 
         public RlmNetwork CreateOrLoadNetwork(MazeInfo maze)
         {
-            var rlmNet = new RlmNetwork("RLM_maze" + maze.Name + "_" + Guid.NewGuid().ToString("N"));
+            var rlmNet = new RlmNetwork("RLM_maze_" + maze.Name); //+ "_" + Guid.NewGuid().ToString("N"));
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
             rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
+
+            if (!rlmNetCache.Contains("rlmNet"))
+            {
+                var expiration = DateTimeOffset.UtcNow.AddDays(1);
+                rlmNetCache.Add("rlmNet", rlmNet, expiration);
+            }
+            else
+                rlmNet = (RlmNetwork)rlmNetCache.Get("rlmNet", null);
 
             if (!rlmNet.LoadNetwork(maze.Name))
             {
@@ -300,5 +310,6 @@ namespace MazeGameLib
         {
             rlmNet.TrainingDone();
         }
+
     }
 }

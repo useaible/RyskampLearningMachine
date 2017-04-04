@@ -134,6 +134,7 @@ namespace WPFMazeApp
 
             if (!Learn)
             {
+                CurrentIteration = 1;
                 Temp_num_sessions = 1;
                 StartRandomness = 0;
                 EndRandomness = 0;
@@ -163,23 +164,25 @@ namespace WPFMazeApp
                         RunUIThread(() => {
                             lblCurrentSession.Content = 1;
                         });
-                        traveler.Travel(5000);
+                        CurrentIteration = i + 1;
+                        traveler.Travel(10000);
                     }
               
                     // set to predict instead of learn for the remaining sessions
-                    //traveler.Learn = false;
+                    traveler.Learn = false;
 
                     for (int i = 0; i < Temp_num_sessions - RandomnessOver; i++)
                     {
+                        CurrentIteration++;
                         locations = new List<Location>();
                         RunUIThread(() => {
                             StatusText.Content = $"Training started... {CurrentIteration * 100 / Temp_num_sessions}%";
                         });
-                        traveler.Travel(5000);
+                        traveler.Travel(10000);
                     }
 
 
-                    traveler.TrainingDone();
+                    //traveler.TrainingDone();
                     RunUIThread(() => {
                         StatusText.Content = $"Training done... 100%";
                     });
@@ -190,17 +193,15 @@ namespace WPFMazeApp
                         StatusText.Content = $"RLM preparing to play...";
                     });
 
-                    
-                   
-
                     locations = new List<Location>();
-                    traveler.Travel(5000);
+                    
                     RunUIThread(() => {
                         StatusText.Content = $"RLM Playing...";
                     });
                     traveler.Learn = false;
-                    traveler.Travel(5000);
-                    traveler.TrainingDone();
+                    
+                    traveler.Travel(10000);
+
                 }
 
 
@@ -227,9 +228,9 @@ namespace WPFMazeApp
                         {
                             maze.ChangeCellColor(new TravelerLocation() { X = loc.X, Y = loc.Y }, true);
                         });
-                        await Task.Delay(TimeSpan.FromMilliseconds(1));
+                        await Task.Delay(TimeSpan.FromMilliseconds(2));
                         //If game is not solved within 5s, go to the next session.
-                        if (watch.Elapsed.TotalSeconds >= 5)
+                        if (watch.Elapsed.TotalSeconds >= 10)
                             break;
                     }
 
@@ -270,8 +271,8 @@ namespace WPFMazeApp
 
         private void Traveler_SessionComplete(int cycleNum, double score, int movesCnt)
         {
-            replayMemory[cycleNum] = new { randomnessLeft = _randomnessLeft, moves=locations, movesCnt=movesCnt, score=score, cycleNum=cycleNum};
-            CurrentIteration = cycleNum + 1;     
+            replayMemory[CurrentIteration-1] = new { randomnessLeft = _randomnessLeft, moves=locations, movesCnt=movesCnt, score=score, cycleNum=CurrentIteration};
+            //CurrentIteration = cycleNum + 1;     
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

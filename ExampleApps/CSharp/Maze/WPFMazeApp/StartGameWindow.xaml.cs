@@ -70,59 +70,59 @@ namespace WPFMazeApp
             this.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        //private void btnPlay_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        // Human
-        //        if (cmbPlayer.SelectedIndex == 0)
-        //        {
-        //            win = new MainWindow(MazeId, PlayerType.Human);
-        //            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-        //            win.Show();
-        //            this.Visibility = System.Windows.Visibility.Hidden;
-        //        }
-        //        else if (cmbPlayer.SelectedIndex == 1) // RNN AI
-        //        {
-        //            var selectedMaze = mazeRepo.GetByID(MazeId);
+        private void btnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Human
+                if (cmbPlayer.SelectedIndex == 0)
+                {
+                    win = new MainWindow(MazeId, PlayerType.Human);
+                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+                    win.Show();
+                    this.Visibility = System.Windows.Visibility.Hidden;
+                }
+                else if (cmbPlayer.SelectedIndex == 1) // RNN AI
+                {
+                    var selectedMaze = mazeRepo.GetByID(MazeId);
 
-        //            if (selectedMaze != null)
-        //            {
-        //                var hasLearned = true;//rnn_utils.NeuralNetworkExisting(selectedMaze.Name);
-        //                if (hasLearned)
-        //                {
-        //                    win = new MainWindow(MazeId, PlayerType.RNN, false);
-        //                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-        //                    win.Show();
-        //                    this.Visibility = System.Windows.Visibility.Hidden;
-        //                }
-        //                else
-        //                    Xceed.Wpf.Toolkit.MessageBox.Show("You must first train the AI with the selected maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    if (selectedMaze != null)
+                    {
+                        var hasLearned = RlmUtils.RLMHasTrainingData("RLM_maze_" + selectedMaze.Name);
+                        if (hasLearned)
+                        {
+                            win = new MainWindow(MazeId, PlayerType.RNN, false);
+                            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+                            win.Show();
+                            this.Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        else
+                            Xceed.Wpf.Toolkit.MessageBox.Show("You must first train the AI with the selected maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
-        //            }
-        //            else
-        //                Xceed.Wpf.Toolkit.MessageBox.Show("You must select a maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-        //        }
-        //        else // Encog AI
-        //        {
-        //            win = new MainWindow(MazeId, PlayerType.Encog);
-        //            win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
-        //            win.Show();
-        //            this.Visibility = System.Windows.Visibility.Hidden;
-        //        }
-        //    }
-        //    catch (Exception err)
-        //    {
-        //        if (err.InnerException != null && err.InnerException is RlmDefaultConnectionStringException)
-        //        {
-        //            Xceed.Wpf.Toolkit.MessageBox.Show($"Error: {err.InnerException.Message}");
-        //        }
-        //        else
-        //        {
-        //            Xceed.Wpf.Toolkit.MessageBox.Show($"ERROR: {err.Message}");
-        //        }
-        //    }
-        //}
+                    }
+                    else
+                        Xceed.Wpf.Toolkit.MessageBox.Show("You must select a maze.", "Warning", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+                else // Encog AI
+                {
+                    win = new MainWindow(MazeId, PlayerType.Encog);
+                    win.Closed += (s, ev) => { this.Visibility = Visibility.Visible; };
+                    win.Show();
+                    this.Visibility = System.Windows.Visibility.Hidden;
+                }
+            }
+            catch (Exception err)
+            {
+                if (err.InnerException != null && err.InnerException is RlmDefaultConnectionStringException)
+                {
+                    Xceed.Wpf.Toolkit.MessageBox.Show($"Error: {err.InnerException.Message}");
+                }
+                else
+                {
+                    Xceed.Wpf.Toolkit.MessageBox.Show($"ERROR: {err.Message}");
+                }
+            }
+        }
 
         private async void btnLearn_Click(object sender, RoutedEventArgs e)
         {
