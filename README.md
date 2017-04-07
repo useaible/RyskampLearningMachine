@@ -33,7 +33,7 @@ We included a Developer Guide to get you started fast and easy. You can view it 
 ![](https://github.com/useaible/RyskampLearningMachine/blob/master/DeveloperGuidePreview.jpg?raw=true)
 
 
-#Nuget Package#
+# Nuget Package #
 
 We now have our Nuget Package available. You may download it [HERE](https://www.nuget.org/packages/useAIble.RyskampLearningMachine) or through the Nuget Package Manager on Visual Studio.
 
