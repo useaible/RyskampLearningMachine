@@ -70,7 +70,7 @@ namespace RLM.Database
         {
             string path = AppDomain.CurrentDomain.BaseDirectory;
 
-            ProcessWrite(path + "\\" + dbName + "_info.txt", msg);
+            //ProcessWrite(path + "\\" + dbName + "_info.txt", msg);
 
             Task.Delay(150).Wait();
         }
@@ -118,12 +118,12 @@ namespace RLM.Database
                                         "<hr/><center>*** END ***</center><hr/>" +
                                 "</html>", msg, src, date, exception);
 
-            string path = AppDomain.CurrentDomain.BaseDirectory;
-            using (StreamWriter f = File.AppendText(path + "\\" + dbName + "_errlog.html"))
-            {
-                f.WriteAsync(logStr);
-                Task.Delay(10).Wait();
-            }
+            //string path = AppDomain.CurrentDomain.BaseDirectory;
+            //using (StreamWriter f = File.AppendText(path + "\\" + dbName + "_errlog.html"))
+            //{
+            //    f.WriteAsync(logStr);
+            //    Task.Delay(10).Wait();
+            //}
         }
     }
 }

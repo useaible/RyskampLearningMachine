@@ -206,7 +206,7 @@ namespace RLM
             // set Current case reference
             rnn_net.CurrentCase = newCase;
                 
-            var cycleOutput = new RlmCycleOutput(newCase.ID, newCase.Solution_ID, rnn_net.Outputs, solution.Output_Values_Solutions, rnn_cyc.CycleCaseGUID);
+            var cycleOutput = new RlmCycleOutput(newCase.ID, newCase.Solution_ID, rnn_net.Outputs, solution.Output_Values_Solutions);
             return cycleOutput;
         }
    
@@ -224,7 +224,7 @@ namespace RLM
             //Check for none found
             if (casefromdb == null)
             {
-                throw new Exception("An error occurred, the current case with the ID of" + cycle.CycleCaseGUID.ToString() + "could not be located in the database.");
+                throw new Exception("An error occurred, the current case could not be located in the database.");
             }
 
             //Check for none found
