@@ -14,6 +14,7 @@ namespace MazeGameLib
 {
     public delegate void MazeCycleCompleteDelegate(int x, int y, bool bumpedIntoWall);
     public delegate void MazeCycleErrorDelegate(string networkName);
+    public delegate void SessionCompleteDelegate(int sessionCnt, double score, int moves);
     public delegate void SessionStartedDelegate(double randomnessLeft);
     public delegate void SetRandomnessLeftDelegate(double val);
 
@@ -27,20 +28,27 @@ namespace MazeGameLib
         private Int64 currentSessionID;
         private Int64 currentCycleID;
         private SetRandomnessLeftDelegate SetRandomnessLeft;
-
+        private bool enableDataPersDisplay = false;
+        
+        private MemoryCache rlmNetCache;
         private MazeInfo maze;
+
         public event MazeCycleCompleteDelegate MazeCycleComplete;
         public event MazeCycleErrorDelegate MazeCycleError;
         public event SessionStartedDelegate SessionStarted;
         public event SessionCompleteDelegate SessionComplete;
+
         public RlmNetwork CurrentNetwork { get; set; }
-        private MemoryCache rlmNetCache;
+        public bool DataPersistenceDone { get; private set; } = false;        
+
         // for windowless version
-        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1)
+        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, bool enableDataPers = false)
         {
             this.maze = maze;
             Learn = learn;
             rlmNetCache = MemoryCache.Default;
+
+            enableDataPersDisplay = enableDataPers;
 
             rlmNet = CreateOrLoadNetwork(maze);
 
@@ -49,6 +57,7 @@ namespace MazeGameLib
             rlmNet.EndRandomness = endRandomness;
 
             tmr.Elapsed += Tmr_Elapsed;
+
         }
         // for window version
         public RLMMazeTraveler(MazeInfo maze, MazeGame gameref, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, SetRandomnessLeftDelegate setRandomnessLeft = null)
@@ -86,7 +95,9 @@ namespace MazeGameLib
         {
             var rlmNet = new RlmNetwork("RLM_maze_" + maze.Name); //+ "_" + Guid.NewGuid().ToString("N"));
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
-            rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
+
+            if (enableDataPersDisplay)
+                rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
 
             if (!rlmNetCache.Contains("rlmNet"))
             {
@@ -122,6 +133,7 @@ namespace MazeGameLib
 
         private void RlmNet_DataPersistenceComplete()
         {
+            DataPersistenceDone = true;
             Console.WriteLine("RLM Data Persistence done.");
         }
 

@@ -10,33 +10,9 @@ namespace LunarLanderConsoleApp
     {
         static void Main(string[] args)
         {
-            ConsoleKeyInfo choice;
-            bool isExit = false;
-            do
-            {
-                Console.Clear();
-                Console.WriteLine("Lunar Lander");
-                Console.WriteLine("Select an AI");
-                Console.WriteLine("1) Ryskamp Learning Machine \n2) Encog \n3) Exit");
-                choice = Console.ReadKey();
-
-                switch (choice.KeyChar)
-                {
-                    case '1':
-                        RLMLander.LanderTrain();
-                        break;
-                    case '2':
-                        EncogLander.LanderTrain();
-                        break;
-                    case '3':
-                        isExit = true;
-                        break;
-                    default:
-                        Console.WriteLine("\nInvalid input try again...");
-                        System.Threading.Thread.Sleep(1000);
-                        break;
-                }
-            } while (!isExit);
+            Console.WriteLine("Lunar Lander");
+            var lander = new RLMLander();
+            lander.LanderTrain();
         }
     }
 }

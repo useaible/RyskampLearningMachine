@@ -3,6 +3,7 @@
 // https://github.com/useaible/RyskampLearningMachine/blob/dev-branch/License.md
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace LogisticsConsoleApp
 {
@@ -10,34 +11,11 @@ namespace LogisticsConsoleApp
     {
         static void Main(string[] args)
         {
-            ConsoleKeyInfo choice;
+            // NOTE: to display data persistence progress, uncomment line 39 in RlmLogistics.cs
 
-            bool isExit = false;
-            do
-            {
-                Console.Clear();
-                Console.WriteLine("Logistics Simulator");
-                Console.WriteLine("Select an AI");
-                Console.WriteLine("1) Ryskamp Learning Machine \n2) Encog \n3) Exit");
-                choice = Console.ReadKey();
-
-                switch (choice.KeyChar)
-                {
-                    case '1':
-                        RlmLogistics.LogisticTrain();
-                        break;
-                    case '2':
-                        EncogLogistics.LogisticTrain();
-                        break;
-                    case '3':
-                        isExit = true;
-                        break;
-                    default:
-                        Console.WriteLine("\nInvalid input try again...");
-                        System.Threading.Thread.Sleep(1000);
-                        break;
-                }
-            } while (!isExit);
-        }
+            Console.WriteLine("Logistics Simulator");
+            var logist = new RlmLogistics();
+            logist.LogisticTrain();
+        }        
     }
 }

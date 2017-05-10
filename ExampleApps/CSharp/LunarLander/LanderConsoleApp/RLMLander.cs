@@ -12,13 +12,30 @@ namespace LunarLanderConsoleApp
 {
     public class RLMLander
     {
-        public static void LanderTrain()
+        private RLMPilot pilot;
+
+        public bool DataPersistenceDone
+        {
+            get
+            {
+                bool retVal = false;
+                if (pilot != null)
+                {
+                    retVal = pilot.DataPersistenceDone;
+                }
+                return retVal;
+            }
+        }
+
+        public void LanderTrain()
         {
             const int MOMENTUM_ADJUSTMENT = 21;
             const int CACHE_MARGIN = 0;
             const bool USE_MOM_AVG = false;
 
-            // setting
+            // settings
+            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display? [default Disable: 0 / Enable: 1]: ", 0);
+
             Console.WriteLine("\n\nRLM network settings:");
             int sessions = Util.GetInput("Enter Number of Sessions [default 100]: ", 100);
             int startRand = Util.GetInput("Enter start randomness [default 30]: ", 30);
@@ -29,7 +46,7 @@ namespace LunarLanderConsoleApp
 
             try
             {
-                var pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket);
+                pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket, enableDataPers == 1);
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
@@ -50,8 +67,7 @@ namespace LunarLanderConsoleApp
                     pilot.Learn = false;
                     pilot.StartSimulation(sessions, true);
                 }
-
-                Console.WriteLine("hit enter to continue...");
+                
                 pilot.TrainingDone();
                 Console.ReadLine();
             }
