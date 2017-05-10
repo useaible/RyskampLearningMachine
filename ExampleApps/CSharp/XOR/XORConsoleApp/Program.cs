@@ -24,7 +24,7 @@ namespace XORConsoleApp
         static void Main(string[] args)
         {
             Console.WriteLine("XOR");
-            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display [default disable: 0 / enalbe: 1]: ", 0);
+            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display [default disable: 0 / enable: 1]: ", 0);
 
             Console.WriteLine();
             Console.WriteLine("RLM settings");
@@ -65,12 +65,13 @@ namespace XORConsoleApp
             rlmNet.EndRandomness = endRandomness;
 
             Console.WriteLine("Training Session started");
+            double sumOfCycleScores = 0;
 
             for (int i = 0; i < sessions; i++)
             {
                 // start session
                 long sessionId = rlmNet.SessionStart();
-                double sumOfCycleScores = 0;
+                sumOfCycleScores = 0;
 
                 foreach (var xor in xorTable)
                 {
@@ -116,6 +117,7 @@ namespace XORConsoleApp
             // NOTE that the only difference with Predict from Training is that we passed 'false' to the learn argument on the Cycle.RunCycle() method
             // and of course, the inputs which we used our xor table to check if the RLM has learned as expected
             long SessionID = rlmNet.SessionStart();
+            sumOfCycleScores = 0;
 
             foreach (var xor in xorTable)
             {
@@ -128,11 +130,13 @@ namespace XORConsoleApp
 
                 double score = ScoreCycle(result, xor, true);
 
+                sumOfCycleScores += score;
+
                 // sets the score
                 rlmNet.ScoreCycle(result.CycleOutput.CycleID, score);
             }
 
-            rlmNet.SessionEnd(100);
+            rlmNet.SessionEnd(sumOfCycleScores);
 
             // must call this to let the Data persistence know we are done training/predicting
             rlmNet.TrainingDone();
