@@ -37,10 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="encog-core-cs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=3e882172b12155d4, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\packages\encog-dotnet-core.3.3.0\lib\net35\encog-core-cs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -52,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EncogLander.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RLMLander.cs" />

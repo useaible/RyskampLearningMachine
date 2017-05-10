@@ -112,15 +112,15 @@ namespace WPFMazeApp
             }
         }
 
-        private Task StartGame(EncogMaze encogMaze)
-        {
-            Task task = Task.Run(() =>
-            {
-                encogMaze.Train(TotalIterations, maxTemp, minTemp, encogCycles);
-            });
+        //private Task StartGame(EncogMaze encogMaze)
+        //{
+        //    Task task = Task.Run(() =>
+        //    {
+        //        encogMaze.Train(TotalIterations, maxTemp, minTemp, encogCycles);
+        //    });
 
-            return task;
-        }
+        //    return task;
+        //}
 
         public void RunUIThread(Action act)
         {
@@ -131,11 +131,11 @@ namespace WPFMazeApp
         {
             if (isEncog)
             {
-                EncogMaze encogMaze = new EncogMaze(maze);
-                encogMaze.MazeCycleComplete += Traveler_MazeCycleComplete;
-                //encogMaze.EncogCycleComplete += EncogMaze_EncogCycleComplete;
-                encogMaze.TrainingIterationComplete += EncogMaze_TrainingIterationComplete;
-                await StartGame(encogMaze);
+                //EncogMaze encogMaze = new EncogMaze(maze);
+                //encogMaze.MazeCycleComplete += Traveler_MazeCycleComplete;
+                ////encogMaze.EncogCycleComplete += EncogMaze_EncogCycleComplete;
+                //encogMaze.TrainingIterationComplete += EncogMaze_TrainingIterationComplete;
+                //await StartGame(encogMaze);
             }
             else
             {

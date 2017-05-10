@@ -44,6 +44,7 @@ namespace RLM.Memory
 
         private System.Diagnostics.Stopwatch dbSavingTime = new System.Diagnostics.Stopwatch();
         private System.Timers.Timer progressUpdater = new System.Timers.Timer();
+        private double lastProgress = -1;
 
         // temp for benchmarks
         public int CacheBoxCount { get; set; } = 0;
@@ -55,7 +56,7 @@ namespace RLM.Memory
 
         public event DataPersistenceCompleteDelegate DataPersistenceComplete;
         public event DataPersistenceProgressDelegate DataPersistenceProgress;
-
+        
         public IRlmNetwork Network { get; private set; }
         
         public SortedList<RlmInputKey, RlmInputValue> DynamicInputs { get; set; }
@@ -880,7 +881,11 @@ namespace RLM.Memory
 
         private void ProgressUpdater_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            DataPersistenceProgress?.Invoke(rlmDb.TotalTaskCompleted, rlmDbEnqueuer.TotalTaskEnqueued);
+            if (lastProgress != rlmDb.TotalTaskCompleted)
+            {
+                lastProgress = rlmDb.TotalTaskCompleted;
+                DataPersistenceProgress?.Invoke(rlmDb.TotalTaskCompleted, rlmDbEnqueuer.TotalTaskEnqueued);
+            }
         }
 
         private IEnumerable<RlmIOWithValue> GetRandomOutputValues(IEnumerable<RlmIO> outputs)

@@ -14,12 +14,16 @@ namespace LanderGameLib
         private const string NETWORK_NAME = "lunar lander";
         private RlmNetwork network;
 
-        public RLMPilot(bool learn = false, int numSessions = 50, int startRandomness = 30, int endRandomness = 0, int maxLinearBracket = 15, int minLinearBracket = 3)
+        public bool DataPersistenceDone { get; private set; } = false;
+
+        public RLMPilot(bool learn = false, int numSessions = 50, int startRandomness = 30, int endRandomness = 0, int maxLinearBracket = 15, int minLinearBracket = 3, bool enableDataPers = false)
         {
             string dbName = "RLM_lander_" + Guid.NewGuid().ToString("N");
             network = new RlmNetwork(dbName);
             network.DataPersistenceComplete += Network_DataPersistenceComplete;
-            network.DataPersistenceProgress += Network_DataPersistenceProgress;
+
+            if (enableDataPers)
+                network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
             if (!network.LoadNetwork(NETWORK_NAME))
             {
@@ -44,6 +48,7 @@ namespace LanderGameLib
 
         private void Network_DataPersistenceProgress(long processed, long total)
         {
+            DataPersistenceDone = true;
             Console.WriteLine($"Data Persistence progress: {processed} / {total}");
         }
 
