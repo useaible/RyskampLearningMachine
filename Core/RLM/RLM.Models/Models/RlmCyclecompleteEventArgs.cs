@@ -27,11 +27,10 @@ namespace RLM.Models
         /// <param name="outputs"></param>
         /// <param name="outputsWithVal"></param>
         /// <param name="cycleGUID"></param>
-        public RlmCycleOutput(long cycleID, long solutionID, IEnumerable<RlmIO> outputs, IEnumerable<Output_Values_Solution> outputsWithVal, string cycleGUID)
+        public RlmCycleOutput(long cycleID, long solutionID, IEnumerable<RlmIO> outputs, IEnumerable<Output_Values_Solution> outputsWithVal)
         {
             CycleID = cycleID;
             SolutionID = solutionID;
-            CycleGUID = cycleGUID;
 
             var outputList = new List<RlmIOWithValue>();
             foreach(var o in outputsWithVal)
@@ -55,7 +54,6 @@ namespace RLM.Models
         public long CycleID { get; set; }
         public long SolutionID { get; set; }
         public IEnumerable<RlmIOWithValue> Outputs { get; set; }
-        public string CycleGUID { get; set; }
     }
 
     public class RlmCyclecompleteArgs

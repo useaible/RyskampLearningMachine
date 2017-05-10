@@ -16,10 +16,8 @@ namespace RLM
     {
         public RlmCycle()
         {
-            CycleCaseGUID = null;
         }
 
-        public string CycleCaseGUID { get; set; }
         // this allows us to reference the case from db instead of getting it again later on inside the cerebral cortex
         public Case CaseReference { get; private set; }
         public RlmNetworkType RlmType { get; private set; }
@@ -75,7 +73,7 @@ namespace RLM
         
         private Int64 Init(RlmNetwork rnn_net, Int64 sessionID, List<RlmIOWithValue> inputs_values, Boolean learn, List<RlmIOWithValue> output_values = null)
         {
-            if(this.CycleCaseGUID != null)
+            if(this.CaseReference != null)
             {
                 throw new Exception("You may only envoke Runxx once per cycle object.");
             }
@@ -97,7 +95,6 @@ namespace RLM
             }
             
             Case cyclecase = new Case() {Session_ID = sessionID /*db.Sessions.Where(item=>item.ID == sessionID).First()*/, CycleStartTime=DateTime.Now, CycleEndTime = DateTime.Now};
-            this.CycleCaseGUID = Guid.NewGuid().ToString("N");
             this.CaseReference = cyclecase;
             return cyclecase.ID;
         }

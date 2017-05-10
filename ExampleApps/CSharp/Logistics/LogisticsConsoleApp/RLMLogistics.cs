@@ -15,10 +15,13 @@ namespace LogisticsConsoleApp
 {
     public class RlmLogistics
     {
-        public static void LogisticTrain()
-        {
-            Console.WriteLine("\n\nRLM network settings:");
+        public bool DataPersistenceDone { get; private set; } = false;
 
+        public void LogisticTrain()
+        {
+            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display? [default Disable: 0 / Enable: 1]: ", 0);
+
+            Console.WriteLine("\n\nRLM network settings:");
             int sessions = Util.GetInput("\nEnter Number of Session [default 100]: ", 100); //Gets user input for the number of tries the game will play
             int startRand = Util.GetInput("Enter Start Randomness [default 100]: ", 100); //Gets user input for start randomness
             int endRand = Util.GetInput("Enter End Randomness [default 0]: ", 0); //Gets user input for end randomness
@@ -33,7 +36,9 @@ namespace LogisticsConsoleApp
             {
                 RlmNetwork network = new RlmNetwork(dbName); //Make an instance of rlm_network passing the database name as parameter
                 network.DataPersistenceComplete += Network_DataPersistenceComplete;
-                network.DataPersistenceProgress += Network_DataPersistenceProgress;
+
+                if (enableDataPers == 1)
+                    network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
                 if (!network.LoadNetwork(networkName)) //
                 {
@@ -128,11 +133,12 @@ namespace LogisticsConsoleApp
             Console.ReadLine();
         }
         
-        private static void Network_DataPersistenceComplete()
+        private void Network_DataPersistenceComplete()
         {
+            DataPersistenceDone = true;
             Console.WriteLine("RLM data persistence done.");
         }
-        private static void Network_DataPersistenceProgress(long processed, long total)
+        private void Network_DataPersistenceProgress(long processed, long total)
         {
             Console.WriteLine($"Data Persistence progress: {processed} / {total}");
         }

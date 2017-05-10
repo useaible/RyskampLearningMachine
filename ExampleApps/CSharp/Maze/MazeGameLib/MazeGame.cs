@@ -122,22 +122,6 @@ namespace MazeGameLib
 
         }
 
-        public void StartGame(EncogMaze encogMaze)
-        {
-            // set traveler
-            traveler = encogMaze.Traveler;
-
-            // Initial Location
-            traveler.location.X = OldLocation.X;
-            traveler.location.Y = OldLocation.Y;
-
-            // Fire GameStart Event
-            if (GameStartEvent != null) GameStartEvent(traveler);
-
-            Thread GameLoopThread = new Thread(() => { this.GameLoop(); });
-            GameLoopThread.Start();
-        }
-
         private void GameLoop()
         {
             int i = 0;
