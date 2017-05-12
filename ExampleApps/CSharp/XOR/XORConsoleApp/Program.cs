@@ -20,14 +20,12 @@ namespace XORConsoleApp
             new { Input1 = "False", Input2 = "True", Answer = "True" },
             new { Input1 = "False", Input2 = "False", Answer = "False" },
         };
+        private static bool showDataPersistProgress = false;
 
         static void Main(string[] args)
         {
-            Console.WriteLine("XOR");
-            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display [default disable: 0 / enable: 1]: ", 0);
-
-            Console.WriteLine();
-            Console.WriteLine("RLM settings");
+            Console.WriteLine("XOR");            
+            Console.WriteLine("\nRLM settings");
 
             // user inputs for the RLM settings
             int sessions = Util.GetInput("Number of sessions [default 50]: ", 50);
@@ -40,8 +38,7 @@ namespace XORConsoleApp
 
             // subscribe to events to know the status of the Data Persistence that works in the background
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
-            if (enableDataPers == 1)
-                rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
+            rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
 
             // checks to see if the network already exists and loads it to memory
             if (!rlmNet.LoadNetwork("XOR_SAMPLE"))
@@ -58,6 +55,16 @@ namespace XORConsoleApp
                 // creates a new network
                 rlmNet.NewNetwork("XOR_SAMPLE", ins, outs);
             }
+
+            // execute it on another thread as not to block the RLM training
+            Console.WriteLine("\nPress 'd' to show Data persistence progress\n");
+            Task.Run(() =>
+            {
+                while (!Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.D)
+                {
+                    showDataPersistProgress = true;
+                }
+            });
 
             // set rlm training settings
             rlmNet.NumSessions = sessions;
@@ -146,7 +153,10 @@ namespace XORConsoleApp
 
         private static void RlmNet_DataPersistenceProgress(long processed, long total)
         {
-            Console.WriteLine($"Data persistence progress - {processed} / {total}");
+            if (showDataPersistProgress)
+            {
+                Console.WriteLine($"Data persistence progress - {processed} / {total}");
+            }
         }
 
         private static void RlmNet_DataPersistenceComplete()

@@ -28,7 +28,6 @@ namespace MazeGameLib
         private Int64 currentSessionID;
         private Int64 currentCycleID;
         private SetRandomnessLeftDelegate SetRandomnessLeft;
-        private bool enableDataPersDisplay = false;
         
         private MemoryCache rlmNetCache;
         private MazeInfo maze;
@@ -39,16 +38,15 @@ namespace MazeGameLib
         public event SessionCompleteDelegate SessionComplete;
 
         public RlmNetwork CurrentNetwork { get; set; }
-        public bool DataPersistenceDone { get; private set; } = false;        
+        public bool DataPersistenceDone { get; private set; } = false;
+        public bool ShowDataPersistenceProgress { get; set; } = false;
 
         // for windowless version
-        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, bool enableDataPers = false)
+        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1)
         {
             this.maze = maze;
             Learn = learn;
             rlmNetCache = MemoryCache.Default;
-
-            enableDataPersDisplay = enableDataPers;
 
             rlmNet = CreateOrLoadNetwork(maze);
 
@@ -95,9 +93,7 @@ namespace MazeGameLib
         {
             var rlmNet = new RlmNetwork("RLM_maze_" + maze.Name); //+ "_" + Guid.NewGuid().ToString("N"));
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
-
-            if (enableDataPersDisplay)
-                rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
+            rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
 
             if (!rlmNetCache.Contains("rlmNet"))
             {
@@ -128,7 +124,10 @@ namespace MazeGameLib
 
         private void RlmNet_DataPersistenceProgress(long processed, long total)
         {
-            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+            if (ShowDataPersistenceProgress)
+            {
+                Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+            }
         }
 
         private void RlmNet_DataPersistenceComplete()

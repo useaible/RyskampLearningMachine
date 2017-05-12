@@ -13,20 +13,7 @@ namespace LunarLanderConsoleApp
     public class RLMLander
     {
         private RLMPilot pilot;
-
-        public bool DataPersistenceDone
-        {
-            get
-            {
-                bool retVal = false;
-                if (pilot != null)
-                {
-                    retVal = pilot.DataPersistenceDone;
-                }
-                return retVal;
-            }
-        }
-
+        
         public void LanderTrain()
         {
             const int MOMENTUM_ADJUSTMENT = 21;
@@ -34,9 +21,7 @@ namespace LunarLanderConsoleApp
             const bool USE_MOM_AVG = false;
 
             // settings
-            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display? [default Disable: 0 / Enable: 1]: ", 0);
-
-            Console.WriteLine("\n\nRLM network settings:");
+            Console.WriteLine("\nRLM network settings:");
             int sessions = Util.GetInput("Enter Number of Sessions [default 100]: ", 100);
             int startRand = Util.GetInput("Enter start randomness [default 30]: ", 30);
             int endRand = Util.GetInput("Enter end randomness [default 0]: ", 0);
@@ -46,7 +31,17 @@ namespace LunarLanderConsoleApp
 
             try
             {
-                pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket, enableDataPers == 1);
+                pilot = new RLMPilot(true, sessions, startRand, endRand, maxLinearBracket, minLinearBracket);
+
+                // execute it on another thread as not to block the RLM training
+                Console.WriteLine("\nPress 'd' to show Data persistence progress\n");
+                Task.Run(() =>
+                {
+                    while (!Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.D)
+                    {
+                        pilot.ShowDataPersistenceProgress = true;
+                    }
+                });
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();

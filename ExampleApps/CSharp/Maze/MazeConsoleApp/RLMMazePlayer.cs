@@ -21,8 +21,6 @@ namespace MazeConsoleApp
         /// </summary>
         public void MazeTrain()
         {
-            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display? [default Disable: 0 / Enable: 1]: ", 0);
-
             int mazeSize = Util.GetInput($"Enter Maze size [must be {MIN_MAZE_SIZE} or greater]: ", MIN_MAZE_SIZE);
             var maze = GenerateOrGetExistingMaze(mazeSize);
 
@@ -36,14 +34,22 @@ namespace MazeConsoleApp
             int startRandomness = Util.GetInput("Start randomness [default 100]: ", 100); //Gets user input for the start randomness
             int endRandomness = Util.GetInput("End randomness [default 0]: ", 0); //Gets user input for the end randomness
             int randomnessThrough = Util.GetInput("Number of sessions to enforce randomness [default 1]: ", 1);
-
-            Console.WriteLine();
-
+            
             try
             {
-                RLMMazeTraveler traveler = new RLMMazeTraveler(maze, true, randomnessThrough, startRandomness, endRandomness, enableDataPers == 1); //Instantiate RlmMazeTraveler game lib to configure the network.
+                RLMMazeTraveler traveler = new RLMMazeTraveler(maze, true, randomnessThrough, startRandomness, endRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
                 traveler.SessionComplete += SesionComplete;
                 
+                // execute it on another thread as not to block the RLM training
+                Console.WriteLine("\nPress 'd' to show Data persistence progress\n");
+                Task.Run(() =>
+                {
+                    while (!Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.D)
+                    {
+                        traveler.ShowDataPersistenceProgress = true;
+                    }
+                });
+
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
 
