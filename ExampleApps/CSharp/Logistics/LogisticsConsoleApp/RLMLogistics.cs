@@ -15,13 +15,13 @@ namespace LogisticsConsoleApp
 {
     public class RlmLogistics
     {
+        private bool showDataPersistProgress = false;
+
         public bool DataPersistenceDone { get; private set; } = false;
 
         public void LogisticTrain()
         {
-            int enableDataPers = Util.GetInput("Enable Data Persistence Progress display? [default Disable: 0 / Enable: 1]: ", 0);
-
-            Console.WriteLine("\n\nRLM network settings:");
+            Console.WriteLine("\nRLM network settings:");
             int sessions = Util.GetInput("\nEnter Number of Session [default 100]: ", 100); //Gets user input for the number of tries the game will play
             int startRand = Util.GetInput("Enter Start Randomness [default 100]: ", 100); //Gets user input for start randomness
             int endRand = Util.GetInput("Enter End Randomness [default 0]: ", 0); //Gets user input for end randomness
@@ -31,16 +31,14 @@ namespace LogisticsConsoleApp
             LogisticSimulator simulator = null;
 
             IEnumerable<int> customerOrders = LogisticInitialValues.CustomerOrders;
-
+            
             try
             {
                 RlmNetwork network = new RlmNetwork(dbName); //Make an instance of rlm_network passing the database name as parameter
                 network.DataPersistenceComplete += Network_DataPersistenceComplete;
+                network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
-                if (enableDataPers == 1)
-                    network.DataPersistenceProgress += Network_DataPersistenceProgress;
-
-                if (!network.LoadNetwork(networkName)) //
+                if (!network.LoadNetwork(networkName))
                 {
                     var inputs = new List<RlmIO>()
                     {
@@ -66,6 +64,16 @@ namespace LogisticsConsoleApp
 
                     network.NewNetwork(networkName, inputs, outputs);
                 }
+
+                // execute it on another thread as not to block the RLM training
+                Console.WriteLine("\nPress 'd' to show Data persistence progress\n");
+                Task.Run(() =>
+                {
+                    while (!Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.D)
+                    {
+                        showDataPersistProgress = true;
+                    }
+                });
 
                 network.NumSessions = sessions; // num of sessioins default 100
                 network.StartRandomness = startRand;
@@ -140,7 +148,10 @@ namespace LogisticsConsoleApp
         }
         private void Network_DataPersistenceProgress(long processed, long total)
         {
-            Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+            if (showDataPersistProgress)
+            {
+                Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+            }
         }
     }
 }
