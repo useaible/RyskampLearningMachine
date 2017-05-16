@@ -78,13 +78,15 @@ namespace LogisticsConsoleApp
                 network.NumSessions = sessions; // num of sessioins default 100
                 network.StartRandomness = startRand;
                 network.EndRandomness = endRand;
-
+                
                 simulator = new LogisticSimulator(LogisticInitialValues.StorageCost, LogisticInitialValues.BacklogCost, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory, LogisticInitialValues.InitialInventory);
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 Console.WriteLine("\n\nTraining:\n");
                 IEnumerable<LogisticSimulatorOutput> predictedLogisticOutputs = null;
+                
+                network.ResetRandomizationCounter();
 
                 for (int i = 0; i < sessions; i++)
                 {
