@@ -144,6 +144,11 @@ namespace MazeGameLib
             }
         }
 
+        public void ResetRLMRandomization()
+        {
+            rlmNet.ResetRandomizationCounter();
+        }
+
         /// <summary>
         /// This method will let the AI play the maze for one game (windowless)
         /// </summary>

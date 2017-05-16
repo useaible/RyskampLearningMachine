@@ -58,8 +58,13 @@ namespace LanderGameLib
             DataPersistenceDone = true;
             Console.WriteLine("RLM Data Persistence done.");
         }
-
+                
         public bool Learn { get; set; }
+
+        public void ResetRLMRandomization()
+        {
+            network.ResetRandomizationCounter();
+        }
 
         public void StartSimulation(int sessionNumber, bool showOutput = true)
         {

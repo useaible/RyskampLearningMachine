@@ -157,6 +157,9 @@ namespace WPFMazeApp
                     RunUIThread(() => {
                         StatusText.Content = "Training started...";
                     });
+
+                    traveler.ResetRLMRandomization();
+
                     //Start the training (Play the game)
                     for (int i = 0; i < RandomnessOver; i++)
                     {
