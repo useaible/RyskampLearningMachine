@@ -47,6 +47,8 @@ namespace LunarLanderConsoleApp
                 watch.Start();
                 Console.WriteLine();
 
+                pilot.ResetRLMRandomization();
+
                 for (int i = 0; i < sessions; i++)
                 {
                     pilot.StartSimulation(i, true);

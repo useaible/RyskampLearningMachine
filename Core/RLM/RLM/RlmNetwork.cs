@@ -615,6 +615,16 @@ namespace RLM
         }
 
         /// <summary>
+        /// Resets the internal randomization counter to the maximum that was set (StartRandomness). You must call this when you want to retrain the network
+        /// after it has recently been trained to maintain the StartRandomness-EndRandomness range. Without calling this method, the randomization will stay 
+        /// at the minimum value (EndRandomness) for all training sessions onwards.
+        /// </summary>
+        public void ResetRandomizationCounter()
+        {
+            SessionCountInitial = SessionCount;
+        }
+
+        /// <summary>
         /// Changes the interval time that the DataPersistenceProgress event is triggered. Default time is 1000ms (1 second)
         /// </summary>
         /// <param name="milliseconds">The amount of time for the interval in milliseconds (ms)</param>

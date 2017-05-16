@@ -53,6 +53,8 @@ namespace MazeConsoleApp
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
 
+                traveler.ResetRLMRandomization();
+
                 //Start the training (Play the game)
                 for (int i = 0; i < randomnessThrough; i++)
                 {

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace RLM.Database
 {
-    [DbConfigurationType(typeof(ContextConfiguration))]
+    //[DbConfigurationType(typeof(ContextConfiguration))]
     public class RlmDbEntities : DbContext
     {
         public const string DEFAULT_RLM_DBNAME = "RyskampLearningMachines";
@@ -49,8 +49,14 @@ namespace RLM.Database
 
             CreateRLMFoldersIfNotExists();
             CreateRLMTemplateDB();
+            
+            // So that front end apps no longer need to reference EF
+            // via http://stackoverflow.com/a/29743758/6223318
+            var type = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
+            if (type == null)
+                throw new Exception("Do not remove, ensures static reference to System.Data.Entity.SqlServer");
         }
-        
+
         public static string DefaultRLMTemplateDb
         {
             get
@@ -414,13 +420,13 @@ namespace RLM.Database
         }
     }
 
-    public class ContextConfiguration : DbConfiguration
-    {
-        public ContextConfiguration()
-        {
-            SetExecutionStrategy("System.Data.SqlClient", () => new SqlAzureExecutionStrategy(5, TimeSpan.FromSeconds(30)));
-        }
-    }
+    //public class ContextConfiguration : DbConfiguration
+    //{
+    //    public ContextConfiguration()
+    //    {
+    //        SetExecutionStrategy("System.Data.SqlClient", () => new SqlAzureExecutionStrategy(5, TimeSpan.FromSeconds(30)));
+    //    }
+    //}
 
     #region Replaced by RnnCreateDBIfNotExists
     /*

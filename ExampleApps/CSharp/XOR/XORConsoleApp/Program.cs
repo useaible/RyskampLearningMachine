@@ -1,4 +1,4 @@
-﻿using RLM;
+using RLM;
 using RLM.Enums;
 using RLM.Models;
 using System;
@@ -70,9 +70,14 @@ namespace XORConsoleApp
             rlmNet.NumSessions = sessions;
             rlmNet.StartRandomness = startRandomness;
             rlmNet.EndRandomness = endRandomness;
-
+            
             Console.WriteLine("Training Session started");
             double sumOfCycleScores = 0;
+            
+            // this is just good practice, usually you need to call this when you want to do multiple trainings on the same network over and over again.
+            // it resets the randomization of the RLM back to the beginning (start randomness) after each training set 
+            // i.e, training for 50 sessions, then training for another 50 sessions, and so on and so forth
+            rlmNet.ResetRandomizationCounter();
 
             for (int i = 0; i < sessions; i++)
             {
