@@ -272,7 +272,7 @@ namespace RetailPoC
                             {
                                 // we give the cycle a zero (0) score as it was not able to satisfy our conditions (punish it)
                                 isValid = false;
-                                network.ScoreCycle(rlmOutput.CycleOutput.CycleID, -1);
+                                network.ScoreCycle(rlmOutput.CycleOutput.CycleID, 0);
                                 //System.Diagnostics.Debug.WriteLine("try again");
                             }
                         } while (!isValid); // if invalid, we redo the whole thing until the RLM is able to output an item that is unique and fits the remaining slot in the planogram
