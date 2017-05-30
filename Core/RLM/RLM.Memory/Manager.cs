@@ -14,6 +14,8 @@ namespace RLM.Memory
 {
     public class Manager : IManager
     {
+        private const int MAX_ALLOC = 100000; //1000000;
+
         private BlockingCollection<Rneuron> rneuron_queue;
         private BlockingCollection<Session> session_queue;
         private BlockingCollection<Session> savedSession_queue;
@@ -47,11 +49,11 @@ namespace RLM.Memory
         private double lastProgress = -1;
 
         // temp for benchmarks
-        public int CacheBoxCount { get; set; } = 0;
-        public List<TimeSpan> GetRneuronTimes { get; set; } = new List<TimeSpan>();
-        public List<TimeSpan> RebuildCacheboxTimes { get; set; } = new List<TimeSpan>();
-        public System.Diagnostics.Stopwatch swGetRneuron = new System.Diagnostics.Stopwatch();
-        public System.Diagnostics.Stopwatch swRebuildCache = new System.Diagnostics.Stopwatch();
+        public uint CacheBoxCount { get; set; } = 0;
+        public List<TimeSpan> GetRneuronTimes { get; set; }
+        public List<TimeSpan> RebuildCacheboxTimes { get; set; }
+        public System.Diagnostics.Stopwatch SwGetRneuron { get; set; }
+        public System.Diagnostics.Stopwatch SwRebuildCache { get; set; }
         // temp for benchmarks
 
         public event DataPersistenceCompleteDelegate DataPersistenceComplete;
@@ -88,11 +90,15 @@ namespace RLM.Memory
         public double CacheBoxMargin { get; set; } = 0;
         public bool UseMomentumAvgValue { get; set; } = false;
 
+        private readonly ConcurrentQueue<Queue<Case>> MASTER_CASE_QUEUE = new ConcurrentQueue<Queue<Case>>();
+        private Queue<Case> caseQueue = null;
+        private object caseQueue_lock = new object();
+
         /// <summary>
         /// Initializes memory manager
         /// </summary>
         /// <param name="databaseName">datbase name</param>
-        public Manager(IRlmNetwork network)
+        public Manager(IRlmNetwork network, bool trackStats = false)
         {
             Network = network;
             rneuron_queue = new BlockingCollection<Rneuron>();
@@ -112,8 +118,18 @@ namespace RLM.Memory
 
             progressUpdater.Interval = 1000;
             progressUpdater.Elapsed += ProgressUpdater_Elapsed;
-        }
 
+            if (trackStats)
+            {
+                GetRneuronTimes = new List<TimeSpan>();
+                RebuildCacheboxTimes = new List<TimeSpan>();
+                SwGetRneuron = new System.Diagnostics.Stopwatch();
+                SwRebuildCache = new System.Diagnostics.Stopwatch();
+            }
+
+            MASTER_CASE_QUEUE.Enqueue(caseQueue = new Queue<Case>());
+        }
+        
         /// <summary>
         /// Save created network
         /// </summary>
@@ -144,7 +160,7 @@ namespace RLM.Memory
 
             //Rneurons = new ConcurrentDictionary<long, Rneuron>(iConcurrencyLevel, rneuronsBoundedCapacity);
             //Solutions = new ConcurrentDictionary<long, Solution>(iConcurrencyLevel, solutionsBoundedCapacity);
-            
+
         }
         /// <summary>
         /// Save the new network and send it to a task. It also starts the database workers
@@ -246,11 +262,18 @@ namespace RLM.Memory
         /// <param name="c_case">current case</param>
         public void AddCaseToQueue(long key, Case c_case)
         {
-            Cases.Add(c_case);
+            //Cases.Add(c_case);
+            //Cases2.Enqueue(c_case);
 
-            //case_queue.Add(c_case);
+            if (caseQueue.Count() >= MAX_ALLOC)
+            {
+                MASTER_CASE_QUEUE.Enqueue(caseQueue = new Queue<Case>(MAX_ALLOC));
+            }
 
-            Cases2.Enqueue(c_case);
+            lock (caseQueue_lock)
+            {
+                caseQueue.Enqueue(c_case);
+            }
         }
         /// <summary>
         /// Gets existing Rneuron and creates a new one if not existing
@@ -449,17 +472,17 @@ namespace RLM.Memory
             {
                 if (CacheBox.IsWithinRange(rangeInfos, linearTolerance))
                 {
-                    swGetRneuron.Start();
+                    SwGetRneuron?.Start();
 
                     RlmInputValue.RecurseInputForMatchingRneurons(CacheBox.CachedInputs, rangeInfos, rneuronsFound);
 
-                    swGetRneuron.Stop();
-                    GetRneuronTimes.Add(swGetRneuron.Elapsed);
-                    swGetRneuron.Reset();
+                    SwGetRneuron?.Stop();
+                    GetRneuronTimes?.Add(SwGetRneuron.Elapsed);
+                    SwGetRneuron?.Reset();
                 }
                 else
                 {
-                    swRebuildCache.Start();
+                    SwRebuildCache?.Start();
 
                     CacheBoxCount++;
                     CacheBox.Clear();
@@ -521,9 +544,9 @@ namespace RLM.Memory
                     CacheBox.CachedInputs = RlmInputValue.RecurseInputForMatchingRneuronsForCaching(DynamicInputs, cacheBoxRangeInfos, rangeInfos, rneuronsFound);
                     //RnnInputValue.RecurseInputForMatchingRneurons(CacheBox.CachedInputs, rangeInfos, rneuronsFound);
 
-                    swRebuildCache.Stop();
-                    RebuildCacheboxTimes.Add(swRebuildCache.Elapsed);
-                    swRebuildCache.Reset();
+                    SwRebuildCache?.Stop();
+                    RebuildCacheboxTimes?.Add(SwRebuildCache.Elapsed);
+                    SwRebuildCache?.Reset();
                 }
             }
             else
@@ -768,7 +791,8 @@ namespace RLM.Memory
             Task.Run(() => { rlmDbEnqueuer.QueueObjects<Session>(Sessions3, savedSession_queue); }); //queue sessions for update to blocking collections
 
             caseTask = rlmDb.StartCaseWorker(case_queue, tokenCases); //start case thread to save (Rneuron, Solution, Case) to db
-            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Case>(Cases2, case_queue); }); //queue case values to blocking collections                     
+            //Task.Run(() => { rlmDbEnqueuer.QueueObjects<Case>(Cases2, case_queue); }); //queue case values to blocking collections                     
+            Task.Run(() => { rlmDbEnqueuer.QueueObjects(MASTER_CASE_QUEUE, case_queue, caseQueue_lock); });
 
             progressUpdater.Start();
 

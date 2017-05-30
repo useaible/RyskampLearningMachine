@@ -11,6 +11,8 @@ namespace RLM.Database
 {
     public class RlmObjectEnqueuer
     {
+        private const int DELAY = 10;
+
         private long taskEnqueuedCounter = 0;
         public long TotalTaskEnqueued
         {
@@ -58,7 +60,52 @@ namespace RLM.Database
                     }
                 }
 
-                Task.Delay(50).Wait();
+                Task.Delay(DELAY).Wait();
+            }
+        }
+
+        public void QueueObjects(ConcurrentQueue<Queue<Case>> cache, BlockingCollection<Case> bc, object queue_lock)
+        {
+            int index = 0;
+            while (true)
+            {
+                Queue<Case> currentReadQueue;
+                Queue<Case> doneReadQueue;
+                if (cache.TryPeek(out currentReadQueue))
+                {
+                    if (currentReadQueue.Count > 0)
+                    {
+                        int batch = 10;
+                        int max = batch + index;
+
+                        lock (queue_lock)
+                        {
+                            for (int i = 0; i < batch; i++)
+                            {
+                                if (currentReadQueue.Count > 0)
+                                {
+                                    Case item = currentReadQueue.Dequeue();
+                                    if (bc.TryAdd(item))
+                                    {
+                                        Interlocked.Increment(ref taskEnqueuedCounter);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (cache.Count > 1)
+                        {
+                            if (cache.TryDequeue(out doneReadQueue))
+                            {
+                                doneReadQueue = null;
+                            }
+                        }
+                    }
+                }
+
+                Task.Delay(DELAY).Wait();
             }
         }
     }

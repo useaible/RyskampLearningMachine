@@ -34,6 +34,8 @@ namespace RetailPoC
 
         private SimulationSettings simSettings;
         private double maxScore = -1;
+        private double MAX_SCORE = 0;
+        //private const int DEFAULT_SCORE_PERCENTAGE = 85;
 
         public SimulationPanel()
         {
@@ -51,22 +53,35 @@ namespace RetailPoC
                 Score = simSettings.Score;
                 chkSimDisplay.IsChecked = simSettings.EnableSimDisplay;
 
+                calculateMaxScore();
+                simScoreSlider.Value = simSettings.DefaultScorePercentage;
+                simScoreSliderLbl.Content = simScoreSlider.Value + "%";
+
                 switch (SimType)
                 {
                     case SimulationType.Sessions:
                         rdbSessions.IsChecked = true;
                         txtSimInput.Text = Sessions.ToString();
+                        showScoreSlider(false);
                         break;
                     case SimulationType.Time:
                         rdbTime.IsChecked = true;
                         txtSimInput.Text = Hours.ToString();
+                        showScoreSlider(false);
                         break;
                     default:
                         rdbScore.IsChecked = true;
                         txtSimInput.Text = Score.ToString();
+                        showScoreSlider(true);
                         break;
                 }
             }
+        }
+
+        private void showScoreSlider(bool val)
+        {
+            simScoreSlider.Visibility = val == false? Visibility.Hidden : Visibility.Visible;
+            simScoreSliderLbl.Visibility = val == false ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void radioButton_Checked(object sender, RoutedEventArgs e)
@@ -80,6 +95,8 @@ namespace RetailPoC
                 SimType = SimulationType.Sessions;
                 lblSimInput.Content = "Number of sessions:";
                 SetBtnMaxEnable(false);
+                txtSimInput.Text = Sessions.ToString();
+                showScoreSlider(false);
             }
 
             if (rdbTime.IsChecked.Value)
@@ -87,13 +104,16 @@ namespace RetailPoC
                 SimType = SimulationType.Time;
                 lblSimInput.Content = "Number of hours:";
                 SetBtnMaxEnable(false);
+                txtSimInput.Text = Hours.ToString();
+                showScoreSlider(false);
             }
 
             if (rdbScore.IsChecked.Value)
             {
                 SimType = SimulationType.Score;
                 lblSimInput.Content = "Must achieve at least this score 10 consecutive times:";
-                SetBtnMaxEnable(true);
+                //SetBtnMaxEnable(true);
+                showScoreSlider(true);
                 btnMax_Click(null, null);
             }
         }
@@ -157,19 +177,31 @@ namespace RetailPoC
 
         private void btnMax_Click(object sender, RoutedEventArgs e)
         {
-            if (maxScore < 0)
+            //if (maxScore < 0)
             {
-                using (PlanogramContext ctx = new PlanogramContext())
-                {
-                    MockData mock = new MockData(ctx);
-                    maxScore = mock.GetItemMaximumScore(simSettings) * simSettings.NumShelves * simSettings.NumSlots;
-                    double minScore = mock.GetItemMinimumScore(simSettings) * simSettings.NumShelves * simSettings.NumSlots;
-                    double offset = (maxScore - minScore) * 0.80;
-                    maxScore = Math.Round(minScore + offset, 2); //80% of "perfect" with "perfect" only being achievable with infinite duplicates as every slot would have to be the highest ranked item.
-                }
+                double maxPercentage = simScoreSlider.Value / 100;
+
+                maxScore = Math.Round(MAX_SCORE * maxPercentage, 2); // todo 90% must be from slider value
+                simSettings.Score = maxScore;
+                Score = simSettings.Score;
             }
 
             txtSimInput.Text = maxScore.ToString();
+        }
+
+        private void calculateMaxScore()
+        {
+            using (PlanogramContext ctx = new PlanogramContext())
+            {
+                MockData mock = new MockData(ctx);
+                MAX_SCORE = mock.GetItemMaxScoreForTop(simSettings);
+            }
+        }
+
+        private void simScoreSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            simScoreSliderLbl.Content = simScoreSlider.Value + "%";
+            btnMax_Click(null, null);
         }
     }
 }

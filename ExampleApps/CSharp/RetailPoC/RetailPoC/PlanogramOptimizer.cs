@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace RetailPoC
 {
     //public delegate void SessionDone(PlanogramOptResults results);
-    public delegate void UpdateUICallback(PlanogramOptResults results, bool enableSimDisplay);
+    public delegate void UpdateUICallback(PlanogramOptResultsSettings results, bool enableSimDisplay);
     public delegate void UpdateStatusCallback(string statusMsg, bool isDone = false);
 
     /// <summary>
@@ -20,11 +20,19 @@ namespace RetailPoC
     {
         // modify this to enforce how many duplicate items allowed in the planogram
         // -1 = infinite
-        const int MAX_ITEMS = 10; //10 Facings max of any single item
+        int MAX_ITEMS = SimulationSettings.MAX_ITEMS; //10 Facings max of any single item        
+        const int START_RANDOMNESS = 2;
+        const int END_RANDOMNESS = 0;
+        //const int MAX_LINEAR = 0;
+        //const int MIN_LINEAR = 0;
+        const int DEFAULT_SESSIONS_PER_BATCH = 800;
+        const int PREDICT_SESSIONS = 10;
+        const bool ENABLE_RLM_OUTPUT_LIMITER = true;
 
         private RlmNetwork network;
         private Item[] items;
         private SimulationSettings simSettings;
+        private List<int> currentItemIndexes;
 
         //public event SessionDone OnSessionDone;
         private UpdateUICallback UpdateUI;
@@ -35,6 +43,7 @@ namespace RetailPoC
         public int totalSessions = 0;
         private SimulationCsvLogger logger;
         private int numScoreHits = 0;
+        private RLM.Enums.RlmInputType inputType;
 
         /// <summary>
         /// Instantiates a new instance of the plangoram optimizer
@@ -52,6 +61,10 @@ namespace RetailPoC
             this.simSettings = simSettings;
             UpdateUI = updateUI;
             UpdateStatus = updateStatus;
+            if (ENABLE_RLM_OUTPUT_LIMITER)
+            {
+                currentItemIndexes = new List<int>();
+            }
 
             UpdateStatus?.Invoke("Initializing...");
 
@@ -60,13 +73,15 @@ namespace RetailPoC
 
             // checks if the network structure already exists
             // if not then we proceed to define the inputs and outputs
+
+            inputType = RLM.Enums.RlmInputType.Distinct;
             if (!network.LoadNetwork("planogram"))
             {
                 string int32Type = typeof(Int32).ToString();
 
                 var inputs = new List<RlmIO>();
                 //inputs.Add(new RlmIO() { Name = "Shelf", DotNetType = int32Type, Min = 1, Max = simSettings.NumShelves, Type = RLM.Enums.RlmInputType.Linear });
-                inputs.Add(new RlmIO() { Name = "Slot", DotNetType = int32Type, Min = 1, Max = simSettings.NumSlots * simSettings.NumShelves, Type = RLM.Enums.RlmInputType.Linear });
+                inputs.Add(new RlmIO() { Name = "Slot", DotNetType = int32Type, Min = 1, Max = simSettings.NumSlots * simSettings.NumShelves, Type = inputType });
 
                 var outputs = new List<RlmIO>();
                 outputs.Add(new RlmIO() { Name = "Item", DotNetType = int32Type, Min = 0, Max = this.items.Length - 1 });
@@ -76,6 +91,23 @@ namespace RetailPoC
 
                 // creates the network
                 network.NewNetwork("planogram", inputs, outputs);
+            }
+        }
+
+        private int GetEquivalentIndex(int index)
+        {
+            var item = currentItemIndexes.ElementAt(index);
+            return item;
+        }
+
+        private void ResetCurrentItemIndexes()
+        {
+            if (!ENABLE_RLM_OUTPUT_LIMITER) return;
+
+            currentItemIndexes.Clear();
+            for (int i = 0; i < items.Length; i++)
+            {
+                currentItemIndexes.Add(i);
             }
         }
 
@@ -90,7 +122,7 @@ namespace RetailPoC
             var retVal = new PlanogramOptResults();
 
             // checks what type of simulation we are running
-            int sessions = simSettings.SimType == SimulationType.Sessions ? simSettings.Sessions.Value : 100;
+            int sessions = simSettings.SimType == SimulationType.Sessions ? simSettings.Sessions.Value : DEFAULT_SESSIONS_PER_BATCH;
             double hours = simSettings.SimType == SimulationType.Time ? simSettings.Hours.Value : 0;
             simSettings.StartedOn = DateTime.Now;
             simSettings.EndsOn = DateTime.Now.AddHours(hours);
@@ -107,34 +139,32 @@ namespace RetailPoC
                 // NOTE if you decide to have multiple facings (by changing the NumFacings output Max to greater than 1) and enforce item uniqueness then the EndRandomness must not be 0 (i suggest 5 as the minimum) 
                 // as the planogram needs a bit of randomness towards the end since we have a condition where we enforce uniqueness of items. In the event that the RLM outputs an item that 
                 // is already in the planogram then having enough randomness left will allow it to still have a chance to suggest a different item otherwise the RLM will suggest the same item over and over again and cause an infinite loop
-                network.StartRandomness = 5;
-                network.EndRandomness = (simSettings.SimType == SimulationType.Sessions) ? 0 : network.StartRandomness;
-                network.MaxLinearBracket = 17;
-                network.MinLinearBracket = 0;
+                network.StartRandomness = START_RANDOMNESS;
+                network.EndRandomness = END_RANDOMNESS; //(simSettings.SimType == SimulationType.Sessions) ? 0 : network.StartRandomness;
+                //network.MaxLinearBracket = MAX_LINEAR;
+                //network.MinLinearBracket = MIN_LINEAR;
 
                 // since we might be retraining the network (i.e, SimulationType.Time or Score), we need to call this method to reset the randomization counter of the RLM
                 network.ResetRandomizationCounter();
 
                 // training, train 90% per session batch if not Session Type
-                retVal = Optimize((simSettings.SimType == SimulationType.Sessions) ? sessions : Convert.ToInt32(sessions * .9));
-                
-                // for non Sessions type, we predict 10% times per session batch
+                var trainingTimes = (simSettings.SimType == SimulationType.Sessions) ? sessions : sessions - PREDICT_SESSIONS;
+                retVal = Optimize(trainingTimes, true, simSettings.EnableSimDisplay);
+
+                // for non Sessions type, we predict {PREDICT_SESSIONS}-times per session batch
                 if (simSettings.SimType != SimulationType.Sessions)
                 {
-                    int predictTimes = Convert.ToInt32(sessions * .1);
+                    int predictTimes = PREDICT_SESSIONS;
                     if (simSettings.SimType == SimulationType.Score && predictTimes < SimulationSettings.NUM_SCORE_HITS)
                         predictTimes = SimulationSettings.NUM_SCORE_HITS;
-                    retVal = Optimize(predictTimes, false);
+                    retVal = Optimize(predictTimes, false, simSettings.EnableSimDisplay);
                 }
 
             } while ((simSettings.SimType == SimulationType.Time && simSettings.EndsOn > DateTime.Now) ||
                 (simSettings.SimType == SimulationType.Score && SimulationSettings.NUM_SCORE_HITS > numScoreHits));
 
-            // if Sessions type, we do a final prediction
-            if (simSettings.SimType == SimulationType.Sessions)
-            {
-                retVal = Optimize(1, false);
-            }
+            // we do a final prediction and to ensure we update the plangoram display for the final output
+            retVal = Optimize(1, false, true);
 
             network.TrainingDone();
 
@@ -167,6 +197,9 @@ namespace RetailPoC
                 }
                 else
                 {
+                    // update the current item indexes for the rlm output limiter
+                    currentItemIndexes?.Remove(itemIndex);
+
                     itemDict.Add(itemIndex, numFacings);
                     retVal = true;
                 }
@@ -181,9 +214,9 @@ namespace RetailPoC
         /// <param name="sessions">Number of session to train/predict for</param>
         /// <param name="learn">Lets the RLM know if we are training or predicting</param>
         /// <returns>The final output for the training or prediction</returns>
-        private PlanogramOptResults Optimize(int sessions, bool learn = true)
+        private PlanogramOptResults Optimize(int sessions, bool learn = true, bool enablePlanogramDisplay = false)
         {
-            var output = new PlanogramOptResults();
+            var output = new PlanogramOptResultsSettings();
 
             // holds the unique SKUs that are already in the planogram. Ensures there are no duplicate SKUs
             var hashedSku = new HashSet<int>();
@@ -198,6 +231,7 @@ namespace RetailPoC
                 shelves.Clear();
                 hashedSku.Clear();
                 itemDict.Clear();
+                ResetCurrentItemIndexes();
                 totalMetricScore = 0;
                 totalSessions++;
                 DateTime startSession = DateTime.Now;
@@ -230,9 +264,15 @@ namespace RetailPoC
                             //inputs.Add(new RlmIOWithValue(network.Inputs.First(a => a.Name == "Slot"), slot.ToString()));
                             inputs.Add(new RlmIOWithValue(network.Inputs.First(a => a.Name == "Slot"),numSlotFlattened.ToString()));
 
+                            var rlmItemOutput = network.Outputs.FirstOrDefault();
+                            var rlmIdeas = new List<RlmIdea>()
+                            {
+                                new RlmOutputLimiter(rlmItemOutput.ID, currentItemIndexes.Count - 1, GetEquivalentIndex)
+                            };
+
                             // runs a cycle with the sessionId passed in
                             var cycle = new RlmCycle();
-                            var rlmOutput = cycle.RunCycle(network, sessionId, inputs, learn);
+                            var rlmOutput = cycle.RunCycle(network, sessionId, inputs, learn, ideas: rlmIdeas);
 
                             // get the outputs
                             // the RLM outputs the item index so we will get the actual reference to the Item later on and 
@@ -272,7 +312,7 @@ namespace RetailPoC
                             {
                                 // we give the cycle a zero (0) score as it was not able to satisfy our conditions (punish it)
                                 isValid = false;
-                                network.ScoreCycle(rlmOutput.CycleOutput.CycleID, 0);
+                                network.ScoreCycle(rlmOutput.CycleOutput.CycleID, -1);
                                 //System.Diagnostics.Debug.WriteLine("try again");
                             }
                         } while (!isValid); // if invalid, we redo the whole thing until the RLM is able to output an item that is unique and fits the remaining slot in the planogram
@@ -300,6 +340,12 @@ namespace RetailPoC
                 output.MaxScore = metricScoreHistory.Max();
                 output.TimeElapsed = DateTime.Now - simSettings.StartedOn;
                 output.CurrentSession = totalSessions;
+                output.MaxItems = MAX_ITEMS;
+                output.StartRandomness = network.StartRandomness;
+                output.EndRandomness = network.EndRandomness;
+                output.SessionsPerBatch = DEFAULT_SESSIONS_PER_BATCH;
+                output.InputType = inputType.ToString();
+                output.CurrentRandomnessValue = network.RandomnessCurrentValue;
 
                 if (logger != null)
                 {
@@ -329,14 +375,14 @@ namespace RetailPoC
                 //OnSessionDone?.Invoke(output);
 
                 // updates the results to the UI
-                bool enableSimDisplay = (!learn) ? true : (learn && simSettings.EnableSimDisplay) ? true : false;
-                if (enableSimDisplay)
+                //bool enableSimDisplay = (!learn) ? true : (learn && simSettings.EnableSimDisplay) ? true : false;
+                if (enablePlanogramDisplay)
                 {
                     output.MetricMin = simSettings.ItemMetricMin;
                     output.MetricMax = simSettings.ItemMetricMax;
                     output.CalculateItemColorIntensity();
                 }
-                UpdateUI?.Invoke(output, enableSimDisplay);
+                UpdateUI?.Invoke(output, enablePlanogramDisplay);
 
                 // checks if we have already by passed the time or score that was set
                 // if we did, then we stop the training and end it abruptly

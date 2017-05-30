@@ -91,6 +91,7 @@
     <Compile Include="MetricPanel.xaml.cs">
       <DependentUpon>MetricPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\PlanogramOptResultsSettings.cs" />
     <Compile Include="Models\Scale.cs" />
     <Compile Include="Models\SimulationData.cs" />
     <Compile Include="SimulationCsvLogger.cs" />

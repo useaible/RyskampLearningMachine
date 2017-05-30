@@ -18,6 +18,12 @@ namespace RLM.Memory
             }
         }
 
+        public static double GetRandomDoubleNumber(double min, double max)
+        {
+            var next = Randomizer.NextDouble();
+            return min + (next * (max - min));
+        }
+
         private static readonly xxHash _xxHash64 = new xxHash(64);
         public static xxHash xxHash64
         {

@@ -98,6 +98,57 @@ namespace RetailPoC
             return retVal;
         }
 
+        public double GetItemMaxScoreForTop(SimulationSettings simSettings)
+        {
+            double retVal = 0;
+            int numSlots = simSettings.NumShelves * simSettings.NumSlots;
+            double top = Math.Ceiling(Convert.ToDouble(numSlots) / Convert.ToDouble(SimulationSettings.MAX_ITEMS));
+
+            var topItems = _context.Database.SqlQuery<double>($@"
+                    select top {top}
+	                    (m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + m10) as Score
+                    from (
+	                    select 
+		                    a.ID,
+		                    iif(@p0 = 0, 0, sum(c.Metric1) * (@p0 / 100)) m1,
+		                    iif(@p1 = 0, 0, sum(c.Metric2) * (@p1 / 100)) m2,
+		                    iif(@p2 = 0, 0, sum(c.Metric3) * (@p2 / 100)) m3,
+		                    iif(@p3 = 0, 0, sum(c.Metric4) * (@p3 / 100)) m4,
+		                    iif(@p4 = 0, 0, sum(c.Metric5) * (@p4 / 100)) m5,
+		                    iif(@p5 = 0, 0, sum(c.Metric6) * (@p5 / 100)) m6,
+		                    iif(@p6 = 0, 0, sum(c.Metric7) * (@p6 / 100)) m7,
+		                    iif(@p7 = 0, 0, sum(c.Metric8) * (@p7 / 100)) m8,
+		                    iif(@p8 = 0, 0, sum(c.Metric9) * (@p8 / 100)) m9,
+		                    iif(@p9 = 0, 0, sum(c.Metric10) * (@p9 / 100)) m10
+	                    from Items a
+	                    inner join ItemAttributes b on a.ID = b.Item_ID
+	                    inner join Attributes c on b.Attributes_ID = c.ID
+	                    group by a.ID
+                    ) a
+                    order by Score desc
+                "
+                , simSettings.Metric1, simSettings.Metric2, simSettings.Metric3, simSettings.Metric4, simSettings.Metric5, simSettings.Metric6, simSettings.Metric7, simSettings.Metric8, simSettings.Metric9, simSettings.Metric10).ToList();
+
+            int slotsAccountedFor = 0;
+            for (int i = 0; i < topItems.Count; i++)
+            {
+                if (slotsAccountedFor + 10 >= numSlots)
+                {
+                    var remaining = numSlots - slotsAccountedFor;
+                    topItems[i] = topItems[i] * remaining;
+                }
+                else
+                {
+                    slotsAccountedFor += 10;
+                    topItems[i] = topItems[i] * 10D;
+                }                
+            }
+
+            retVal = topItems.Sum();
+
+            return retVal;
+        }
+
         public Item[] GetItemsWithAttr()
         {
             return _context.Items.Include(a => a.Attributes).ToArray();

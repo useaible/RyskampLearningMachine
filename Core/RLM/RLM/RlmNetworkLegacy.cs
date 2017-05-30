@@ -22,8 +22,8 @@ namespace RLM
             long retVal =  base.SessionStart();
 
             // TEMPORARY for benchmark only
-            MemoryManager.GetRneuronTimes.Clear();
-            MemoryManager.RebuildCacheboxTimes.Clear();
+            MemoryManager.GetRneuronTimes?.Clear();
+            MemoryManager.RebuildCacheboxTimes?.Clear();
             CurrentCycleCount = 0;
             MemoryManager.CacheBoxCount = 0;
             // TEMPORARY for benchmark only

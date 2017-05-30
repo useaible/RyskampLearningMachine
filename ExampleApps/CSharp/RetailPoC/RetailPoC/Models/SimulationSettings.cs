@@ -9,14 +9,14 @@ namespace RetailPoC.Models
     public class SimulationSettings
     {
         public const int NUM_SCORE_HITS = 10;
+        public const int MAX_ITEMS = 10;
 
         // planogram layout info
         public int NumItems { get; set; }
         public int NumShelves { get; set; } // 12 shelves
         public int NumSlots { get; set; } // 24 slots
-
         // sim info
-        public SimulationType SimType { get; set; } = SimulationType.Sessions;
+        public SimulationType SimType { get; set; } = SimulationType.Score;
         public int? Sessions { get; set; }
         public double? Hours { get; set; }
         public DateTime StartedOn { get; set; }
@@ -39,5 +39,6 @@ namespace RetailPoC.Models
         // item metric into
         public double ItemMetricMin { get; set; }
         public double ItemMetricMax { get; set; }
+        public double DefaultScorePercentage { get; set; }
     }
 }

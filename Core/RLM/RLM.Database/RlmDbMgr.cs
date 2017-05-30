@@ -69,14 +69,27 @@ namespace RLM.Database
         private ConcurrentQueue<Case> caseBox = new ConcurrentQueue<Case>();
         public Task StartCaseWorker(BlockingCollection<Case> casesQueue, CancellationToken ct)
         {
-            Task T1 = Task.Run(() =>
+            Task T1 = Task.Run(async () =>
             {
+                List<Case> cases = new List<Case>();
+                int cnt = 0;
                 foreach (Case theCase in casesQueue.GetConsumingEnumerable())
                 {
-                    //caseBox.Enqueue(theCase);
-                    saveCase(theCase);
+                    cnt++;
+                    cases.Add(theCase);
+
                     Interlocked.Increment(ref taskCompletedCounter);
-                    Task.Delay(TaskDelay).Wait();
+                    if (cnt % 10 == 0)
+                    {
+                        await saveCase(cases.ToList());
+                        cases.Clear();
+                        Task.Delay(TaskDelay).Wait();
+                    }
+                }
+
+                if(cases.Count > 0)
+                {
+                    await saveCase(cases);
                 }
 
             }, ct);
@@ -280,6 +293,41 @@ namespace RLM.Database
                     }
 
                     theCase.SavedToDb = true;
+
+                    //RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
+                }
+                catch (Exception ex)
+                {
+                    RlmDbLogger.Error(ex, databaseName, "saveCase");
+                    Task.Delay(TaskDelay).Wait();
+                    goto start;
+                }
+            }
+        }
+
+        //save case
+        private async Task saveCase(IEnumerable<Case> cases)
+        {
+            using (RlmDbEntities db = new RlmDbEntities(databaseName))
+            {
+                db.Cases.AddRange(cases);
+                start:
+
+                try
+                {
+                    await db.SaveChangesAsync();
+
+                    //if (theCase.Rneuron != null)
+                    //{
+                    //    theCase.Rneuron.SavedToDb = true;
+                    //}
+
+                    //if (theCase.Solution != null)
+                    //{
+                    //    theCase.Solution.SavedToDb = true;
+                    //}
+
+                    //theCase.SavedToDb = true;
 
                     //RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
                 }

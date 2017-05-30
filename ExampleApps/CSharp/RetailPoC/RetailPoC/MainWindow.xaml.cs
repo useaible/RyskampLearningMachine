@@ -51,7 +51,8 @@ namespace RetailPoC
             Metric9 = 10,
             Metric10 = 10,
             NumShelves = SHELVES,
-            NumSlots = SLOTS_PER_SHELF
+            NumSlots = SLOTS_PER_SHELF,
+            DefaultScorePercentage = 85
         };
 
         private Item[] itemsCache = null;
@@ -79,6 +80,11 @@ namespace RetailPoC
 
             planogramTensorflow.Visibility = Visibility.Hidden;
             rectTensorflow.Visibility = Visibility.Hidden;
+
+            tensorFlowPlanogramScore.Visibility = Visibility.Hidden;
+            GrdTensorFlowsetting.Visibility = Visibility.Hidden;
+            grpBox_Tensorflow.Visibility = Visibility.Hidden;
+
             FillGrid(planogram, Colors.LightGray);
 
 
@@ -94,6 +100,8 @@ namespace RetailPoC
 
             targetScoreTxt.Margin = new Thickness(522, 128, 0, 0);
             targetScoreLbl.Margin = new Thickness(497, 98, 0, 0);
+            
+            
         }
 
         private void dataGenerationBtn_Click(object sender, RoutedEventArgs e)
@@ -176,7 +184,8 @@ namespace RetailPoC
                     FillGrid(planogramTensorflow, Colors.LightGray);
 
                 // disable control buttons
-                statusTxt.Text = statusTxtTensor.Text = "";
+                //statusTxt.Text = statusTxtTensor.Text = "";
+                statusTxtTensor.Text = "Waiting for RLM to finish running...";
                 EnableControlButtons(false);
 
                 // set simulation settings
@@ -185,6 +194,7 @@ namespace RetailPoC
                 simSettings.Hours = simPanel.Hours;
                 simSettings.Score = simPanel.Score;
                 simSettings.EnableSimDisplay = simPanel.EnableSimDisplay;
+                simSettings.DefaultScorePercentage = simPanel.simScoreSlider.Value;
 
                 targetScoreTxt.Text = "";
                 if (simSettings.SimType == SimulationType.Score)
@@ -197,6 +207,17 @@ namespace RetailPoC
                 {
                     targetScoreLbl.Visibility = Visibility.Hidden;
                     targetScoreTxt.Visibility = Visibility.Hidden;
+                }
+
+                if(simSettings.SimType == SimulationType.Sessions)
+                {
+                    sessionPerBatchLbl.Visibility = Visibility.Hidden;
+                    sessionPerBatchTxt.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    sessionPerBatchLbl.Visibility = Visibility.Visible;
+                    sessionPerBatchTxt.Visibility = Visibility.Visible;
                 }
 
                 Logger.Clear();
@@ -214,7 +235,7 @@ namespace RetailPoC
                     }
 
                     // let's tensorflow (or other listeners) know that it should start training
-                    OnSimulationStart?.Invoke(items, simSettings); //return;
+                    //OnSimulationStart?.Invoke(items, simSettings); //return;
 
                     // initialize and start RLM training
                     PlanogramOptimizer optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger);
@@ -235,19 +256,24 @@ namespace RetailPoC
             CbPlanogramSize.IsEnabled = value;
         }
 
-        private void UpdateRLMResults(PlanogramOptResults results, bool enableSimDisplay)
+        private void UpdateRLMResults(PlanogramOptResultsSettings results, bool enableSimDisplay)
         {
             Dispatcher.Invoke(() =>
             {
                 string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
                 scoreTxt.Text = scoreText;
                 sessionRunTxt.Text = results.CurrentSession.ToString();
-                timElapseTxt.Text = results.TimeElapsed.ToString();
+                timElapseTxt.Text = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
                 minScoretxt.Text = results.MinScore.ToString("#,###.##");
                 maxScoreTxt.Text = results.MaxScore.ToString("#,###.##");
                 //engineTxt.Text = "RLM";
                 averageScoreTxt.Text = results.AvgScore.ToString("#,###.##");
                 averageScoreOf10Txt.Text = results.AvgLastTen.ToString("#,###.##");
+                currentRandomnessTxt.Text = results.CurrentRandomnessValue.ToString();
+                startRandomnessTxt.Text = results.StartRandomness.ToString();
+                endRandomnessTxt.Text = results.EndRandomness.ToString();
+                sessionPerBatchTxt.Text = results.SessionsPerBatch.ToString();
+                inputTypeTxt.Text = results.InputType;
 
                 if (enableSimDisplay)
                 {
@@ -266,8 +292,25 @@ namespace RetailPoC
 
                 if (headToHead)
                 {
-                    if (isRLMDone && isTensorflowDone)
-                        EnableControlButtons(true);
+                    if (isRLMDone)
+                    {
+                        Task.Run(() => {
+                            Item[] items;
+                            using (PlanogramContext ctx = new PlanogramContext())
+                            {
+                                MockData mock = new MockData(ctx);
+                                items = mock.GetItemsWithAttr();
+                                simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
+                                simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
+                            }
+
+                            // let's tensorflow (or other listeners) know that it should start training
+                            OnSimulationStart?.Invoke(items, simSettings);
+                        });
+
+                        if (isTensorflowDone)
+                            EnableControlButtons(true);
+                    }
                 }
                 else
                 {
@@ -395,7 +438,7 @@ namespace RetailPoC
                 string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
                 scoreTxtTensor.Text = scoreText;
                 sessionRunTxtTensor.Text = results.CurrentSession.ToString();
-                timElapseTxtTensor.Text = results.TimeElapsed.ToString();
+                timElapseTxtTensor.Text = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
                 minScoreTxtTensor.Text = results.MinScore.ToString("#,###.##");
                 maxScoreTxtTensor.Text = results.MaxScore.ToString("#,###.##");
                 //engineTxtTensor.Text = "Tensorflow";

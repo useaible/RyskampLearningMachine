@@ -13,14 +13,16 @@
                     <ColumnDefinition Width="215*"/>
                     <ColumnDefinition Width="133*"/>
                 </Grid.ColumnDefinitions>
-                <RadioButton x:Name="rdbSessions" Content="Sessions" IsChecked="True" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
+                <RadioButton x:Name="rdbSessions" Content="Sessions" IsChecked="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
                 <RadioButton x:Name="rdbTime" Content="Time" IsChecked="False" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
                 <RadioButton x:Name="rdbScore" Content="Score" IsChecked="False" HorizontalAlignment="Left" Margin="151,10,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
-                <Label x:Name="lblSimInput" Content="Number of sessions:" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="330"/>
-                <TextBox x:Name="txtSimInput" HorizontalAlignment="Left" Height="23" Margin="16,64,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="324" Grid.ColumnSpan="2"/>
+                <Label x:Name="lblSimInput" Content="Number of sessions:" HorizontalAlignment="Left" Margin="10,24,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="330"/>
+                <TextBox x:Name="txtSimInput" HorizontalAlignment="Left" Height="23" Margin="16,50,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="324" Grid.ColumnSpan="2"/>
                 <CheckBox x:Name="chkSimDisplay" Content="Enable simulation display" IsChecked="True" HorizontalAlignment="Left" Margin="9,101,0,0" VerticalAlignment="Top" Width="226" Grid.ColumnSpan="2"/>
                 <Label x:Name="label" Content="*Enabling this may have a negative effect on performance" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" FontStyle="Italic" FontSize="9" Grid.ColumnSpan="2"/>
                 <Button x:Name="btnMax" IsEnabled="False" Visibility="Hidden" Content="80% of Max" Grid.Column="1" HorizontalAlignment="Left" Margin="49,64,0,0" VerticalAlignment="Top" Width="76" Height="23" Click="btnMax_Click"/>
+                <Slider x:Name="simScoreSlider" Value="85" Minimum="0" Maximum="90" HorizontalAlignment="Left" Margin="16,78,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="283" PreviewMouseUp="simScoreSlider_PreviewMouseUp" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft"/>
+                <Label x:Name="simScoreSliderLbl" Content="85%" Grid.Column="1" HorizontalAlignment="Left" Margin="84,73,0,0" VerticalAlignment="Top" Height="23" Width="41" RenderTransformOrigin="0.54,0.163"/>
             </Grid>
         </GroupBox>
         <Button x:Name="btnRun" Content="Run Simulation" Margin="0,0,100,17" Click="btnRun_Click" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="120"/>

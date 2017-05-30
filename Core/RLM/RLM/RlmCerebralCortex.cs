@@ -85,7 +85,7 @@ namespace RLM
             else if (rnnType == RlmNetworkType.Unsupervised && randomnessValue > 0)
             {
                 //TODO:  This should be based upon the randomization factor
-                int randomProbability = Util.Randomizer.Next(1, 101);
+                double randomProbability = Util.GetRandomDoubleNumber(0, 100);
                 bool random = randomProbability <= randomnessValue;
                 
                 //Idea 

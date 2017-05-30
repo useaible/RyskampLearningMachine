@@ -11,7 +11,7 @@ namespace RLM.Models.Interfaces
     public interface IManager
     {
         // temp for benchmark only
-        int CacheBoxCount { get; set; }
+        uint CacheBoxCount { get; set; }
         List<TimeSpan> GetRneuronTimes { get; set; }
         List<TimeSpan> RebuildCacheboxTimes { get; set; }
         // temp for benchmar only
