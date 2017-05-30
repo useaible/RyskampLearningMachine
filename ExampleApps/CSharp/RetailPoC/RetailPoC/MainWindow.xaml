@@ -273,10 +273,10 @@
                     <Label x:Name="maxScoreLblTensor" Content="Max Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="117" FontSize="12" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="4" Grid.Column="0"/>
 
                     <TextBlock x:Name="scoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold"  Grid.Row="0" Grid.Column="1" Margin="0,8" />
-                    <TextBlock x:Name="averageScoreOf10TxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="1" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="minScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="maxScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="3" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="averageScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="4" Grid.Column="1" Margin="0,8"/>
+                    <TextBlock x:Name="averageScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="1" Grid.Column="1" Margin="0,8"/>
+                    <TextBlock x:Name="averageScoreOf10TxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,8"/>
+                    <TextBlock x:Name="minScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="3" Grid.Column="1" Margin="0,8"/>
+                    <TextBlock x:Name="maxScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="4" Grid.Column="1" Margin="0,8"/>
 
 
                     <!--<Label x:Name="currentScoreTxt" Content="Current Score:" HorizontalAlignment="Left" Margin="10,-1,0,0" VerticalAlignment="Top" Height="31" Width="118" FontSize="15" FontWeight="Bold" VerticalContentAlignment="Center" />
