@@ -263,7 +263,7 @@ namespace RetailPoC
                 string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
                 scoreTxt.Text = scoreText;
                 sessionRunTxt.Text = results.CurrentSession.ToString();
-                timElapseTxt.Text = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
+                timElapseTxt.Text = results.TimeElapsed.ToString();
                 minScoretxt.Text = results.MinScore.ToString("#,###.##");
                 maxScoreTxt.Text = results.MaxScore.ToString("#,###.##");
                 //engineTxt.Text = "RLM";
@@ -438,7 +438,7 @@ namespace RetailPoC
                 string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
                 scoreTxtTensor.Text = scoreText;
                 sessionRunTxtTensor.Text = results.CurrentSession.ToString();
-                timElapseTxtTensor.Text = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
+                timElapseTxtTensor.Text = results.TimeElapsed.ToString();
                 minScoreTxtTensor.Text = results.MinScore.ToString("#,###.##");
                 maxScoreTxtTensor.Text = results.MaxScore.ToString("#,###.##");
                 //engineTxtTensor.Text = "Tensorflow";
