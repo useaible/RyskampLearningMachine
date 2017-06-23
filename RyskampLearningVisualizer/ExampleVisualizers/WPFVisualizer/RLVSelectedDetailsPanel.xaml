@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="WPFVisualizer.RLVSelectedDetailsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFVisualizer"
+             Name="detailControl"
+             mc:Ignorable="d" Width="750.464" Height="380">
+    <Grid Name="mainGrid">
+        <Label x:Name="lblSelectedDetailsHeader" Content="Selected Details" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="20" FontFamily="Fonts/#Oswald Light"/>
+        <Label x:Name="lblInputDetailsHeader" Content="Input Details" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" Width="177" FontWeight="Bold" FontSize="10" FontFamily="Fonts/#Oswald Light"/>
+        <DataGrid x:Name="inputDetailsGrid" Tag="InputDetails" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" Width="168" Height="212" AutoGenerateColumns="True" FontFamily="Fonts/#Oswald Light" />
+        <Label x:Name="lblOutputDetailsHeader" Content="Output Details" HorizontalAlignment="Left" Margin="192,56,0,0" VerticalAlignment="Top" Width="164" FontSize="10" FontWeight="Bold" FontFamily="Fonts/#Oswald Light" />
+        <DataGrid x:Name="outputDetailsGrid" Tag="OutputDetails" HorizontalAlignment="Left" Margin="183,82,0,0" VerticalAlignment="Top" Width="173" Height="208" AutoGenerateColumns="True" FontFamily="Fonts/#Oswald Light" />
+        <Button x:Name="btnPrevious" Content="Previous" HorizontalAlignment="Left" Margin="232,10,0,0" VerticalAlignment="Top" Width="75" Click="btnPrevious_Click" FontFamily="Fonts/#Oswald Light"/>
+        <Button x:Name="btnNext" Content="Next" HorizontalAlignment="Left" Margin="665,9,0,0" VerticalAlignment="Top" Width="75" Click="btnNext_Click" FontFamily="Fonts/#Oswald Light"/>
+        <Rectangle Fill="LightGray" Stroke="Transparent" HorizontalAlignment="Left" Height="303" Margin="370,54,0,0" VerticalAlignment="Top" Width="2" RenderTransformOrigin="0.5,0.5">
+            <Rectangle.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Rectangle.RenderTransform>
+        </Rectangle>
+        <Label x:Name="lblCurrentHeader" Content="Learned" HorizontalAlignment="Left" Margin="658,60,0,0" VerticalAlignment="Top" FontSize="14"  FontFamily="Fonts/#Oswald Light"/>
+        <Label x:Name="lblPreviousHeader" Content="Prior To Learned" HorizontalAlignment="Left" Margin="496,60,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Fonts/#Oswald Light"/>
+        <Label x:Name="lblSessionTitle" Content="Session" HorizontalAlignment="Left" Margin="389,101,0,0" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+        <Label x:Name="lblTimeTitle" Content="Time" HorizontalAlignment="Left" Margin="400,152,0,0" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+        <Label x:Name="lblCaseTitle" Content="Case" HorizontalAlignment="Left" Margin="401,200,0,0" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+        <Label x:Name="lblScoreTitle" Content="Score" HorizontalAlignment="Left" Margin="401,250,0,0" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+        <Rectangle Fill="LightGray" HorizontalAlignment="Left" Height="2" Margin="442,141,0,0" Stroke="Transparent" VerticalAlignment="Top" Width="298" />
+        <Rectangle Fill="LightGray" HorizontalAlignment="Left" Height="2" Margin="442,191,0,0" Stroke="Transparent" VerticalAlignment="Top" Width="298" />
+        <Rectangle Fill="LightGray" HorizontalAlignment="Left" Height="2" Margin="442,240,0,0" Stroke="Transparent" VerticalAlignment="Top" Width="298" />
+
+        <Label x:Name="prevSessionVal" Tag="PreviousSession" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="445,101,162,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="143" FontWeight="Bold" FontSize="25" Height="40" FontFamily="Fonts/#Oswald Bold" Padding="0"  Foreground="#FFFE8F41"/>
+        <Label x:Name="prevTimeVal" Tag="PreviousTime" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="446,145,162,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="142" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="46" Padding="0" Foreground="#FFFE8F41"/>
+        <Label x:Name="prevCaseVal" Tag="PreviousCase" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="444,196,162,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="144" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="44" Padding="0"  Foreground="#FFFE8F41"/>
+        <TextBlock x:Name="prevScoreValContainer" HorizontalAlignment="Center" Margin="444,244,159,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="147" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="39" Padding="0"  Foreground="#FFFE8F41">
+            <Hyperlink>
+                <TextBlock x:Name="prevScoreVal" Tag="PreviousScore" ToolTip="PreviousSessionId" PreviewMouseDown="score_PreviewMouseDown"></TextBlock>
+            </Hyperlink>
+        </TextBlock>
+        <Label x:Name="currSessionVal" Tag="CurrentSession" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="604,101,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="136" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="39" Padding="0"  Foreground="#FFFE8F41"/>
+        <Label x:Name="currTimeVal" Tag="CurrentTime" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="604,145,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="136" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="46" Padding="0"  Foreground="#FFFE8F41"/>
+        <Label x:Name="currCaseVal" Tag="CurrentCase" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="604,195,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="136" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="44" Padding="0"  Foreground="#FFFE8F41"/>
+        <TextBlock x:Name="currScoreValContainer" HorizontalAlignment="Center" Margin="604,244,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.184,0.538" Width="136" FontWeight="Bold" FontSize="25" FontFamily="Fonts/#Oswald Bold" Height="40" Padding="0"  Foreground="#FFFE8F41">
+            <Hyperlink>
+                <TextBlock x:Name="currScoreVal" Tag="CurrentScore" ToolTip="CurrentSessionId" PreviewMouseDown="score_PreviewMouseDown"></TextBlock>
+            </Hyperlink>
+        </TextBlock>
+        <Button x:Name="btnShowLearningComparison" FontFamily="Fonts/#Oswald Light" Content="Show Learning Comparison" HorizontalAlignment="Left" Margin="518,325,0,0" VerticalAlignment="Top" Width="222" Click="btnShowLearningComparison_Click"/>
+        <local:RLVScaleSelectionPanel x:Name="scaleSelectionControl" DefaultScale="{Binding DefaultScale, Mode=TwoWay}" SliderLabelText="{Binding SliderLabelText, Mode=TwoWay}" HorizontalAlignment="Left" Margin="394,-2,0,0" VerticalAlignment="Top" Height="43" Width="178" FontFamily="Fonts/#Oswald Light" Visibility="Hidden" />
+    </Grid>
+</UserControl>

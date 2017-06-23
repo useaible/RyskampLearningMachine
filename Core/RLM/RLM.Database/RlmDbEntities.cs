@@ -22,7 +22,7 @@ namespace RLM.Database
     {
         public const string DEFAULT_RLM_DBNAME = "RyskampLearningMachines";
         public const string MASTER_DB = "master";
-        private const string DBNAME_PLACEHOLDER = "{{dbName}}";
+        public const string DBNAME_PLACEHOLDER = "{{dbName}}";
         public string DatabaseName { get; private set; }
 
         public virtual DbSet<Rnetwork> Rnetworks { get; set; }

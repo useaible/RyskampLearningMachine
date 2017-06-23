@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using RLM.Models.Interfaces;
 using PagedList;
+using System.Diagnostics;
 
 namespace RLM.Database
 {
@@ -18,10 +19,11 @@ namespace RLM.Database
         private string databaseName;
         private long networkID;
         private Rnetwork rlm;
-
+        private RlmDbBatchProcessor batchProcessor;
         public RlmDbMgr(string databaseName)
         {
             this.databaseName = databaseName;
+            this.batchProcessor = new RlmDbBatchProcessor(databaseName);
         }
 
         public int TaskDelay { get; private set; } = 50;
@@ -44,7 +46,7 @@ namespace RLM.Database
                 {
                     createSession(session);
                     Interlocked.Increment(ref taskCompletedCounter);
-                    Task.Delay(TaskDelay).Wait();
+                    //Task.Delay(TaskDelay).Wait();
                 }
 
             }, ct);
@@ -71,6 +73,9 @@ namespace RLM.Database
         {
             Task T1 = Task.Run(async () =>
             {
+                Stopwatch st = new Stopwatch();
+                st.Start();
+
                 List<Case> cases = new List<Case>();
                 int cnt = 0;
                 foreach (Case theCase in casesQueue.GetConsumingEnumerable())
@@ -83,7 +88,7 @@ namespace RLM.Database
                     {
                         await saveCase(cases.ToList());
                         cases.Clear();
-                        Task.Delay(TaskDelay).Wait();
+                        //Task.Delay(TaskDelay).Wait();
                     }
                 }
 
@@ -92,6 +97,8 @@ namespace RLM.Database
                     await saveCase(cases);
                 }
 
+                st.Stop();
+                System.Diagnostics.Debug.WriteLine($"Case time: {st.Elapsed}");
             }, ct);
 
             return T1;
@@ -338,6 +345,9 @@ namespace RLM.Database
                     goto start;
                 }
             }
+
+            // TODO needs more testing and fix for Sessions concurrency bug
+            //await batchProcessor.InsertCases(cases);
         }
 
         private double caseCount = 0;

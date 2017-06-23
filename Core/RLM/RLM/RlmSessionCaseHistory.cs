@@ -6,6 +6,7 @@ using RLM.Database;
 using RLM.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -119,6 +120,301 @@ namespace RLM
                 {
                     return a;
                 }).ToList();
+            }
+
+            return retVal;
+        }
+
+        public long? GetRneuronIdFromInputs(KeyValuePair<string, string>[] inputs)
+        {
+            long? retVal = null;
+            List<SqlParameter> parameters = new List<SqlParameter>();
+
+            string query = $@"
+                    SELECT DISTINCT
+                        ivr.Rneuron_ID
+                    FROM Input_Values_Rneuron ivr
+                    INNER JOIN Inputs i ON ivr.Input_ID = i.ID 
+                    WHERE ";
+
+            int cnt = 0;
+            foreach(var input in inputs)
+            {
+                SqlParameter input_name = new SqlParameter($"p{cnt++}", input.Key);
+                SqlParameter input_val = new SqlParameter($"p{cnt++}", input.Value);
+
+                query += $"(i.Name = @{input_name.ParameterName} AND ivr.Value = @{input_val.ParameterName}) AND\n";
+
+                parameters.Add(input_name);
+                parameters.Add(input_val);
+            }
+            query = query.Substring(0, query.LastIndexOf("AND"));
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                retVal = db.Database.SqlQuery<long?>(query, parameters.ToArray()).FirstOrDefault();
+            }
+
+            return retVal;
+        }
+
+        public long? GetSolutionIdFromOutputs(KeyValuePair<string, string>[] outputs)
+        {
+            long? retVal = null;
+            List<SqlParameter> parameters = new List<SqlParameter>();
+
+            string query = $@"
+                    SELECT DISTINCT
+	                    ovs.Solution_ID
+                    FROM Output_Values_Solution ovs
+                    INNER JOIN Outputs o ON ovs.Output_ID = o.ID 
+                    WHERE ";
+
+            int cnt = 0;
+            foreach (var output in outputs)
+            {
+                SqlParameter output_name = new SqlParameter($"p{cnt++}", output.Key);
+                SqlParameter output_val = new SqlParameter($"p{cnt++}", output.Value);
+
+                query += $"(o.Name = @{output_name.ParameterName} AND ovs.Value = @{output_val.ParameterName}) AND\n";
+
+                parameters.Add(output_name);
+                parameters.Add(output_val);
+            }
+            query = query.Substring(0, query.LastIndexOf("AND"));
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                retVal = db.Database.SqlQuery<long?>(query, parameters.ToArray()).FirstOrDefault();
+            }
+
+            return retVal;
+        }
+        
+        public IEnumerable<RlmLearnedCase> GetLearnedCases(long rneuronId, long solutionId, double scale)
+        {
+            IEnumerable<RlmLearnedCase> retVal = null;
+
+            var rneuronParam = new SqlParameter("rneuron", rneuronId);
+            var solutionParam = new SqlParameter("solution", solutionId);
+            var scaleParam = new SqlParameter("scale", scale);
+
+            string query = $@"
+                WITH cte (ID, [Time], Score)
+                AS
+                (
+	                SELECT 
+		                c.ID,
+		                s.[Time],
+		                MAX(s.SessionScore) OVER(ORDER BY c.ID ASC) Score
+	                FROM Cases c
+	                INNER JOIN (
+		                SELECT
+			                ID,
+			                SUM(DATEDIFF(ms, DateTimeStart, DateTimeStop)) OVER (ORDER BY DateTimeStart) [Time],
+			                SessionScore
+		                FROM [Sessions]
+	                ) s ON c.Session_ID = s.ID
+	                WHERE c.Rneuron_ID = @{rneuronParam.ParameterName} AND c.Solution_ID = @{solutionParam.ParameterName}
+                )
+                SELECT TOP (@{scaleParam.ParameterName}) PERCENT
+	                MIN(ID) CaseID,
+	                MIN([Time]) [Time],
+	                Score
+                FROM cte
+                GROUP BY Score
+                ORDER BY Score DESC";
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                retVal = db.Database.SqlQuery<RlmLearnedCase>(query, rneuronParam, solutionParam, scaleParam).ToList();
+            }
+
+            return retVal;
+        }
+
+        public long? GetNextPreviousLearnedCaseId(long caseId, bool next = false)
+        {
+            long? retVal = null;
+
+            string tempTablePostfix = Guid.NewGuid().ToString("N");
+            var caseParam = new SqlParameter("case", caseId);
+
+            string query = $@"
+                DECLARE @temp_table_{tempTablePostfix} TABLE(ID BIGINT, Score FLOAT)
+
+                INSERT INTO @temp_table_{tempTablePostfix}
+                SELECT
+	                c.ID,
+	                s.SessionScore as Score
+                FROM
+                (
+	                SELECT 
+		                MIN(sub.Id) as ID,		
+		                sub.Score
+	                FROM (
+		                SELECT 
+			                c.ID as Id,
+			                MAX(s.SessionScore) OVER(ORDER BY c.ID ASC) as Score
+		                FROM Cases c
+		                INNER JOIN [Sessions] s ON c.Session_ID = s.ID
+		                WHERE c.Rneuron_ID = (select Rneuron_ID from Cases where ID = @{caseParam.ParameterName}) AND c.Solution_ID = (select Solution_ID from Cases where ID = @{caseParam.ParameterName})
+	                ) sub
+	                GROUP BY sub.Score
+                ) sub
+                INNER JOIN [Cases] c ON sub.Id = c.ID
+                INNER JOIN [Sessions] s ON c.Session_ID = s.ID
+
+                SELECT
+                    s2.ID AS PreviousCaseId
+                FROM (SELECT *, ROW_NUMBER() OVER (ORDER BY Score DESC) ord FROM @temp_table_{tempTablePostfix}) s1
+                LEFT JOIN (SELECT *, ROW_NUMBER() OVER (ORDER BY Score DESC) ord FROM @temp_table_{tempTablePostfix}) s2 on s1.ord = s2.ord {(next ? "+" : "-")} 1
+                WHERE s1.ID = @{caseParam.ParameterName}";
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                retVal = db.Database.SqlQuery<long?>(query, caseParam).FirstOrDefault();
+            }
+
+            return retVal;
+        }
+        
+        public IEnumerable<RlmLearnedCaseDetails> GetCaseDetails(params long[] caseIds)
+        {
+            IEnumerable<RlmLearnedCaseDetails> retVal = null;
+
+            var sqlParams = new List<SqlParameter>();
+            for (int i = 0; i < caseIds.Length; i++)
+            {
+                sqlParams.Add(new SqlParameter($"id_{i}", caseIds[i]));
+            }
+
+            string query = $@"
+                WITH cte (ID, SessionScore, [Time], [Order])
+                AS
+                (	
+	                SELECT
+		                ID,
+		                SessionScore,
+		                SUM(DATEDIFF(ms, DateTimeStart, DateTimeStop)) OVER (ORDER BY DateTimeStart) [Time],
+		                ROW_NUMBER() OVER (ORDER BY DateTimeStart) [Order]
+	                FROM [Sessions]
+                )
+                SELECT
+	                c.ID CaseId,
+	                c.[Order] CycleNum,
+	                c.CycleScore CycleScore,
+	                c.Session_ID SessionId,
+	                s.[SessionScore] SessionScore,
+	                s.[Time] SessionTime,
+	                s.[Order] SessionNum
+                FROM Cases c
+                INNER JOIN cte s ON c.Session_ID = s.ID
+                WHERE c.ID in ({string.Join(",", sqlParams.Select(a => $"@{a.ParameterName}").ToArray())})";
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                retVal = db.Database.SqlQuery<RlmLearnedCaseDetails>(query, sqlParams.ToArray()).ToList();
+            }
+
+            return retVal;
+        }
+
+        public IEnumerable<RlmIODetails>[] GetCaseIODetails(long caseId)
+        {
+            const int INPUT_INDEX = 0;
+            const int OUTPUT_INDEX = 1; 
+            var retVal = new IEnumerable<RlmIODetails>[2];
+
+            var caseParam = new SqlParameter("caseId", caseId);
+
+            string query = $@"
+                SELECT
+	                i.ID,
+	                i.Name,
+	                ivr.Value,
+	                CAST(1 AS BIT) [IsInput]
+                FROM Cases c
+                INNER JOIN Input_Values_Rneuron ivr on c.Rneuron_ID = ivr.Rneuron_ID
+                INNER JOIN Inputs i on ivr.Input_ID = ivr.Input_ID
+                WHERE c.ID = @{caseParam.ParameterName}
+                UNION
+                SELECT
+	                o.ID,
+	                o.Name,
+	                ovs.Value,
+	                CAST(0 AS BIT) [IsInput]
+                FROM Cases c
+                INNER JOIN Output_Values_Solution ovs on c.Solution_ID = ovs.Solution_ID
+                INNER JOIN Outputs o on ovs.Output_ID = ovs.Output_ID
+                WHERE c.ID = @{caseParam.ParameterName}";
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                var results = db.Database.SqlQuery<RlmIODetails>(query, caseParam).ToList();
+
+                if (results != null)
+                {
+                    retVal[INPUT_INDEX] = results.Where(a => a.IsInput).ToList();
+                    retVal[OUTPUT_INDEX] = results.Where(a => !a.IsInput).ToList();
+                }
+            }
+
+            return retVal;
+        }
+
+        public IEnumerable<RlmLearnedSessionDetails> GetSessionIODetails(params long[] sessionIds)
+        {
+            var retVal = new List<RlmLearnedSessionDetails>();
+
+            var sqlParams = new List<SqlParameter>();
+            for (int i = 0; i < sessionIds.Length; i++)
+            {
+                sqlParams.Add(new SqlParameter($"id_{i}", sessionIds[i]));
+            }
+
+            string query = $@"
+                SELECT
+	                i.ID,
+	                i.Name,
+	                ivr.Value,
+	                CAST(1 AS BIT) [IsInput],	
+	                c.ID [CaseId],
+	                c.CycleScore,
+	                c.Session_ID [SessionId]
+                FROM Cases c
+                INNER JOIN Input_Values_Rneuron ivr on c.Rneuron_ID = ivr.Rneuron_ID
+                INNER JOIN Inputs i on ivr.Input_ID = ivr.Input_ID
+                WHERE c.Session_ID in ({string.Join(",", sqlParams.Select(a => $"@{a.ParameterName}").ToArray())})
+                UNION
+                SELECT
+	                o.ID,
+	                o.Name,
+	                ovs.Value,
+	                CAST(0 AS BIT) [IsInput],
+	                c.ID [CaseId],
+	                c.CycleScore,
+	                c.Session_ID [SessionId]
+                FROM Cases c
+                LEFT JOIN Output_Values_Solution ovs on c.Solution_ID = ovs.Solution_ID
+                LEFT JOIN Outputs o on ovs.Output_ID = ovs.Output_ID
+                WHERE c.Session_ID in ({string.Join(",", sqlParams.Select(a => $"@{a.ParameterName}").ToArray())})";
+
+            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            {
+                var results = db.Database.SqlQuery<RlmIODetails>(query, sqlParams.ToArray()).ToList();
+                if (results != null)
+                {
+                    var sessionIODetails = results.GroupBy(a => a.SessionId);
+                    foreach (var item in sessionIODetails)
+                    {
+                        var learnedSess = new RlmLearnedSessionDetails();
+                        learnedSess.SessionId = item.Key;
+                        learnedSess.Inputs = item.Where(a => a.IsInput).ToList();
+                        learnedSess.Outputs = item.Where(a => !a.IsInput).ToList();
+                        retVal.Add(learnedSess);
+                    }
+                }
             }
 
             return retVal;

@@ -41,7 +41,7 @@ namespace RLM.Models.Interfaces
         bool AddSessionToQueue(long key, Session session);
         bool AddSessionUpdateToQueue(Session session);
         void AddCaseToQueue(long key, Case c_case);
-        Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double linearTolerance = 0, bool predict = false);
+        Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double linearTolerance = 0, bool predict = false, double predictLinearTolerance = 0);
         void SetBestSolution(BestSolution bestSolution);
         GetRneuronResult GetRneuronFromInputs(IEnumerable<RlmIOWithValue> inputs, long rnetworkID);
         void SetRneuronWithInputs(Rneuron rneuron);

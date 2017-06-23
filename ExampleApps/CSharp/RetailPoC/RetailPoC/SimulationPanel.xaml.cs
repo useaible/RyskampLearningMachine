@@ -12,13 +12,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
 
 namespace RetailPoC
 {
     /// <summary>
     /// Interaction logic for SimulationPanel.xaml
     /// </summary>
-    public partial class SimulationPanel : Window
+    public partial class SimulationPanel : MetroWindow
     {
         public SimulationType SimType { get; private set; }
         public int? Sessions { get; private set; }

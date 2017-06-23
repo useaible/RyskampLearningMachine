@@ -151,7 +151,7 @@ namespace RetailPoC
 
         public Item[] GetItemsWithAttr()
         {
-            return _context.Items.Include(a => a.Attributes).ToArray();
+            return _context.Items.Include(a => a.Attributes).OrderBy(b=>b.ID).ToArray();
         }
 
         

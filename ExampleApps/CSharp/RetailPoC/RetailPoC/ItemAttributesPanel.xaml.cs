@@ -11,13 +11,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
 
 namespace RetailPoC
 {
     /// <summary>
     /// Interaction logic for ItemAttributes.xaml
     /// </summary>
-    public partial class ItemAttributesPanel : Window
+    public partial class ItemAttributesPanel : MetroWindow
     {
         public ItemAttributesPanel()
         {

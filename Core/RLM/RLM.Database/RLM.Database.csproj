@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RlmDbBatchProcessor.cs" />
     <Compile Include="RlmDbInfo.cs" />
     <Compile Include="Utility\ConfigFile.cs" />
     <Compile Include="Utility\IRlmDbLogger.cs" />

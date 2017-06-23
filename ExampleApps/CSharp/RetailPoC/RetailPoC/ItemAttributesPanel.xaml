@@ -1,13 +1,14 @@
-﻿<Window x:Class="RetailPoC.ItemAttributesPanel"
+﻿<Controls:MetroWindow x:Class="RetailPoC.ItemAttributesPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RetailPoC"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"              
         mc:Ignorable="d"
-        Title="ItemAttributes" Height="337.029" Width="362.133" Topmost="True" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+        Title="ItemAttributes" Height="337.029" Width="362.133" Topmost="True" WindowStartupLocation="CenterScreen" SizeToContent="Height"  FontFamily="Fonts/#Oswald Light">
     <Grid>
         <DataGrid x:Name="itemAttributesGrid" ColumnWidth="Auto"/>
 
     </Grid>
-</Window>
+</Controls:MetroWindow>

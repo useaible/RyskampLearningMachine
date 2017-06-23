@@ -20,7 +20,7 @@
     <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -28,6 +28,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -55,6 +57,18 @@
       <HintPath>..\..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LiveCharts, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\LiveCharts.0.9.6\lib\net45\LiveCharts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\LiveCharts.Wpf.0.9.6\lib\net45\LiveCharts.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -62,7 +76,12 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -88,15 +107,26 @@
     <Compile Include="ItemAttributesPanel.xaml.cs">
       <DependentUpon>ItemAttributesPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ItemClickedCommand.cs" />
+    <Compile Include="ItemComparisonPanel.xaml.cs">
+      <DependentUpon>ItemComparisonPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MetricPanel.xaml.cs">
       <DependentUpon>MetricPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\PlanogramOptResultsSettings.cs" />
     <Compile Include="Models\Scale.cs" />
     <Compile Include="Models\SimulationData.cs" />
+    <Compile Include="NoDataNotificationWindow.xaml.cs">
+      <DependentUpon>NoDataNotificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RLVOutputVisualizer.cs" />
     <Compile Include="SimulationCsvLogger.cs" />
     <Compile Include="SimulationPanel.xaml.cs">
       <DependentUpon>SimulationPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TempRLVContainerPanel.xaml.cs">
+      <DependentUpon>TempRLVContainerPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\AttributesVM.cs" />
     <Compile Include="ViewModels\ItemVM.cs" />
@@ -106,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ItemAttributesPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ItemComparisonPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -126,7 +160,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NoDataNotificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SimulationPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TempRLVContainerPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -158,6 +200,25 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="Fonts\Oswald-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Oswald-ExtraLight.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Oswald-Light.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Oswald-Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Oswald-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Oswald-SemiBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Design\projectGuides.guides" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -184,6 +245,14 @@
     <ProjectReference Include="..\..\..\..\Core\RLM\RLM\RLM.csproj">
       <Project>{01eec6ce-a2ca-4637-8133-6288b6e246c3}</Project>
       <Name>RLM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RyskampLearningVisualizer\ExampleVisualizers\WPFVisualizer\WPFVisualizer.csproj">
+      <Project>{DEF23AA6-4AF7-43BE-9A39-B41FCF829F7E}</Project>
+      <Name>WPFVisualizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RyskampLearningVisualizer\RLV.Core\RLV.Core.csproj">
+      <Project>{05dc7651-b6c9-425e-92c9-529ee019cf97}</Project>
+      <Name>RLV.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="WPFVisualizer.RLVDetailsConfigurationPanel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPFVisualizer"
+        mc:Ignorable="d"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        Name="rlvConfigWindow"
+        FontFamily="Fonts/#Oswald Light" Height="Auto" Width="Auto">
+    <Grid x:Name="mainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Expander IsExpanded="True" Header="Labels Configuration (Modify Labels and Visibility)" Grid.Row="0">
+            <Grid x:Name="labelsGrid" Height="Auto" Margin="0,0,-12,10"/>
+        </Expander>
+        <Expander IsExpanded="True" Header="Values Configuration (Formatting and Visibility)" Grid.Row="1">
+            <Grid x:Name="valuesGrid" Height="Auto" Margin="0,0,-2,10"/>
+        </Expander>
+    </Grid>
+</UserControl>

@@ -13,13 +13,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
 
 namespace RetailPoC
 {
     /// <summary>
     /// doubleeraction logic for MetricPanel2.xaml
     /// </summary>
-    public partial class MetricPanel : Window
+    public partial class MetricPanel : MetroWindow
     {
         public double Metric1 { get; set; } // Storage for Metric1
         public double Metric2 { get; set; } // Storage for Metric2

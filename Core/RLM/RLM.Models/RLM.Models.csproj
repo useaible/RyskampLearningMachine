@@ -54,6 +54,8 @@
     <Compile Include="Exceptions\RlmDefaultConnectionStringException.cs" />
     <Compile Include="Interfaces\IManager.cs" />
     <Compile Include="Interfaces\IRlmNetwork.cs" />
+    <Compile Include="Models\Archives\RlmIODetails.cs" />
+    <Compile Include="Models\Archives\RlmLearnedSessionDetails.cs" />
     <Compile Include="Models\GetSolutionResult.cs" />
     <Compile Include="Models\GetRneuronResult.cs" />
     <Compile Include="Models\BestSolution.cs" />
@@ -70,12 +72,14 @@
     <Compile Include="Models\EF\RnetworkSetting.cs" />
     <Compile Include="Models\EF\Rneuron.cs" />
     <Compile Include="Models\LoadRnetworkResult.cs" />
-    <Compile Include="Models\RlmCaseHistory.cs" />
-    <Compile Include="Models\RlmCaseIOHistory.cs" />
+    <Compile Include="Models\Archives\RlmCaseHistory.cs" />
+    <Compile Include="Models\Archives\RlmCaseIOHistory.cs" />
     <Compile Include="Models\RlmDatatypeDescription.cs" />
     <Compile Include="Models\RlmDelegates.cs" />
+    <Compile Include="Models\Archives\RlmLearnedCase.cs" />
+    <Compile Include="Models\Archives\RlmLearnedCaseDetails.cs" />
     <Compile Include="Models\RlmScoreInfo.cs" />
-    <Compile Include="Models\RlmSessionHistory.cs" />
+    <Compile Include="Models\Archives\RlmSessionHistory.cs" />
     <Compile Include="Models\RlmStats.cs" />
     <Compile Include="Models\RneuronInputSet.cs" />
     <Compile Include="Models\SolutionOutputSet.cs" />

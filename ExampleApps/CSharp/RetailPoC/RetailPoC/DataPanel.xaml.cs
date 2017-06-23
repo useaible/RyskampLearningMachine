@@ -13,13 +13,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
 
 namespace RetailPoC
 {
     /// <summary>
     /// Interaction logic for DataPanel.xaml
     /// </summary>
-    public partial class DataPanel : Window
+    public partial class DataPanel
     {
         private DataFactory dataFactory = new DataFactory(); // This is where items are queried from the database
         public List<ItemVM> Items { get; set; } // Storage for the items loaded on the datagrid
@@ -60,6 +61,7 @@ namespace RetailPoC
                 if (context.Items.Count() > 0)
                 {
                     var confirmation = MessageBox.Show("Warning! You currently have an existing database. Generating a new set of data will overwrite the current one. Proceed?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                    //var confirmation = MessageBox.Show("Warning! You currently have an existing database. Generating a new set of data will overwrite the current one. Proceed?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
                     if (confirmation == MessageBoxResult.OK)
                     {
                         //todo: dropDb and generate a new data set

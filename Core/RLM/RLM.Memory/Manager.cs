@@ -434,8 +434,11 @@ namespace RLM.Memory
         /// <param name="linearTolerance"></param>
         /// <param name="predict"></param>
         /// <returns></returns>
-        public Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double linearTolerance = 0, bool predict = false)
+        public Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double trainingLinearTolerance = 0, bool predict = false, double predictLinearTolerance = 0)
         {
+            bool useLinearTolerance = ((predict && predictLinearTolerance > 0) || !predict) ? true : false;
+            double linearTolerance = (predict) ? predictLinearTolerance : trainingLinearTolerance;
+
             Solution retVal = null;
             
             var comparer = new DynamicInputComparer();//Util.DynamicInputComparer;
@@ -459,16 +462,8 @@ namespace RLM.Memory
                 cnt++;
             }
 
-            //swGetRneuron.Start();
-
-            //RnnInputValue.RecurseInputForMatchingRneurons(DynamicInputs, rangeInfos, rneuronsFound);
-
-            //swGetRneuron.Stop();
-            //GetRneuronTimes.Add(swGetRneuron.Elapsed);
-            //swGetRneuron.Reset();
-
             //TODO Cache Box, current implementation is slow don't know why
-            if (!predict)
+            if (useLinearTolerance)
             {
                 if (CacheBox.IsWithinRange(rangeInfos, linearTolerance))
                 {
@@ -867,7 +862,7 @@ namespace RLM.Memory
                 while (true)
                 {
                     bool processing = Sessions.Any(a => a.Value.CreatedToDb == false || a.Value.UpdatedToDb == false);
-                    if (!processing && Sessions.Count > 0 && trainingDone)
+                    if (!processing && /*Sessions.Count > 0 &&*/ trainingDone)
                     {
                         StopRlmDbWorkersSessions();
                         System.Diagnostics.Debug.WriteLine("Worker Session done");
@@ -884,8 +879,18 @@ namespace RLM.Memory
             {
                 while (true)
                 {
-                    bool processing = Cases.Any(a => a.SavedToDb == false);
-                    if (!processing && Cases.Count > 0 && trainingDone && sessionsDone && rlmDb.DistinctCaseSessionsCount() == totalSessionsCount)
+                    ////bool processing = Cases.Any(a => a.SavedToDb == false);
+                    //if (/*!processing &&*/ Cases.Count == 0 && trainingDone && sessionsDone && rlmDb.DistinctCaseSessionsCount() == totalSessionsCount)
+                    //{
+                    //    StopRlmDbWorkersCases();
+                    //    System.Diagnostics.Debug.WriteLine("Worker Cases done");
+                    //    break;
+                    //}
+
+                    if (sessionsDone && 
+                        rlmDb.DistinctCaseSessionsCount() == totalSessionsCount && 
+                        MASTER_CASE_QUEUE.Count == 1 && 
+                        MASTER_CASE_QUEUE.ElementAt(0).Count == 0)
                     {
                         StopRlmDbWorkersCases();
                         System.Diagnostics.Debug.WriteLine("Worker Cases done");

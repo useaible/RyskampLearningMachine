@@ -129,7 +129,7 @@ namespace RLM
             }
             else // Predict
             {
-                solution = memoryMgr.GetBestSolution(rnn_ins, predict: true); //db.GetBestSolution(rnn_net.CurrentNetworkID, new List<long>() { neuron.ID }, true);
+                solution = memoryMgr.GetBestSolution(rnn_ins, predict: true, predictLinearTolerance: rnn_net.PredictLinear); //db.GetBestSolution(rnn_net.CurrentNetworkID, new List<long>() { neuron.ID }, true);
                 
                 if (solution == null)
                 {

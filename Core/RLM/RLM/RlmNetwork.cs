@@ -97,6 +97,7 @@ namespace RLM
         /// Minimum value set for the range of Linear Type Training
         /// </summary>
         public double MinLinearBracket { get; set; } = 3;
+        public double PredictLinear { get; set; } = 0;
         public double? LinearCap { get; set; } = null; 
                 
         private double RandomnessSessionIntervalValue

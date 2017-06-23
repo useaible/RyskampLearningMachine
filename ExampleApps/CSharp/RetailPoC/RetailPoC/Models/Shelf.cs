@@ -24,13 +24,13 @@ namespace RetailPoC.Models
         {            
             // todo get item instance from DB and set other needed properties
             var dcolor = System.Drawing.Color.FromArgb(item.Color);
-            items.Add(new ShelfItem() { ItemID = item.ID, Score = metricScore, Order = items.Count + 1, DrawingColor = dcolor, Color = System.Windows.Media.Color.FromArgb(dcolor.A, dcolor.R, dcolor.G, dcolor.B) });
+            items.Add(new ShelfItem() { ItemID = item.ID, Index = Convert.ToInt32(item.SKU), Name = item.Name, Score = metricScore, Order = items.Count + 1, DrawingColor = dcolor, Color = System.Windows.Media.Color.FromArgb(dcolor.A, dcolor.R, dcolor.G, dcolor.B) });
         }
 
         public void Add()
         {
             var color = System.Windows.Media.Color.FromRgb((byte)rand.Next(1, 255), (byte)rand.Next(1, 255), (byte)rand.Next(1, 255));
-            items.Add(new ShelfItem() { ItemID = 1, Score = rand.Next(0, 101), Color = color, Order = 0 });
+            items.Add(new ShelfItem() { ItemID = 1, Name = "item 1", Score = rand.Next(0, 101), Color = color, Order = 0 });
         }
     }
 }

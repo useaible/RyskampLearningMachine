@@ -54,7 +54,7 @@ namespace RetailPoC
         /// <param name="updateStatus">Callback function for sending the current status of the RLM</param>
         /// <param name="logger">Logs the per session stats and allows users to download the CSV file after the training</param>
         /// <remarks>Used a callback instead of an event because we worry that the display might not keep up with the optimization. You can disable the display by setting it in the Simulation panel</remarks>
-        public PlanogramOptimizer(Item[] items, SimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null)
+        public PlanogramOptimizer(Item[] items, SimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, string dbIdentifier = null)
         {
             this.logger = logger;
             this.items = items.ToArray();
@@ -69,7 +69,7 @@ namespace RetailPoC
             UpdateStatus?.Invoke("Initializing...");
 
             // creates the network (and the underlying DB) with a unique name to have a different network everytime you run a simulation
-            network = new RlmNetwork("RLM_planogram_" + Guid.NewGuid().ToString("N"));
+            network = new RlmNetwork(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" +  Guid.NewGuid().ToString("N"));
 
             // checks if the network structure already exists
             // if not then we proceed to define the inputs and outputs
@@ -404,37 +404,44 @@ namespace RetailPoC
         public static double GetCalculatedWeightedMetrics(Item item, SimulationSettings simSettings)
         {
             double retVal = 0;
-            double[] metrics = new double[10];
+            double[] metrics = GetCalculatedWeightedMetricArray(item, simSettings);
+
+            // now having the weighted metrics calculated we simply sum it all up to get a single metric used to score the item
+            retVal = metrics.Sum();
+
+            return retVal;
+        }
+
+        public static double[] GetCalculatedWeightedMetricArray(Item item, SimulationSettings simSettings)
+        {
+            double[] retVal = new double[10];
 
             // we go through each attribute for the item and sum up each of its metric
             foreach (var attr in item.Attributes)
             {
-                metrics[0] += attr.Metric1;
-                metrics[1] += attr.Metric2;
-                metrics[2] += attr.Metric3;
-                metrics[3] += attr.Metric4;
-                metrics[4] += attr.Metric5;
-                metrics[5] += attr.Metric6;
-                metrics[6] += attr.Metric7;
-                metrics[7] += attr.Metric8;
-                metrics[8] += attr.Metric9;
-                metrics[9] += attr.Metric10;
+                retVal[0] += attr.Metric1;
+                retVal[1] += attr.Metric2;
+                retVal[2] += attr.Metric3;
+                retVal[3] += attr.Metric4;
+                retVal[4] += attr.Metric5;
+                retVal[5] += attr.Metric6;
+                retVal[6] += attr.Metric7;
+                retVal[7] += attr.Metric8;
+                retVal[8] += attr.Metric9;
+                retVal[9] += attr.Metric10;
             }
 
-            // with the metrics all summed up, we then get the percentage (based on the ones set in SimulationSettings) so we can get its weight metrics
-            metrics[0] = simSettings.Metric1 == 0 ? 0 : metrics[0] * (simSettings.Metric1 / 100D);
-            metrics[1] = simSettings.Metric2 == 0 ? 0 : metrics[1] * (simSettings.Metric2 / 100D);
-            metrics[2] = simSettings.Metric3 == 0 ? 0 : metrics[2] * (simSettings.Metric3 / 100D);
-            metrics[3] = simSettings.Metric4 == 0 ? 0 : metrics[3] * (simSettings.Metric4 / 100D);
-            metrics[4] = simSettings.Metric5 == 0 ? 0 : metrics[4] * (simSettings.Metric5 / 100D);
-            metrics[5] = simSettings.Metric6 == 0 ? 0 : metrics[5] * (simSettings.Metric6 / 100D);
-            metrics[6] = simSettings.Metric7 == 0 ? 0 : metrics[6] * (simSettings.Metric7 / 100D);
-            metrics[7] = simSettings.Metric8 == 0 ? 0 : metrics[7] * (simSettings.Metric8 / 100D);
-            metrics[8] = simSettings.Metric9 == 0 ? 0 : metrics[8] * (simSettings.Metric9 / 100D);
-            metrics[9] = simSettings.Metric10 == 0 ? 0 : metrics[9] * (simSettings.Metric10 / 100D);
-
-            // now having the weighted metrics calculated we simply sum it all up to get a single metric used to score the item
-            retVal = metrics.Sum();
+            // with the retVal all summed up, we then get the percentage (based on the ones set in SimulationSettings) so we can get its weight retVal
+            retVal[0] = simSettings.Metric1 == 0 ? 0 : retVal[0] * (simSettings.Metric1 / 100D);
+            retVal[1] = simSettings.Metric2 == 0 ? 0 : retVal[1] * (simSettings.Metric2 / 100D);
+            retVal[2] = simSettings.Metric3 == 0 ? 0 : retVal[2] * (simSettings.Metric3 / 100D);
+            retVal[3] = simSettings.Metric4 == 0 ? 0 : retVal[3] * (simSettings.Metric4 / 100D);
+            retVal[4] = simSettings.Metric5 == 0 ? 0 : retVal[4] * (simSettings.Metric5 / 100D);
+            retVal[5] = simSettings.Metric6 == 0 ? 0 : retVal[5] * (simSettings.Metric6 / 100D);
+            retVal[6] = simSettings.Metric7 == 0 ? 0 : retVal[6] * (simSettings.Metric7 / 100D);
+            retVal[7] = simSettings.Metric8 == 0 ? 0 : retVal[7] * (simSettings.Metric8 / 100D);
+            retVal[8] = simSettings.Metric9 == 0 ? 0 : retVal[8] * (simSettings.Metric9 / 100D);
+            retVal[9] = simSettings.Metric10 == 0 ? 0 : retVal[9] * (simSettings.Metric10 / 100D);
 
             return retVal;
         }
