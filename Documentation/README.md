@@ -17,7 +17,11 @@ UseAIble documentation is designed to provide resources for business research ar
 
 **Retail POC How To.pdf**
  
-- How to Guide on initial setup and usage of hte Retail Proof of Concept Application
+- How to Guide on initial setup and usage of the Retail Proof of Concept Application
+
+**RLM Learning Visualizer Overview**
+ 
+- How to Guide on the usage and interpretation of the RLM Learning Visualizer
 
 **The RLM-A technical Overview.pdf**
  
