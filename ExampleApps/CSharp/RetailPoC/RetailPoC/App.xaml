@@ -6,15 +6,15 @@
     <Application.Resources>
 
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+            <!--<ResourceDictionary.MergedDictionaries>
+                --><!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! --><!--
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <!-- Accent and AppTheme setting -->
+                --><!-- Accent and AppTheme setting --><!--
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary.MergedDictionaries>-->
             <!--<Style x:Key="OswaldFont">
                 <Setter Property="TextElement.FontFamily"
                         Value="/Fonts/#Oswald">

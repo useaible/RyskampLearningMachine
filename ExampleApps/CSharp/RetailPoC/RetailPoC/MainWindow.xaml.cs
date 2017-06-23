@@ -115,6 +115,12 @@ namespace RetailPoC
             //    detailsPanel,
             //    chartPanel
             //}, visualizer);
+
+            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml") });
+            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml") });
+            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml") });
+            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml") });
+            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml") });
         }
 
         public MainWindow(bool headtohead)
@@ -125,10 +131,8 @@ namespace RetailPoC
             FillGrid(planogram, Colors.LightGray);
             FillGrid(planogramTensorflow, Colors.LightGray);
 
-            targetScoreTxt.Margin = new Thickness(522, 128, 0, 0);
-            targetScoreLbl.Margin = new Thickness(497, 98, 0, 0);
-
-
+            //targetScoreTxt.Margin = new Thickness(522, 128, 0, 0);
+            //targetScoreLbl.Margin = new Thickness(497, 98, 0, 0);
         }
 
         private void dataGenerationBtn_Click(object sender, RoutedEventArgs e)
@@ -230,11 +234,14 @@ namespace RetailPoC
                     targetScoreLbl.Visibility = Visibility.Visible;
                     targetScoreTxt.Visibility = Visibility.Visible;
                     targetScoreTxt.Text = simSettings.Score.Value.ToString("n");
+                    targetScoreTxt2.Visibility = Visibility.Visible;
+                    targetScoreTxt2.Text = simSettings.Score.Value.ToString("n");
                 }
                 else
                 {
                     targetScoreLbl.Visibility = Visibility.Hidden;
                     targetScoreTxt.Visibility = Visibility.Hidden;
+                    targetScoreTxt2.Visibility = Visibility.Hidden;
                 }
 
                 if (simSettings.SimType == SimulationType.Sessions)
@@ -651,7 +658,7 @@ namespace RetailPoC
             }
         }
 
-        private void FillGrid(Grid planogramGrid, IEnumerable<Shelf> result, bool usePerfColor = false, MouseEventHandler mouseEnterHandler = null, MouseEventHandler mouseLeaveHandler = null, IEnumerable<Shelf> comparisonResult = null)
+        private void FillGrid(Grid planogramGrid, IEnumerable<Shelf> result, bool usePerfColor = false, MouseEventHandler mouseEnterHandler = null, MouseEventHandler mouseLeaveHandler = null, IEnumerable<Shelf> comparisonResult = null, bool isRLM = true)
         {
             if (result == null || planogramGrid == null)
                 return;
@@ -672,10 +679,17 @@ namespace RetailPoC
                     itemAttributes.Stroke = new SolidColorBrush(Colors.Black);
                     itemAttributes.Tag = item;
 
-                    itemAttributes.InputBindings.Add(new MouseBinding() { Gesture = new MouseGesture(MouseAction.LeftClick), Command = new ItemClickedCommand(()=> 
+                    if (isRLM)
                     {
-                        OnSelectedItem(itemAttributes, null);
-                    })});
+                        itemAttributes.InputBindings.Add(new MouseBinding()
+                        {
+                            Gesture = new MouseGesture(MouseAction.LeftClick),
+                            Command = new ItemClickedCommand(() =>
+                            {
+                                OnSelectedItem(itemAttributes, null);
+                            })
+                        });
+                    }
 
                     
                     if (comparisonResult == null)
@@ -794,7 +808,7 @@ namespace RetailPoC
 
         private void ItemAttrbutes_MouseEnter_Tensorflow(object sender, MouseEventArgs e)
         {
-            itemScoreTxtTensor.Text = ((ShelfItem)((Rectangle)sender).Tag).ToString();
+            itemScoreTxtTensor.Text = ((ShelfItem)((Rectangle)sender).Tag).Score.ToString("#,###.##");
         }
 
         private void ItemAttrbutes_MouseLeave_Tensorflow(object sender, MouseEventArgs e)
@@ -808,7 +822,7 @@ namespace RetailPoC
             FillGrid(planogram, currentResults.Shelves, usePerfColor, ItemAttributes_MouseEnter, ItemAttributes_MouseLeave);
             if (headToHead)
             {
-                FillGrid(planogramTensorflow, currentResultsTensor.Shelves, usePerfColor, ItemAttrbutes_MouseEnter_Tensorflow, ItemAttrbutes_MouseLeave_Tensorflow);
+                FillGrid(planogramTensorflow, currentResultsTensor.Shelves, usePerfColor, ItemAttrbutes_MouseEnter_Tensorflow, ItemAttrbutes_MouseLeave_Tensorflow, isRLM:false);
             }
         }
 
@@ -829,7 +843,7 @@ namespace RetailPoC
                 if (enableSimDisplay)
                 {
                     currentResultsTensor = results;
-                    FillGrid(planogramTensorflow, results.Shelves, false, ItemAttrbutes_MouseEnter_Tensorflow, ItemAttrbutes_MouseLeave_Tensorflow);
+                    FillGrid(planogramTensorflow, results.Shelves, false, ItemAttrbutes_MouseEnter_Tensorflow, ItemAttrbutes_MouseLeave_Tensorflow, isRLM:false);
                 }
             });
         }

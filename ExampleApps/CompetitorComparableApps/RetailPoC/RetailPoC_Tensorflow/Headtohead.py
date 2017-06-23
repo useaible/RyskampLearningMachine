@@ -6,10 +6,17 @@ if 'win' in sys.platform:
     import pythoncom
     pythoncom.CoInitialize()
 
+    sys.path.append(os.path.dirname(__file__))
+
 import clr
-#clr.AddReference("System.Xml")
+clr.AddReference("System.Xml")
 clr.AddReference("PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35")
 clr.AddReference("PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35")
+
+binPath = 'CSharp\\RetailPoC\\RetailPoC\\bin\\Debug\\'
+mahApps = os.path.abspath(os.path.join('..', '..', '..', binPath + 'MahApps.Metro.dll'))
+clr.AddReference(mahApps)
+
 #from System import Nullable, Boolean
 #from System.IO import StringReader
 #from System.Xml import XmlReader
@@ -41,4 +48,5 @@ if __name__ == "__main__":
         main.OnSimulationStart += start
         helpPath = os.environ['PYTHONPATH'].split(os.pathsep)[0]
         main.HelpPath = helpPath
-        Application().Run(main)
+        #Application().Run(main)
+        App().Run(main)

@@ -190,11 +190,11 @@
                         <RowDefinition Height="*" />
 
                     </Grid.RowDefinitions>
-                    <Label x:Name="currentRanmdomessLbl" Content="Current Randomness:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="113" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="14"/>
-                    <Label x:Name="startRanmdomessLbl" Content="Start Randomness:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="113" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="14"/>
-                    <Label x:Name="endtRanmdomessLbl" Content="End Randomness:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="113" FontWeight="Bold" Grid.Row="2" Grid.Column="0" FontSize="14"/>
-                    <Label x:Name="inputType" Content="Input Type:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="113" FontWeight="Bold" Grid.Row="3" Grid.Column="0" FontSize="14"/>
-                    <Label x:Name="sessionPerBatchLbl" Content="Sessions Per Batch:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="113" FontWeight="Bold" Grid.Row="4" Grid.Column="0" FontSize="14"/>
+                    <Label x:Name="currentRanmdomessLbl" Content="Current Randomness:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="14"/>
+                    <Label x:Name="startRanmdomessLbl" Content="Start Randomness:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="14"/>
+                    <Label x:Name="endtRanmdomessLbl" Content="End Randomness:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontWeight="Bold" Grid.Row="2" Grid.Column="0" FontSize="14"/>
+                    <Label x:Name="inputType" Content="Input Type:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontWeight="Bold" Grid.Row="3" Grid.Column="0" FontSize="14"/>
+                    <Label x:Name="sessionPerBatchLbl" Content="Sessions Per Batch:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontWeight="Bold" Grid.Row="4" Grid.Column="0" FontSize="14"/>
 
                     <TextBlock x:Name="currentRandomnessTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="115"  Grid.Row="0" Grid.Column="1" Margin="0,8" FontSize="14" Foreground="#FF29ABE2"/>
                     <TextBlock x:Name="startRandomnessTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="115"  Grid.Row="1" Grid.Column="1" Margin="0,8" FontSize="14" Foreground="#FF29ABE2"/>
@@ -227,9 +227,9 @@
                 <Label x:Name="ItemScoreLblTensor" Content="Item Score:" FontFamily="Fonts/#Oswald Light" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="92" FontWeight="Bold"  Grid.Row="5" Grid.Column="0" FontSize="14" Margin="0,51,0,0" Grid.RowSpan="3"/>
 
                 <!--<TextBlock x:Name="statusTxts" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="53" Width="120" Grid.Column="0" FontWeight="Bold" FontSize="32" Foreground="#FF29ABE2" Margin="0,8,0,0" Grid.RowSpan="2"/>-->
-                <TextBlock x:Name="statusTxtTensor"   HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Column="0" Margin="6,10,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.RowSpan="2"/>
-                <TextBlock x:Name="sessionRunTxtTensor" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="6,14,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.RowSpan="2" />
-                <TextBlock x:Name="timElapseTxtTensor" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Row="4" Grid.Column="0" Margin="6,16,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.RowSpan="2" />
+                <TextBlock x:Name="statusTxtTensor"   HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Column="0" Margin="6,0,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.Row="1"/>
+                <TextBlock x:Name="sessionRunTxtTensor" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Row="3" Grid.Column="0" Margin="6,0,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" />
+                <TextBlock x:Name="timElapseTxtTensor" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="127" FontWeight="Bold" Grid.Row="4" Grid.Column="0" Margin="6,16,0,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.RowSpan="2" />
                 <TextBlock x:Name="itemScoreTxtTensor" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="154" FontWeight="Bold" Grid.Row="6" Grid.Column="0" Margin="6,17,-6,0" Height="40" FontSize="25" Foreground="#FF29ABE2" Grid.RowSpan="2" />
 
             </Grid>
@@ -247,8 +247,8 @@
 
 
 
-            <GroupBox x:Name="grpBox_Tensorflow" Header="Planogram Scores" FontFamily="Fonts/#Oswald Light"  HorizontalAlignment="Left" Margin="580,468,0,0" Width="261" FontWeight="Bold" FontSize="14" BorderBrush="#FFC3C3C3" Height="230" VerticalAlignment="Top">
-                <Grid x:Name="tensorFlowPlanogramScore"  Margin="0,10,-2,0">
+            <GroupBox x:Name="grpBox_Tensorflow" Header="Planogram Scores" FontFamily="Fonts/#Oswald Light"  HorizontalAlignment="Left" Margin="579,470,0,0" Width="261" FontWeight="Bold" FontSize="14" BorderBrush="#FFC3C3C3" Height="229" VerticalAlignment="Top">
+                <Grid x:Name="tensorFlowPlanogramScore"  Margin="0,10,-2,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -261,19 +261,19 @@
                         <ColumnDefinition Width="145*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Label x:Name="currentScoreTxt" Content="Current Score:" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="31" Width="118" FontSize="12" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="0" Grid.Column="0"/>
-                    <Label x:Name="AverageScoreOf10Tensor" Content="Average Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="118" FontSize="12" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="1" Grid.Column="0"/>
-                    <Label x:Name="averageScoreLblTensor"  HorizontalAlignment="Left"  VerticalAlignment="Center" Height="48" Width="125" FontSize="15" FontWeight="Bold" VerticalContentAlignment="Center" Grid.ColumnSpan="2"  Grid.Row="1" Grid.Column="0" Margin="0,30" Grid.RowSpan="3">
-                        <TextBlock Width="128" FontSize="12"><Run Text="Average of"/><LineBreak/><Run Text="Last Ten Scores:"/></TextBlock>
+                    <Label x:Name="currentScoreTxt" Content="Current Score:" HorizontalAlignment="Right"  VerticalAlignment="Top" Height="31" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="0" Grid.Column="0"/>
+                    <Label x:Name="AverageScoreOf10Tensor" Content="Average Score:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="1" Grid.Column="0"/>
+                    <Label x:Name="averageScoreLblTensor"  HorizontalAlignment="Right"  VerticalAlignment="Center" Height="48"  FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="1" Grid.Column="0" Margin="0,25,0,32" Grid.RowSpan="3">
+                        <TextBlock FontSize="14"  TextAlignment="Right"><Run Text="Average of"/><LineBreak/><Run Text="Last Ten Scores:"/></TextBlock>
                     </Label>
-                    <Label x:Name="minScoreLblTensor" Content="Min Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="117" FontSize="12" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="3" Grid.Column="0"/>
-                    <Label x:Name="maxScoreLblTensor" Content="Max Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="117" FontSize="12" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="4" Grid.Column="0"/>
+                    <Label x:Name="minScoreLblTensor" Content="Min Score:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31"  FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="3" Grid.Column="0"/>
+                    <Label x:Name="maxScoreLblTensor" Content="Max Score:" HorizontalAlignment="Right" VerticalAlignment="Top" Height="31"  FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"  Grid.Row="4" Grid.Column="0"/>
 
-                    <TextBlock x:Name="scoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold"  Grid.Row="0" Grid.Column="1" Margin="0,8" />
-                    <TextBlock x:Name="averageScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="1" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="averageScoreOf10TxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="minScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" Grid.Row="3" Grid.Column="1" Margin="0,8"/>
-                    <TextBlock x:Name="maxScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="12" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="4" Grid.Column="1" Margin="0,8"/>
+                    <TextBlock x:Name="scoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="14" FontWeight="Bold"  Grid.Row="0" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
+                    <TextBlock x:Name="averageScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="14" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="1" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
+                    <TextBlock x:Name="averageScoreOf10TxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="14" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
+                    <TextBlock x:Name="minScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="14" FontWeight="Bold" Grid.Row="3" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
+                    <TextBlock x:Name="maxScoreTxtTensor" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="145" FontSize="14" FontWeight="Bold" RenderTransformOrigin="0.5,0.5" Grid.Row="4" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
 
                 </Grid>
             </GroupBox>
@@ -295,13 +295,13 @@
 
                     </Grid.RowDefinitions>
 
-                    <Label x:Name="scoreLbl" Content="Current Score:" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="31" Width="119" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" Grid.Row="0" Grid.Column="0"/>
-                    <Label x:Name="averageScoreLbl" Content="Average Score:"  HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="121" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" Grid.Row="1" Grid.Column="0"/>
-                    <Label x:Name="averageScoreFor10Lbl" HorizontalAlignment="Left" VerticalAlignment="Top" Height="48" Width="121" FontSize="15" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Row="1" Grid.Column="0" Margin="-2,31,0,0" Grid.RowSpan="3">
-                        <TextBlock Height="47" FontSize="14" HorizontalAlignment="Left"><Run Text="Average of"/><LineBreak /><Run Text="Last Ten Scores:"/></TextBlock>
+                    <Label x:Name="scoreLbl" Content="Current Score:" HorizontalAlignment="right"  VerticalAlignment="Top" Height="31" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Row="0" Grid.Column="0"/>
+                    <Label x:Name="averageScoreLbl" Content="Average Score:"  HorizontalAlignment="right" VerticalAlignment="Top" Height="31"  FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch"  Grid.Row="1" Grid.Column="0"/>
+                    <Label x:Name="averageScoreFor10Lbl" HorizontalAlignment="right" VerticalAlignment="Top" Height="48"  FontSize="15" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Row="1" Grid.Column="0" Margin="0,24,0,0" Grid.RowSpan="2">
+                        <TextBlock Height="41" FontSize="14" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Top" ><Run Text="Average of"/><LineBreak /><Run Text="Last Ten Scores:"/></TextBlock>
                     </Label>
-                    <Label x:Name="minScoreLbl" Content="Min Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="89" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" Grid.Row="3" Grid.Column="0"/>
-                    <Label x:Name="maxScoreLbl" Content="Max Score:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="102" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" Grid.Row="4" Grid.Column="0"/>
+                    <Label x:Name="minScoreLbl" Content="Min Score:" HorizontalAlignment="right" VerticalAlignment="Top" Height="31" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Row="3" Grid.Column="0"/>
+                    <Label x:Name="maxScoreLbl" Content="Max Score:" HorizontalAlignment="right" VerticalAlignment="Top" Height="31" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Row="4" Grid.Column="0"/>
 
                     <TextBlock x:Name="scoreTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="113" FontSize="14" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
                     <TextBlock x:Name="averageScoreTxt" HorizontalAlignment="left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="113" FontSize="14" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,8" Foreground="#FF29ABE2"/>
@@ -322,21 +322,21 @@
                 <ComboBoxItem Content="Test Scale Only (100 items, 24 slots)"/>
                 <ComboBoxItem Content="Production Scale (5000 items, 288 slots)"/>
             </ComboBox>
-            <Button x:Name="tfCsvBtn" IsEnabled="False" Content="Download CSV" Margin="1005,114,0,0" VerticalAlignment="Top" FontSize="12" HorizontalAlignment="Left" Width="116" Click="tfCsvBtn_Click" FontFamily="Fonts/#Oswald Light" Foreground="#FFFFFF" Background="#FFFE8F41"/>
+            <Button x:Name="tfCsvBtn" IsEnabled="False" Content="Download CSV" Margin="1005,114,0,0" VerticalAlignment="Top" FontSize="12" HorizontalAlignment="Left" Width="125" Click="tfCsvBtn_Click" FontFamily="Fonts/#Oswald Light" Foreground="#FFFFFF" Background="#FFFE8F41" Height="35"/>
             <Label FontFamily="Fonts/#Oswald Light" Content="Scale:" HorizontalAlignment="Left" Margin="20,55,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.027,0.538" FontWeight="Bold" FontSize="14"/>
-            <TextBlock x:Name="targetScoreTxt" TextAlignment="Right" HorizontalAlignment="Left" Margin="422,100,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="121" FontSize="25" FontWeight="Bold" FontFamily="Fonts/#Oswald Light"  />
-            <Label x:Name="targetScoreLbl" Content="Target Score:" HorizontalAlignment="Left" Margin="416,72,0,0" VerticalAlignment="Top" Height="31" Width="129" FontWeight="Bold" FontFamily="Fonts/#Oswald Light" FontSize="14" Visibility="Hidden" />
+            <TextBlock x:Name="targetScoreTxt" TextAlignment="Left" HorizontalAlignment="Left" Margin="422,100,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="121" FontSize="25" FontWeight="Bold" FontFamily="Fonts/#Oswald Light"  />
+            <Label x:Name="targetScoreLbl" Content="Target Score:" HorizontalAlignment="Left" Margin="416,72,0,0" VerticalAlignment="Top" Height="31" Width="129" FontWeight="Bold" FontFamily="Fonts/#Oswald Light" FontSize="14" Visibility="Visible" />
             <Image x:Name="imgBtn" Source="/RetailPoC;component/help-btn.png" Cursor="Hand" Margin="0,10,5,0" ToolTip="Open Instruction Document" RenderTransformOrigin="-6.333,-0.312" HorizontalAlignment="Right" Width="22" MouseUp="imgBtn_MouseUp" Height="22" VerticalAlignment="Top" Visibility="Hidden"/>
             <Button x:Name="btnComparisonClose" Visibility="Hidden" Foreground="#FFFFFF" Background="#FFFE8F41" Content="Close Comparison" HorizontalAlignment="Left" Margin="423,14,0,0" VerticalAlignment="Top" Width="127" Height="36" Click="btnComparisonClose_Click" IsEnabled="False" FontFamily="Fonts/#Oswald Light" FontSize="14"/>
-            <Rectangle x:Name="rectHeadToHeadDivider" Fill="WhiteSmoke" HorizontalAlignment="Left" Height="727" Margin="565,32,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="1"/>
-            <Rectangle Fill="WhiteSmoke" HorizontalAlignment="Left" Height="2" Margin="24,451,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="536"/>
-            <Grid x:Name="comparisonOverlay" Background="{StaticResource comparisonBlack}" HorizontalAlignment="Left" Height="758" Margin="2,10,0,-7" VerticalAlignment="Top" Width="581" Visibility="Hidden">
+            <Rectangle x:Name="rectHeadToHeadDivider" Fill="WhiteSmoke" HorizontalAlignment="Left" Height="713" Margin="565,46,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="1"/>
+            <Rectangle Fill="WhiteSmoke" HorizontalAlignment="Left" Height="2" Margin="24,457,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="526"/>
+            <Grid x:Name="comparisonOverlay" Background="{StaticResource comparisonBlack}" HorizontalAlignment="Left" Height="758" Margin="2,10,0,-7" VerticalAlignment="Top" Width="563" Visibility="Hidden">
                 <TextBlock x:Name="closeComparisonLink" Margin="0,0,0,190" TextWrapping="Wrap" VerticalAlignment="Bottom" FontFamily="Fonts/#Oswald Light" FontSize="24" FontWeight="ExtraBold" TextAlignment="Center" PreviewMouseDown="closeComparisonLink_PreviewMouseDown">
                     <Hyperlink Foreground="White" >
                         Close Comparison
                     </Hyperlink>
                 </TextBlock>
-                <Grid x:Name="comparisonGrid" Margin="426,143,10,469" Background="#FFFFFF" Visibility="Hidden" Panel.ZIndex="1000">
+                <Grid x:Name="comparisonGrid" Margin="426,143,10,469" Background="#FFFFFF" Visibility="Hidden" Panel.ZIndex="1000" Opacity="0.805">
                     <Viewbox Height="Auto" Width="Auto">
                         <Grid Height="230">
                             <Grid Margin="10,33,8,4">
@@ -348,19 +348,22 @@
                                     <ColumnDefinition Width="15*"/>
                                     <ColumnDefinition Width="15*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="txtPrevName" Text="Name" VerticalAlignment="Top" Grid.Row="1" Margin="5,3,5,0" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="txtPrevScore" Text="Score" Margin="5,31,5,0" VerticalAlignment="Top" Grid.Row="1" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="txtCurrName" Text="Name" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="5,3,6,0" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="txtCurrScore" Text="Score" Margin="5,31,6,0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtPrevName" Text="Name" VerticalAlignment="Top" Grid.Row="1" Margin="5,3,5,0" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                                <TextBlock x:Name="txtPrevScore" Text="Score" Margin="5,31,5,0" VerticalAlignment="Top" Grid.Row="1" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="23"  Foreground="#FF29ABE2"/>
+                                <TextBlock x:Name="txtCurrName" Text="Name" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="5,3,6,0" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                                <TextBlock x:Name="txtCurrScore" Text="Score" Margin="5,31,6,0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="23"  Foreground="#FF29ABE2"/>
                                 <Rectangle x:Name="rectPrev" Fill="#FFF4F4F5" Margin="5,0" Stroke="Black"/>
                                 <Rectangle x:Name="rectCurr" Fill="#FFF4F4F5" Margin="5,0,6,0" Stroke="Black" Grid.Column="1"/>
                             </Grid>
-                            <TextBlock x:Name="label" Text="Previous" Margin="41,12,135,0" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="label_Copy1" Text="Current" Margin="137,12,43,0" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="label" Text="Previous" Margin="34,-4,144,0" VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                            <TextBlock x:Name="label_Copy1" Text="Current" Margin="147,-4,37,0" VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
                         </Grid>
                     </Viewbox>
                 </Grid>
             </Grid>
+            <Rectangle Fill="WhiteSmoke" HorizontalAlignment="Left" Height="2" Margin="583,457,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="536"/>
+            <TextBlock x:Name="targetScoreTxt2" TextAlignment="Left" HorizontalAlignment="Left" Margin="585,100,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="121" FontSize="25" FontWeight="Bold" FontFamily="Fonts/#Oswald Light"  />
+            <Label x:Name="targetScoreLbl_Copy" Content="Target Score:" HorizontalAlignment="Left" Margin="579,72,0,0" VerticalAlignment="Top" Height="31" Width="129" FontWeight="Bold" FontFamily="Fonts/#Oswald Light" FontSize="14" Visibility="Visible" />
 
             <!--  <Rectangle Grid.ColumnSpan="2" Fill="#FFF4F4F5" Height="1" Margin="20,9,17,0" Stroke="#FFA6A6A6" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">-->
 
