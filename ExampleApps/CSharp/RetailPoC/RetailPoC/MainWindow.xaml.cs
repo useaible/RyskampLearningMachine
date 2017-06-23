@@ -799,7 +799,7 @@ namespace RetailPoC
         }
         private void ItemAttributes_MouseLeave(object sender, MouseEventArgs e)
         {
-            //itemScoreTxt.Text = " ";
+            itemScoreTxt.Text = " ";
             //if (itemCompPanel.IsVisible)
             //{
             //    itemCompPanel.Hide();
