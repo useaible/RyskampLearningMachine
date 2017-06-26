@@ -27,9 +27,9 @@ UseAIble documentation is designed to provide resources for business research ar
  
 - Technical overview of the RLM
  
-**The RLM and Machine Learning Explainability**
+**RLM and Explainability.pdf**
  
-- A deep dive into the functionality and importance of the RLM revolutionary explainability. 
+- A look the the AI "black box" and how the RLM solves it
 
 ## Upcoming Documents ##
 
