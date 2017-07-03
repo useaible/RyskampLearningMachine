@@ -1,6 +1,6 @@
 ![RLM Banner](http://i.imgur.com/VtUAQUh.png)
 
-## Documentation Overview ##
+## Papers and Documentation ##
 
 UseAIble documentation is designed to provide resources for business research around the RLM framework. UseAIble does not provide scientific journal submissions or academic papers in this documentation because it is not applicable to the business needs of UseAIble’s customers. What will be provided within our documentation is developer guides, business practical collateral, API documentation and other resources to help users in implementing the RLM framework into their development.  
 
