@@ -7,7 +7,7 @@
     <ProjectHome>
     </ProjectHome>
     <StartupFile>Headtohead.py</StartupFile>
-    <SearchPath>..\..\..\CSharp\RetailPoC\RetailPoC\bin\Debug\</SearchPath>
+    <SearchPath>..\..\..\CSharp\RetailPoC\RetailPoC\bin\Debug\;..\..\..\CSharp\RetailPoC\RetailPoC\Fonts\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>RetailPoC_Tensorflow</Name>

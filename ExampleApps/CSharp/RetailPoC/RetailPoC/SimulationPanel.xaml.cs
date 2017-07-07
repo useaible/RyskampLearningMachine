@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
+using System.Text.RegularExpressions;
 
 namespace RetailPoC
 {
@@ -32,10 +33,13 @@ namespace RetailPoC
                 return chkSimDisplay.IsChecked.Value;
             }
         }
+        public int HiddenLayers { get; private set; }
+        public int HiddenLayerNeurons { get; private set; }
 
         private SimulationSettings simSettings;
         private double maxScore = -1;
         private double MAX_SCORE = 0;
+        private Regex regexNumbersOnly = new Regex("[^0-9]+");
         //private const int DEFAULT_SCORE_PERCENTAGE = 85;
 
         public SimulationPanel()
@@ -53,6 +57,20 @@ namespace RetailPoC
                 Hours = simSettings.Hours;
                 Score = simSettings.Score;
                 chkSimDisplay.IsChecked = simSettings.EnableSimDisplay;
+
+                if (!simSettings.EncogSelected)
+                {
+                    grpEncogSettings.Visibility = Visibility.Collapsed;
+                    this.Height -= grpEncogSettings.Height;
+                }
+                else
+                {
+                    HiddenLayers = simSettings.HiddenLayers;
+                    txtHiddenLayers.Text = HiddenLayers.ToString();
+
+                    HiddenLayerNeurons = (simSettings.HiddenLayerNeurons <= 0) ? simSettings.NumSlots * simSettings.NumShelves : simSettings.HiddenLayerNeurons;
+                    txtHiddenLayerNeurons.Text = HiddenLayerNeurons.ToString();
+                }
 
                 calculateMaxScore();
                 simScoreSlider.Value = simSettings.DefaultScorePercentage;
@@ -81,7 +99,7 @@ namespace RetailPoC
 
         private void showScoreSlider(bool val)
         {
-            simScoreSlider.Visibility = val == false? Visibility.Hidden : Visibility.Visible;
+            simScoreSlider.Visibility = val == false ? Visibility.Hidden : Visibility.Visible;
             simScoreSliderLbl.Visibility = val == false ? Visibility.Hidden : Visibility.Visible;
         }
 
@@ -135,7 +153,7 @@ namespace RetailPoC
         {
             var simInput = txtSimInput.Text;
 
-            // validates the inputed number to see if it was a valid integer or double before proceeding
+            //validates the inputed number to see if it was a valid integer or double before proceeding
             if (SimType == SimulationType.Sessions)
             {
                 int sessions;
@@ -171,7 +189,10 @@ namespace RetailPoC
                     }
                 }
             }
-            
+
+            HiddenLayers = Convert.ToInt32(txtHiddenLayers.Text);
+            HiddenLayerNeurons = Convert.ToInt32(txtHiddenLayerNeurons.Text);
+
             DialogResult = true;
             Close();
         }
@@ -203,6 +224,19 @@ namespace RetailPoC
         {
             simScoreSliderLbl.Content = simScoreSlider.Value + "%";
             btnMax_Click(null, null);
+        }
+
+        private void NumberValidationEncog(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = regexNumbersOnly.IsMatch(e.Text);
+        }
+
+        private void NumberValidationScore(object sender, TextCompositionEventArgs e)
+        {
+            if (SimType == SimulationType.Sessions)
+            {
+                e.Handled = regexNumbersOnly.IsMatch(e.Text);
+            }
         }
     }
 }

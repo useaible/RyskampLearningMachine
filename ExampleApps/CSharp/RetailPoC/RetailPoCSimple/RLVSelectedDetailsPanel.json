@@ -1,0 +1,204 @@
+{
+  "Header": "Projection Improvement Details",
+  "Labels": [
+    {
+      "Name": "lblSelectedDetailsHeader",
+      "Description": null,
+      "Value": "Selected Details",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblInputDetailsHeader",
+      "Description": null,
+      "Value": "Container",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblOutputDetailsHeader",
+      "Description": null,
+      "Value": "Flavor",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblPreviousHeader",
+      "Description": null,
+      "Value": "Previous Flavor",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblCurrentHeader",
+      "Description": null,
+      "Value": "New Flavor",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblSessionTitle",
+      "Description": null,
+      "Value": "Trial",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblTimeTitle",
+      "Description": null,
+      "Value": "Elapsed Time",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblCaseTitle",
+      "Description": null,
+      "Value": "Case",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblScoreTitle",
+      "Description": null,
+      "Value": "Flavor Revenue",
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },    
+    {
+      "Name": "lblBtnPrevious",
+      "Description": null,
+      "Value": "Previous",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "lblBtnNext",
+      "Description": null,
+      "Value": "Next",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    }
+  ],
+  "Values": [
+    {
+      "Name": "inputDetailsGrid",
+      "Description": "Input Details",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "outputDetailsGrid",
+      "Description": "Output Details",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "prevSessionVal",
+      "Description": "Previous Learning Point",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "prevTimeVal",
+      "Description": "Previous Learning Time",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": {
+        "$type": "RLV.Core.Converters.RLVTimeConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 9,
+      "ConverterType": 1
+    },
+    {
+      "Name": "prevCaseVal",
+      "Description": "Previous Learning Event",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "prevScoreValContainer",
+      "Description": "Previous Learning Score",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": {
+        "$type": "RLV.Core.Converters.RLVNumericConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 2,
+      "ConverterType": 0
+    },
+    {
+      "Name": "currSessionVal",
+      "Description": "Current Learning Point",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "currTimeVal",
+      "Description": "Current Learning Time",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": {
+        "$type": "RLV.Core.Converters.RLVTimeConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 9,
+      "ConverterType": 1
+    },
+    {
+      "Name": "currCaseVal",
+      "Description": "Current Learning Event",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "Name": "currScoreValContainer",
+      "Description": "Current Learning Score",
+      "Value": null,
+      "Visibility": 0,
+      "Converter": {
+        "$type": "RLV.Core.Converters.RLVNumericConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 2,
+      "ConverterType": 0
+    }
+  ]
+}

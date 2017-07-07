@@ -5,15 +5,17 @@ import numpy as np
 from RetailPoC import *
 from RetailPoC.Models import *
 from System import TimeSpan
+from System.Threading import CancellationToken
 
 import time
 import datetime
 
 class PlanogramOptTensorflow():
 
-    def __init__(self, items, simSettings):
+    def __init__(self, items, simSettings, token):
         self.items = items
-        self.simSettings = simSettings        
+        self.simSettings = simSettings
+        self.cancelToken = token   
         self.numSlots = simSettings.NumShelves * simSettings.NumSlots 
         self.numOutputs = len(self.items)
         self.simType = self.simSettings.SimType
@@ -24,6 +26,9 @@ class PlanogramOptTensorflow():
         return (newStart + ((value - originalStart) * scale));
 
     def endTraining(self, criteria):
+        if (self.cancelToken.IsCancellationRequested):
+            return True;
+
         if (self.simType == 0):
             if (criteria >= self.simSettings.Sessions):
                 return True

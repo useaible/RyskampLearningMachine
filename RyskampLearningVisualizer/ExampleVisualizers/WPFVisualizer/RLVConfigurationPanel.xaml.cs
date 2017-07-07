@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace WPFVisualizer
 {
@@ -20,10 +21,24 @@ namespace WPFVisualizer
     /// </summary>
     public partial class RLVConfigurationPanel
     {
+        private IRLVProgressionChartPanel chartControl = null;
+        private IRLVSelectedDetailsPanel detailsControl = null;
         public RLVConfigurationPanel(IRLVProgressionChartPanel chartControl, IRLVSelectedDetailsPanel detailsControl)
         {
             InitializeComponent();
-            detailsConfig.PopulateControls(detailsControl);
+
+            this.chartControl = chartControl;
+            this.detailsControl = detailsControl;
+
+            chartConfig.PopulateControls(this.chartControl);
+            detailsConfig.PopulateControls(this.detailsControl);
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.chartControl.SaveConfiguration();
+            this.detailsControl.SaveConfiguration();
+            base.OnClosing(e);
         }
     }
 }

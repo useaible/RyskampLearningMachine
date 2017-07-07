@@ -10,6 +10,6 @@ namespace RLV.Core.Models
     {
         public string Name { get; set; }
         public double Value { get; set; }
-        public string ValueStr { get { return Value.ToString("#,###.##"); } }
+        public string ValueStr { get { return Value.ToString("#,##0.##"); } }
     }
 }

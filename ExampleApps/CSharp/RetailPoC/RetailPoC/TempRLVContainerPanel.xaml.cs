@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WPFVisualizer;
+using System.ComponentModel;
 
 namespace RetailPoC
 {
@@ -37,23 +38,23 @@ namespace RetailPoC
 
             IRLVScaleSelectionVM scaleVM = new RLVScaleSelectionVM();
 
-            detailsScalePanel = detailsControl.ScalePanel;
-            chartScalePanel = progressionChartControl.ScalePanel;
+            detailsScalePanel = rlv.DetailsControl.ScalePanel;
+            chartScalePanel = rlv.ChartControl.ScalePanel;
 
             detailsScalePanel.SetViewModel(scaleVM);
             chartScalePanel.SetViewModel(scaleVM);
 
             core.SetupVisualizer(new List<IRLVPanel>
             {
-                detailsControl,
-                progressionChartControl,
+                rlv.DetailsControl,
+                rlv.ChartControl,
                 chartScalePanel,
                 detailsScalePanel
             }, visualizer);
         }
-
-        private void hideVBtn_Click(object sender, RoutedEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
+            e.Cancel = true;
             this.Visibility = Visibility.Hidden;
         }
     }

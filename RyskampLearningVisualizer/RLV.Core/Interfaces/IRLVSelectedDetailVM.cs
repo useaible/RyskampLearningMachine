@@ -27,6 +27,7 @@ namespace RLV.Core.Interfaces
         double? CurrentScore { get; set; }
         ObservableCollection<RLVIODetailsVM> InputDetails { get; set; }
         ObservableCollection<RLVIODetailsVM> OutputDetails { get; set; }
+        string Header { get; set; }
         ObservableCollection<RLVItemDisplayVM> Labels { get; set; }
         ObservableCollection<RLVItemDisplayVM> Values { get; set; }
         //ObservableCollection<IValueConverter> DefaultFormatters { get; set; }

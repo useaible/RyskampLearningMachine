@@ -107,5 +107,15 @@ namespace WPFVisualizer
             SetScaleValueManual(scaleSlider.Value + 1);
             scaleSlider_PreviewMouseUp_1(null, null);
         }
+
+        public void UpdateBindings(RLVItemDisplayVM userVal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveConfiguration()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

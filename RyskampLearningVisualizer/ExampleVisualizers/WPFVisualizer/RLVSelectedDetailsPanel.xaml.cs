@@ -19,6 +19,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using System.IO;
+using RLV.Core.Converters;
 
 namespace WPFVisualizer
 {
@@ -38,6 +41,7 @@ namespace WPFVisualizer
         public RLVSelectedDetailsPanel()
         {
             InitializeComponent();
+            getViewModelFromConfig();
             DataContext = ViewModel;
             ScalePanel = scaleSelectionControl;
             setLabelBindings();
@@ -60,25 +64,25 @@ namespace WPFVisualizer
 
             if (previous != null)
             {
-                ((RLVSelectedDetailVM)ViewModel).PreviousSessionId = previous.SessionId;
-                ((RLVSelectedDetailVM)ViewModel).PreviousSession = previous.SessionNum;
-                ((RLVSelectedDetailVM)ViewModel).PreviousTime = previous.SessionTime;
-                ((RLVSelectedDetailVM)ViewModel).PreviousCase = previous.CycleNum;
-                ((RLVSelectedDetailVM)ViewModel).PreviousScore = previous.SessionScore;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousSessionId = previous.SessionId;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousSession = previous.SessionNum;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousTime = previous.SessionTime;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousCase = previous.CycleNum;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousScore = previous.SessionScore;
             }
             else
             {
-                ((RLVSelectedDetailVM)ViewModel).PreviousSession = null;
-                ((RLVSelectedDetailVM)ViewModel).PreviousTime = null;
-                ((RLVSelectedDetailVM)ViewModel).PreviousCase = null;
-                ((RLVSelectedDetailVM)ViewModel).PreviousScore = null;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousSession = null;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousTime = null;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousCase = null;
+                ((IRLVSelectedDetailVM)ViewModel).PreviousScore = null;
             }
 
-            ((RLVSelectedDetailVM)ViewModel).CurrentSessionId = current.SessionId;
-            ((RLVSelectedDetailVM)ViewModel).CurrentSession = current.SessionNum;
-            ((RLVSelectedDetailVM)ViewModel).CurrentTime = current.SessionTime;
-            ((RLVSelectedDetailVM)ViewModel).CurrentCase = current.CycleNum;
-            ((RLVSelectedDetailVM)ViewModel).CurrentScore = current.SessionScore;
+            ((IRLVSelectedDetailVM)ViewModel).CurrentSessionId = current.SessionId;
+            ((IRLVSelectedDetailVM)ViewModel).CurrentSession = current.SessionNum;
+            ((IRLVSelectedDetailVM)ViewModel).CurrentTime = current.SessionTime;
+            ((IRLVSelectedDetailVM)ViewModel).CurrentCase = current.CycleNum;
+            ((IRLVSelectedDetailVM)ViewModel).CurrentScore = current.SessionScore;
 
             //Make input details an observable collection for binding to its grid
             ObservableCollection<RLVIODetailsVM> inputCollection = new ObservableCollection<RLVIODetailsVM>();
@@ -106,8 +110,8 @@ namespace WPFVisualizer
                 outputCollection.Add(outputVm);
             }
 
-            ((RLVSelectedDetailVM)ViewModel).InputDetails = inputCollection;
-            ((RLVSelectedDetailVM)ViewModel).OutputDetails = outputCollection;
+            ((IRLVSelectedDetailVM)ViewModel).InputDetails = inputCollection;
+            ((IRLVSelectedDetailVM)ViewModel).OutputDetails = outputCollection;
 
             if (showComparison)
             {
@@ -149,6 +153,19 @@ namespace WPFVisualizer
 
         public void UpdateBindings(RLVItemDisplayVM userVal)
         {
+
+            if (userVal.SelectedValueFromConverter != null && userVal.ConverterType != null)
+            {
+                if (userVal.ConverterType == 0) //Number
+                {
+                    userVal.Converter = new RLVNumericConverter((RLV.Core.Enums.RLVFormatters)userVal.SelectedValueFromConverter);
+                }
+                else //1=Time
+                {
+                    userVal.Converter = new RLVTimeConverter((RLV.Core.Enums.RLVFormatters)userVal.SelectedValueFromConverter);
+                }
+            }
+
             var controls = this.mainGrid.Children;
             foreach (var control in controls)
             {
@@ -266,7 +283,7 @@ namespace WPFVisualizer
 
         private void setLabelBindings()
         {
-            foreach (var userLabel in ((RLVSelectedDetailVM)ViewModel).Labels)
+            foreach (var userLabel in ((IRLVSelectedDetailVM)ViewModel).Labels)
             {
                 var controls = this.mainGrid.Children;
                 foreach (var control in controls)
@@ -277,7 +294,11 @@ namespace WPFVisualizer
 
                     if(con.Name == userLabel.Name)
                     {
-                        Label lblCtrl = control as Label;
+                        dynamic lblCtrl = control as Label;
+                        if (lblCtrl == null)
+                        {
+                            lblCtrl = control as Button;
+                        }
 
                         Binding labelBinding = new Binding();
                         labelBinding.Source = userLabel;
@@ -286,8 +307,14 @@ namespace WPFVisualizer
                         labelBinding.Converter = userLabel.Converter;
 
                         var visibilityBinding = new Binding { Source = userLabel, Path = new PropertyPath("Visibility"), Mode = BindingMode.TwoWay };
-
-                        BindingOperations.SetBinding(lblCtrl, Label.ContentProperty, labelBinding);
+                        if (lblCtrl.Tag != null)
+                        {
+                            BindingOperations.SetBinding(lblCtrl, Button.ContentProperty, labelBinding);
+                        }
+                        else
+                        {
+                            BindingOperations.SetBinding(lblCtrl, Label.ContentProperty, labelBinding);
+                        }
                         BindingOperations.SetBinding(lblCtrl, Label.VisibilityProperty, visibilityBinding);
                     }
                 }
@@ -296,9 +323,54 @@ namespace WPFVisualizer
 
         private void setValueBindings()
         {
-            foreach(var userVal in ((RLVSelectedDetailVM)ViewModel).Values)
+            foreach(var userVal in ((IRLVSelectedDetailVM)ViewModel).Values)
             {
                 this.UpdateBindings(userVal);
+            }
+        }
+        private void getViewModelFromConfig()
+        {
+            try
+            {
+                using (StreamReader rdr = File.OpenText("RLVSelectedDetailsPanel.json"))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.TypeNameHandling = TypeNameHandling.Auto;
+                    serializer.Formatting = Formatting.Indented;
+                    dynamic viewModel = (dynamic)serializer.Deserialize(rdr, typeof(object));
+
+                    var labels = viewModel.Labels.ToObject<ObservableCollection<RLVItemDisplayVM>>();
+                    var valuesToStr = JsonConvert.SerializeObject(viewModel.Values);
+                    var values = JsonConvert.DeserializeObject<ObservableCollection<RLVItemDisplayVM>>(valuesToStr, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+
+                    ((IRLVSelectedDetailVM)ViewModel).Header = viewModel.Header;
+                    ((IRLVSelectedDetailVM)ViewModel).Labels = labels;
+                    ((IRLVSelectedDetailVM)ViewModel).Values = values;
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("No configuration file found for SelectedDetailsPanel.");
+            }
+        }
+
+        public void SaveConfiguration()
+        {
+            try
+            {
+                FileStream file = File.Open("RLVSelectedDetailsPanel.json", FileMode.Create);
+                dynamic obj = new { Header = ((IRLVSelectedDetailVM)ViewModel).Header, Labels = ((IRLVSelectedDetailVM)ViewModel).Labels, Values = ((IRLVSelectedDetailVM)ViewModel).Values };
+                using (StreamWriter st = new StreamWriter(file))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.TypeNameHandling = TypeNameHandling.Auto;
+                    serializer.Formatting = Formatting.Indented;
+                    serializer.Serialize(st, obj);
+                }
+            }
+            catch(Exception e)
+            {
+                throw (e);
             }
         }
     }

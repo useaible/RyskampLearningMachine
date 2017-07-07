@@ -20,7 +20,5 @@ namespace RLV.Core.Interfaces
         void IRLVCore_SelectedCaseDetailResultsHandler(IEnumerable<RlmLearnedCaseDetails> data, bool showComparison = false);
         void IRLVCore_SessionBreakdownClickResultsHandler(RlmLearnedSessionDetails details);
         void LoadScalePanel(ref IRLVScaleSelectionPanel panel);
-        void LoadConfigurationPanel(object parentWindow);
-        void UpdateBindings(RLVItemDisplayVM userVal);
     }
 }

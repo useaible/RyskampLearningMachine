@@ -50,7 +50,7 @@ namespace WPFVisualizer
                 total += Convert.ToDouble(t.Value);
             }
 
-            this.sessionBreakdownTotalLbl.Text = $"Total: {total.ToString("#,###.##")}";
+            this.sessionBreakdownTotalLbl.Text = $"Total: {total.ToString("#,##0.##")}";
             this.sessionBreakdownDetailsGrid.ItemsSource = itemSource;
             this.sessionBreakdownDetailsGrid.AutoGenerateColumns = false;
         }

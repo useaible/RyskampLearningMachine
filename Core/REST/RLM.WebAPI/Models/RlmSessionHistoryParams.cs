@@ -22,4 +22,47 @@ namespace RLM.WebAPI.Models
         public long RneuronId { get; set; }
         public long SolutionId { get; set; }
     }
+
+    public class RlmGetNextPrevLearnedCaseIdParams : RlmParams
+    {
+        public long? CaseId { get; set; }
+        public bool IsNext { get; set; }
+    }
+
+    public class RlmGetSessionDetailsParams : RlmParams
+    {
+        public long[] SessionIds { get; set; }
+    }
+
+    public class RlmGetRneuronIdFromInputs : RlmParams
+    {
+        public KeyValuePair<string,string>[] InputValuesPair { get; set; }
+    }
+
+    public class RlmGetSolutionIdFromOutputs : RlmParams
+    {
+        public KeyValuePair<string, string>[] OutputValuesPair { get; set; }
+    }
+
+    public class RlmGetLearnedCasesParams : RlmParams
+    {
+        public long RneuronId { get; set; }
+        public long SolutionId { get; set; }
+        public double Scale { get; set; }
+    }
+
+    public class RlmGetLearnedCaseDetailsParams : RlmParams
+    {
+        public long CaseId { get; set; }
+    }
+
+    public class RlmGetCaseDetailsParams : RlmParams
+    {
+        public long CaseId { get; set; }
+    }
+
+    public class RlmGetCaseIODetailsParams : RlmParams
+    {
+        public long CaseId { get; set; }
+    }
 }

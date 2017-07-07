@@ -73,9 +73,16 @@ namespace RetailPoC
         {
             // Call this function to get the new metric values
             setMetricValues();
-
-            this.DialogResult = true;
-            this.Close();
+            double perfect = Total / 100;
+            if (perfect == 1)
+            {
+                this.DialogResult = true;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Metrics must be a total of 100%.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         // Metric1 slider event after setting new value

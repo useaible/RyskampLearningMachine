@@ -200,5 +200,145 @@ namespace RLM.WebAPI.Controllers
 
             return result;
         }
+
+        [HttpGet]
+        [Route("next_prev_learned_case")]
+        [ValidateRlmModel]
+        public long? GetNextPreviousLearnedCaseId(string dbname, long case_id, bool is_next)
+        {
+            long? result = null;
+
+            try
+            {
+                result = manager.GetNextPrevLearnedCaseId(new RlmGetNextPrevLearnedCaseIdParams { RlmName = dbname, CaseId = case_id, IsNext = is_next });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("session_iodetails")]
+        [ValidateRlmModel]
+        public IEnumerable<RlmLearnedSessionDetails> GetSessionIODetails(string dbname, long[] session_ids)
+        {
+            IEnumerable<RlmLearnedSessionDetails> result = null;
+
+            try
+            {
+                result = manager.GetSessionIODetails(new RlmGetSessionDetailsParams { RlmName = dbname, SessionIds = session_ids });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("rneuron_id_from_inputs")]
+        [ValidateRlmModel]
+        public long? GetRneuronIdFromInputs(string dbname, KeyValuePair<string, string>[] input_values_pair)
+        {
+            long? result = null;
+
+            try
+            {
+                result = manager.GetRneuronIdFromInputs(new RlmGetRneuronIdFromInputs { RlmName = dbname, InputValuesPair = input_values_pair });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("solution_id_from_outputs")]
+        [ValidateRlmModel]
+        public long? GetSolutionIdFromOutputs(string dbname, KeyValuePair<string, string>[] output_values_pair)
+        {
+            long? result = null;
+
+            try
+            {
+                result = manager.GetSolutionIdFromOutputs(new RlmGetSolutionIdFromOutputs { RlmName = dbname, OutputValuesPair = output_values_pair });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("learned_cases")]
+        [ValidateRlmModel]
+        public IEnumerable<RlmLearnedCase> GetLearnedCases(string dbname, long rneuron_id, long solution_id, double scale)
+        {
+            IEnumerable<RlmLearnedCase> result = null;
+
+            try
+            {
+                result = manager.GetLearnedCases(new RlmGetLearnedCasesParams { RlmName = dbname, RneuronId = rneuron_id, SolutionId = solution_id, Scale = scale });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("case_details")]
+        [ValidateRlmModel]
+        public IEnumerable<RlmLearnedCaseDetails> GetCaseDetails(string dbname, long case_id)
+        {
+            IEnumerable<RlmLearnedCaseDetails> result = null;
+
+            try
+            {
+                result = manager.GetCaseDetails(new RlmGetCaseDetailsParams { RlmName = dbname, CaseId = case_id});
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("case_iodetails")]
+        [ValidateRlmModel]
+        public IEnumerable<RlmIODetails>[] GetCaseIODetails(string dbname, long case_id)
+        {
+            IEnumerable<RlmIODetails>[] result = null;
+
+            try
+            {
+                result = manager.GetCaseIODetails(new RlmGetCaseIODetailsParams { RlmName = dbname, CaseId = case_id});
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Internal error: {e.Message}");
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, e));
+            }
+
+            return result;
+        }
     }
 }

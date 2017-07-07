@@ -40,5 +40,10 @@ namespace RetailPoC.Models
         public double ItemMetricMin { get; set; }
         public double ItemMetricMax { get; set; }
         public double DefaultScorePercentage { get; set; }
+
+        // encog settings
+        public bool EncogSelected { get; set; } = false;
+        public int HiddenLayers { get; set; } = 1;
+        public int HiddenLayerNeurons { get; set; } = 0;
     }
 }

@@ -24,10 +24,11 @@ using RLV.Core.Interfaces;
 using RLV.Core.Models;
 using RLV.Core.Enums;
 using RLM.Models;
+using System.Threading;
 
 namespace RetailPoC
 {
-    public delegate void SimulationStart(Item[] items, SimulationSettings simSettings);
+    public delegate void SimulationStart(Item[] items, SimulationSettings simSettings, CancellationToken token);
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -38,9 +39,11 @@ namespace RetailPoC
         const int LARGE_ITEMS_COUNT = 5000;
         const int SHELVES = 12;
         const int SLOTS_PER_SHELF = 24;
+
+        private CancellationTokenSource tokenSource = new CancellationTokenSource();
         private DataFactory dataFactory = new DataFactory();
-        private DataPanel dataPanel = new DataPanel();
-        public bool NoData { get; set; } = true;
+        private bool isSmallPlangoram = false;
+        //private DataPanel dataPanel;
 
         private SimulationSettings simSettings = new SimulationSettings()
         {
@@ -71,68 +74,72 @@ namespace RetailPoC
         private bool usePerfColor = false;
         private int selectedSlotIndex = -1;
 
-        public event SimulationStart OnSimulationStart;
-
-        public SimulationCsvLogger Logger { get; set; } = new SimulationCsvLogger();
-        public string HelpPath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
-        public SimulationSettings SimulationSettings { get { return simSettings; } }
-        public Item[] ItemsCache { get { return itemsCache; } }
-
         private ItemComparisonPanel itemCompPanel = new ItemComparisonPanel();
         
         private IRLVCore core = new RLVCore("RLV_small");
         //private IRLVSelectedDetailsPanel detailsPanel = new RLVSelectedDetailsPanel();
         //private IRLVProgressionChartPanel chartPanel = new RLVProgressionChartPanel();
         private IRLVPlangoramOutputVisualizer visualizer = null;
-        public MainWindow()
+
+        private IDictionary<Color, SolidColorBrush> coloredBrushesDict = new Dictionary<Color, SolidColorBrush>();
+        private PlanogramOptimizer optimizer;
+
+        private NoDataNotificationWindow noData = null;
+        private int previousSelectedSlotIndex = -1;
+        private Rectangle previousSelectedRect = null;
+        private int _row = -1;
+        private int _col = -1;
+
+        private TempRLVContainerPanel rlvPanel;
+        private RLVConfigurationPanel vsConfig = null;
+
+        private ShelfItem currentItem;
+        private ShelfItem prevItem;
+
+        private int itemRow = -1;
+        private int itemCol = -1;
+        private RlmLearnedSessionDetails tmpSelectedData;
+        private RlmLearnedSessionDetails tmpComparisonData;
+
+        public event SimulationStart OnSimulationStart;
+
+        public SimulationCsvLogger Logger { get; set; } = new SimulationCsvLogger();
+        public string HelpPath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
+        public SimulationSettings SimulationSettings { get { return simSettings; } }
+        public Item[] ItemsCache { get { return itemsCache; } }
+        public bool NoData { get; set; } = true;
+
+
+        public MainWindow(bool enableTensorflow = false)
         {
             InitializeComponent();
-            headToHead = false;
-            Width = 580;
-            //toggleColorBtn.Margin = new Thickness(422, 14, 0, 0); //new Thickness(62, 10, 0, 0);
-            //dataGenerationBtn.Margin = new Thickness(24, 14, 0, 0); //new Thickness(182, 10, 0, 0);
-            //metricsBtn.Margin = new Thickness(146, 14, 0, 0); //new Thickness(302, 10, 0, 0);
-            //runSlmBtn.Margin = new Thickness(266, 14, 0, 0); //new Thickness(422, 10, 0, 0);
-
-            rectHeadToHeadDivider.Visibility = Visibility.Hidden;
-
-            planogramTensorflow.Visibility = Visibility.Hidden;
- 
-
-            tensorFlowPlanogramScore.Visibility = Visibility.Hidden;
-            GrdTensorFlowsetting.Visibility = Visibility.Hidden;
-            grpBox_Tensorflow.Visibility = Visibility.Hidden;
-
-            FillGrid(planogram, Colors.LightGray);
-            //For testing only
-            string dbIdentifier = "RLV_small";
-            // instantiate visualizer with this window as its parent reference
-            visualizer = new RLVOutputVisualizer(this);
-            core = new RLVCore(dbIdentifier);
-
-            //core.SetupVisualizer(new List<IRLVPanel>
-            //{
-            //    detailsPanel,
-            //    chartPanel
-            //}, visualizer);
-
-            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml") });
-            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml") });
-            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml") });
-            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml") });
-            //this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml") });
-        }
-
-        public MainWindow(bool headtohead)
-        {
-            InitializeComponent();
-            headToHead = headtohead;
+            headToHead = true;
             Title += " - Head to Head";
-            FillGrid(planogram, Colors.LightGray);
-            FillGrid(planogramTensorflow, Colors.LightGray);
+
+            //InitializeGrid(planogram, Colors.LightGray, true);
+            //InitializeGrid(planogramTensorflow, Colors.LightGray);
+
+            //FillGrid(planogram, Colors.LightGray);
+            //FillGrid(planogramTensorflow, Colors.LightGray);
+
+            if (enableTensorflow)
+            {
+                rdbTensorflow.IsChecked = true;
+            }
+            else
+            {
+                rdbTensorflow.IsEnabled = false;
+            }
 
             //targetScoreTxt.Margin = new Thickness(522, 128, 0, 0);
             //targetScoreLbl.Margin = new Thickness(497, 98, 0, 0);
+
+            this.Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            tokenSource.Cancel();
         }
 
         private void dataGenerationBtn_Click(object sender, RoutedEventArgs e)
@@ -143,9 +150,25 @@ namespace RetailPoC
 
         private void showDataPanelDlg()
         {
+            var dataPanel = new DataPanel();
+            if (isSmallPlangoram)
+            {
+                dataPanel.NumItems = SMALL_ITEMS_COUNT;
+                dataPanel.NumShelves = 1;
+                dataPanel.NumSlots = 24;
+            }
+            else
+            {
+                dataPanel.NumItems = LARGE_ITEMS_COUNT;
+                dataPanel.NumShelves = 12;
+                dataPanel.NumSlots = 24;
+            }
+
             dataPanel.Closed += (s, ee) => {
                 dataPanel = new DataPanel();
                 setSelectedPlanogramSize();
+                InitializeGrid(planogram, Colors.LightGray, true);
+                InitializeGrid(planogramTensorflow, Colors.LightGray);
             };
 
             dataPanel.NumItems = simSettings.NumItems;
@@ -200,9 +223,14 @@ namespace RetailPoC
             }
         }
 
-        private PlanogramOptimizer optimizer;
         private void runSlmBtn_Click(object sender, RoutedEventArgs e)
         {
+            selectedSlotIndex = -1;
+            _row = -1;
+            _col = -1;
+            itemRow = -1;
+            itemCol = -1;
+
             SimulationPanel simPanel = new SimulationPanel();
             simPanel.SetSimSettings(simSettings);
             bool? result = simPanel.ShowDialog();
@@ -227,6 +255,8 @@ namespace RetailPoC
                 simSettings.Score = simPanel.Score;
                 simSettings.EnableSimDisplay = simPanel.EnableSimDisplay;
                 simSettings.DefaultScorePercentage = simPanel.simScoreSlider.Value;
+                simSettings.HiddenLayers = simPanel.HiddenLayers;
+                simSettings.HiddenLayerNeurons = simPanel.HiddenLayerNeurons;
 
                 targetScoreTxt.Text = "";
                 if (simSettings.SimType == SimulationType.Score)
@@ -268,12 +298,12 @@ namespace RetailPoC
 
                 // open temporary RLV container panel
                 // todo this must be embeded in this Window instead of the temporary container
-                if (tmpPanel != null)
+                if (rlvPanel != null)
                 {
-                    tmpPanel.Close();
+                    rlvPanel.Close();
                 }
 
-                tmpPanel = new TempRLVContainerPanel(core, visualizer);
+                rlvPanel = new TempRLVContainerPanel(core, visualizer);
 
                 //this.Top = 20;
                 //tmpPanel.Top = this.Top;
@@ -289,7 +319,7 @@ namespace RetailPoC
                     using (PlanogramContext ctx = new PlanogramContext())
                     {
                         MockData mock = new MockData(ctx);
-                        items = itemsCache = mock.GetItemsWithAttr();
+                        items = itemsCache = mock.GetItemsWithAttr();                        
                         simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
                         simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
                     }
@@ -298,10 +328,9 @@ namespace RetailPoC
                     //OnSimulationStart?.Invoke(items, simSettings); //return;
 
                     // initialize and start RLM training
-                    enableSimulation = simSettings.EnableSimDisplay;
                     optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier);
                     //optimizer.OnSessionDone += Optimizer_OnSessionDone;
-                    optimizer.StartOptimization();
+                    optimizer.StartOptimization(tokenSource.Token);
                 });
             }
         }
@@ -317,16 +346,18 @@ namespace RetailPoC
             CbPlanogramSize.IsEnabled = value;
         }
 
-        private bool enableSimulation = false;
         private void UpdateRLMResults(PlanogramOptResultsSettings results, bool enableSimDisplay)
         {
-            enableSimDisplay = enableSimulation;
+            if (tokenSource.IsCancellationRequested) return;
+            if (enableSimDisplay)
+                Task.Delay(1);
+
             Dispatcher.Invoke(() =>
             {
+                currentResults = results;
 
-                if (enableSimDisplay)
+                if (enableSimDisplay && !core.IsComparisonModeOn)
                 {
-                    currentResults = results;
                     FillGrid(planogram, results.Shelves, false, ItemAttributes_MouseEnter, ItemAttributes_MouseLeave);
                 }
 
@@ -336,15 +367,15 @@ namespace RetailPoC
                 }
                 else
                 {
-                    string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
+                    string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,##0.##")} ({results.NumScoreHits})" : results.Score.ToString("#,##0.##");
                     scoreTxt.Text = scoreText;
                     sessionRunTxt.Text = results.CurrentSession.ToString();
                     timElapseTxt.Text = results.TimeElapsed.ToString();//string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
-                    minScoretxt.Text = results.MinScore.ToString("#,###.##");
-                    maxScoreTxt.Text = results.MaxScore.ToString("#,###.##");
+                    minScoretxt.Text = results.MinScore.ToString("#,##0.##");
+                    maxScoreTxt.Text = results.MaxScore.ToString("#,##0.##");
                     //engineTxt.Text = "RLM";
-                    averageScoreTxt.Text = results.AvgScore.ToString("#,###.##");
-                    averageScoreOf10Txt.Text = results.AvgLastTen.ToString("#,###.##");
+                    averageScoreTxt.Text = results.AvgScore.ToString("#,##0.##");
+                    averageScoreOf10Txt.Text = results.AvgLastTen.ToString("#,##0.##");
                     currentRandomnessTxt.Text = results.CurrentRandomnessValue.ToString();
                     startRandomnessTxt.Text = results.StartRandomness.ToString();
                     endRandomnessTxt.Text = results.EndRandomness.ToString();
@@ -356,6 +387,8 @@ namespace RetailPoC
 
         private void UpdateRLMStatus(string statusMsg, bool isDone = false)
         {
+            if (tokenSource.IsCancellationRequested) return;
+
             Dispatcher.Invoke(() =>
             {
                 statusTxt.Text = statusMsg;
@@ -365,18 +398,28 @@ namespace RetailPoC
                 {
                     if (isRLMDone)
                     {
-                        Task.Run(() => {
-                            Item[] items;
-                            using (PlanogramContext ctx = new PlanogramContext())
-                            {
-                                MockData mock = new MockData(ctx);
-                                items = mock.GetItemsWithAttr();
-                                simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
-                                simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
-                            }
+                        bool optimizeEncog = rdbEncog.IsChecked.HasValue && rdbEncog.IsChecked.Value;
 
-                            // let's tensorflow (or other listeners) know that it should start training
-                            OnSimulationStart?.Invoke(items, simSettings);
+                        Task.Run(() => {
+                            //Item[] items;
+                            //using (PlanogramContext ctx = new PlanogramContext())
+                            //{
+                            //    MockData mock = new MockData(ctx);
+                            //    items = mock.GetItemsWithAttr();
+                            //    simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
+                            //    simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
+                            //}
+
+                            if (optimizeEncog)
+                            {
+                                var encogOpt = new PlanogramOptimizerEncog(itemsCache, simSettings, UpdateTensorflowResults, UpdateTensorflowStatus, Logger, true);
+                                encogOpt.StartOptimization(tokenSource.Token);
+                            }
+                            else
+                            {
+                                // let's tensorflow (or other listeners) know that it should start training
+                                OnSimulationStart?.Invoke(itemsCache, simSettings, tokenSource.Token);
+                            }
                         });
 
                         if (isTensorflowDone)
@@ -422,42 +465,7 @@ namespace RetailPoC
                 showDataPanelDlg();
             }
         }
-
-
-
-        private void FillGrid(Grid planogramGrid, Color color)
-        {
-            planogramGrid.Children.Clear();
-
-            int slotNumber = 0;
-            for (int row = 0; row < simSettings.NumShelves; row++)
-            {
-                for (int column = 0; column < simSettings.NumSlots; column++)
-                {
-                    slotNumber++;
-                    Rectangle itemAttributes = new Rectangle();
-                    itemAttributes.Fill = new SolidColorBrush(color);
-                    itemAttributes.Stroke = new SolidColorBrush(Colors.Black);
-                    //itemAttributes.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    if (slotNumber - 1 == selectedSlotIndex)
-                    {
-                        HighlightItem(itemAttributes);
-                    }
-
-                    Grid.SetColumn(itemAttributes, column);
-                    Grid.SetRow(itemAttributes, row);
-                    planogramGrid.Children.Add(itemAttributes);
-                    
-                }
-            }
-        }
-
-        private NoDataNotificationWindow noData = null;
-        private int previousSelectedSlotIndex = -1;
-        private Rectangle previousSelectedRect = null;
-        private int _row = 0;
-        private int _col = 0;
+                
         private void OnSelectedItem(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var point = Mouse.GetPosition(planogram);
@@ -495,7 +503,7 @@ namespace RetailPoC
                 .Where(i => Grid.GetRow(i) == row && Grid.GetColumn(i) == col)
                 .FirstOrDefault();
 
-            if(rect == null)
+            if (rect == null)
             {
                 row = itemRow;
                 col = itemCol;
@@ -505,10 +513,12 @@ namespace RetailPoC
                 .Where(i => Grid.GetRow(i) == row && Grid.GetColumn(i) == col)
                 .FirstOrDefault();
             }
-           
+
             HighlightItem(rect);
+
             _row = row;
             _col = col;
+
             selectedSlotIndex = planogram.Children.IndexOf(rect);
             //MessageBox.Show($"row: {row}, col: {col}, index: {rectIndex}");
 
@@ -563,9 +573,6 @@ namespace RetailPoC
                 new RLVItemDisplay() { Name = "Item", Value = "Item #" + (selectedSlotIndex + 1), Visibility = RLVVisibility.Visible } // todo pass in actual item name (see: Value)
             };
 
-
-            visualizer?.SelectNewItem(inputValues, outputValues, itemDisplay);
-
             if (!NoData)
             {
                 if (noData != null)
@@ -573,19 +580,19 @@ namespace RetailPoC
                     noData.Close();
                 }
 
-                if (tmpPanel != null)
+                if (rlvPanel != null)
                 {
-                    tmpPanel.Visibility = Visibility.Visible;
+                    rlvPanel.Visibility = Visibility.Visible;
                 }
-                else
-                {
-                    if (tmpPanel != null)
-                    {
-                        tmpPanel.Close();
-                    }
-                    tmpPanel = new TempRLVContainerPanel(core, visualizer);
-                    tmpPanel.Show();
-                }
+                //else
+                //{
+                //    if (rlvPanel != null)
+                //    {
+                //        rlvPanel.Close();
+                //    }
+                //    rlvPanel = new TempRLVContainerPanel(core, visualizer);
+                //    rlvPanel.Show();
+                //}
 
                 previousSelectedSlotIndex = selectedSlotIndex;
                 previousSelectedRect = rect;
@@ -608,7 +615,7 @@ namespace RetailPoC
                 if (rect != null)
                 {
                     rect.StrokeThickness = 1;
-                    rect.Stroke = new SolidColorBrush(Colors.Black);
+                    rect.Stroke = GetBrushFromColor(Colors.Black);
                 }
 
                 if (previousSelectedRect != null)
@@ -617,17 +624,20 @@ namespace RetailPoC
                 }
             }
             //HighlightItem(row, col);
-
             //MessageBox.Show($"row: {row}, col: {col}");
+            visualizer?.SelectNewItem(inputValues, outputValues, itemDisplay);
         }
 
         private void alignPanels()
         {
-            this.Top = 20;
-            tmpPanel.Top = this.Top;
-
-            tmpPanel.Left = 10;
-            this.Left = tmpPanel.Left + tmpPanel.Width;
+            if (rlvPanel != null)
+            {
+                //this.Top = 20;
+                rlvPanel.Top = this.Top;
+                //rlvPanel.Left = 10;
+                //this.Left = rlvPanel.Left + rlvPanel.Width;
+                rlvPanel.Left = this.Left - rlvPanel.Width;
+            }
         }
 
         private void HighlightItem(int row, int col)
@@ -642,7 +652,7 @@ namespace RetailPoC
         private void HighlightItem(Rectangle rect)
         {
             rect.StrokeThickness = 2;
-            rect.Stroke = new SolidColorBrush(Colors.GreenYellow);
+            rect.Stroke = GetBrushFromColor(Colors.GreenYellow);
         }
 
         private void RemoveHighlightedItems()
@@ -653,17 +663,82 @@ namespace RetailPoC
             foreach (var shape in shapes)
             {
                 shape.StrokeThickness = 1;
-                shape.Stroke = new SolidColorBrush(Colors.Black);
+                shape.Stroke = GetBrushFromColor(Colors.Black);
                 //shape.Tag = null;
             }
         }
+        
+        private void InitializeGrid(Grid plangoramGrid, Color color, bool isRLM = false)
+        {
+            plangoramGrid.Children.Clear();
 
+            int slotNumber = 0;
+            for (int row = 0; row < simSettings.NumShelves; row++)
+            {
+                for (int column = 0; column < simSettings.NumSlots; column++)
+                {
+                    Rectangle item = new Rectangle();
+                    item.Fill = GetBrushFromColor(color);
+                    item.Stroke = GetBrushFromColor(Colors.Black);
+                    item.Tag = null;
+
+                    if (isRLM)
+                    {
+                        item.InputBindings.Add(new MouseBinding()
+                        {
+                            Gesture = new MouseGesture(MouseAction.LeftClick),
+                            Command = new ItemClickedCommand(() =>
+                            {
+                                OnSelectedItem(item, null);
+                            })
+                        });
+                    }
+
+                    if (slotNumber == selectedSlotIndex)
+                    {
+                        HighlightItem(item);
+                    }
+
+                    Grid.SetColumn(item, column);
+                    Grid.SetRow(item, row);
+                    plangoramGrid.Children.Add(item);
+
+                    slotNumber++;
+                }
+            }
+        }
+
+        private void FillGrid(Grid planogramGrid, Color color)
+        {
+            int slotNumber = 0;
+            foreach (var item in planogramGrid.Children.Cast<Rectangle>())
+            {
+                item.Fill = GetBrushFromColor(color);
+                item.Stroke = GetBrushFromColor(Colors.Black);
+                item.Tag = null;
+
+                item.MouseEnter -= ItemAttrbutes_MouseEnter_Tensorflow;
+                item.MouseEnter -= ItemAttributes_Compare_MouseEnter;
+                item.MouseEnter -= ItemAttributes_MouseEnter;
+
+                item.MouseLeave -= ItemAttrbutes_MouseLeave_Tensorflow;
+                item.MouseLeave -= ItemAttributes_MouseLeave;
+
+                if (slotNumber == selectedSlotIndex)
+                {
+                    HighlightItem(item);
+                }
+
+                slotNumber++;
+            }
+        }
+        
         private void FillGrid(Grid planogramGrid, IEnumerable<Shelf> result, bool usePerfColor = false, MouseEventHandler mouseEnterHandler = null, MouseEventHandler mouseLeaveHandler = null, IEnumerable<Shelf> comparisonResult = null, bool isRLM = true)
         {
             if (result == null || planogramGrid == null)
                 return;
 
-            planogramGrid.Children.Clear();
+            var itemRectangles = planogramGrid.Children.Cast<Rectangle>();
 
             int slotNumber = 0;
             int row = 0;
@@ -673,31 +748,25 @@ namespace RetailPoC
                 //bool highlight = false;
                 foreach (var item in shelf.Items)
                 {
-                    slotNumber++;
-                    Rectangle itemAttributes = new Rectangle();
-                    itemAttributes.Fill = new SolidColorBrush(usePerfColor ? item.PerfColor : item.Color);
-                    itemAttributes.Stroke = new SolidColorBrush(Colors.Black);
-                    itemAttributes.Tag = item;
+                    Rectangle itemRect = itemRectangles.ElementAt(slotNumber);
+                    itemRect.Fill = GetBrushFromColor(item.Color);
+                    itemRect.Stroke = GetBrushFromColor(Colors.Black);
+                    itemRect.Tag = item;
 
-                    if (isRLM)
-                    {
-                        itemAttributes.InputBindings.Add(new MouseBinding()
-                        {
-                            Gesture = new MouseGesture(MouseAction.LeftClick),
-                            Command = new ItemClickedCommand(() =>
-                            {
-                                OnSelectedItem(itemAttributes, null);
-                            })
-                        });
-                    }
+                    itemRect.MouseEnter -= ItemAttrbutes_MouseEnter_Tensorflow;
+                    itemRect.MouseEnter -= ItemAttributes_Compare_MouseEnter;
+                    itemRect.MouseEnter -= ItemAttributes_MouseEnter;
 
-                    
+                    itemRect.MouseLeave -= ItemAttrbutes_MouseLeave_Tensorflow;
+                    itemRect.MouseLeave -= ItemAttributes_Compare_MouseLeave;
+                    itemRect.MouseLeave -= ItemAttributes_MouseLeave;
+
                     if (comparisonResult == null)
                     {
                         if (mouseEnterHandler != null)
-                            itemAttributes.MouseEnter += mouseEnterHandler;
+                            itemRect.MouseEnter += mouseEnterHandler;
                         if (mouseLeaveHandler != null)
-                            itemAttributes.MouseLeave += mouseLeaveHandler;
+                            itemRect.MouseLeave += mouseLeaveHandler;
                     }
                     else
                     {
@@ -705,82 +774,46 @@ namespace RetailPoC
                         
                         if (compItem.ItemID != item.ItemID)
                         {
-                            itemAttributes.Stroke = new SolidColorBrush(Colors.White);
-                            itemAttributes.StrokeThickness = 2;
-                            itemAttributes.Tag = new KeyValuePair<ShelfItem, ShelfItem>(item, compItem);
+                            itemRect.Stroke = GetBrushFromColor(Colors.White);
+                            itemRect.StrokeThickness = 2;
+                            itemRect.Tag = new KeyValuePair<ShelfItem, ShelfItem>(item, compItem);
 
-                            //if (mouseEnterHandler != null)
-                            //    itemAttributes.MouseEnter += mouseEnterHandler;
-                            //if (mouseLeaveHandler != null)
-                            //    itemAttributes.MouseLeave += mouseLeaveHandler;
-
-                            itemAttributes.MouseEnter += (sender, e) =>
-                            {
-                                var itemPair = (KeyValuePair<ShelfItem, ShelfItem>)((Rectangle)sender).Tag;
-                                //itemCompPanel.SetItems(itemPair.Key, itemPair.Value);
-
-                                //if (!itemCompPanel.IsVisible)
-                                //{
-                                //    itemCompPanel.Show();
-                                //    itemCompPanel.Left = this.Left + this.Width;
-                                //    itemCompPanel.Top = this.Top;
-                                //}
-
-                                comparisonGrid.Visibility = Visibility.Visible;
-                                setComparisonData(itemPair.Key, itemPair.Value);
-                                itemScoreTxt.Text = itemPair.Value.Score.ToString("#,###.##");
-                            };
-
-                            itemAttributes.MouseLeave += (sender, e) =>
-                            {
-                                itemScoreTxt.Text = " ";
-                                comparisonGrid.Visibility = Visibility.Hidden;
-                                //if (itemCompPanel.IsVisible)
-                                //{
-                                //    itemCompPanel.Hide();
-                                //}
-                            };
-                            //highlight = true;
+                            if (mouseEnterHandler != null)
+                                itemRect.MouseEnter += mouseEnterHandler;
+                            if (mouseLeaveHandler != null)
+                                itemRect.MouseLeave += mouseLeaveHandler;
                         }
                     }
 
-                    if (slotNumber - 1 == selectedSlotIndex)
+                    if (slotNumber == selectedSlotIndex)
                     {
-                        HighlightItem(itemAttributes);
+                        HighlightItem(itemRect);
                     }
                     
-                    Grid.SetColumn(itemAttributes, col);
-                    Grid.SetRow(itemAttributes, row);
-                    planogramGrid.Children.Add(itemAttributes);
-
-                    //if (highlight)
-                        //HighlightItem(row, col);
-
                     col++;
+                    slotNumber++;
                 }
                 row++;
             }
         }
 
-        private ShelfItem currentItem;
-        private ShelfItem prevItem;
         private void setComparisonData(ShelfItem current, ShelfItem prev)
         {
             currentItem = current;
             prevItem = prev;
 
-            rectCurr.Fill = new SolidColorBrush(current.Color);
+            rectCurr.Fill = GetBrushFromColor(current.Color);
             txtCurrName.Text = current.Name;
-            txtCurrScore.Text = current.Score.ToString("#,###.##");
+            txtCurrScore.Text = current.Score.ToString("#,##0.##");
 
-            rectPrev.Fill = new SolidColorBrush(prev.Color);
+            rectPrev.Fill = GetBrushFromColor(prev.Color);
             txtPrevName.Text = prev.Name;
-            txtPrevScore.Text = prev.Score.ToString("#,###.##");
+            txtPrevScore.Text = prev.Score.ToString("#,##0.##");
         }
 
         private void ItemAttributes_Compare_MouseEnter(object sender, MouseEventArgs e)
         {
-            //var itemPair = (KeyValuePair<ShelfItem, ShelfItem>)((Rectangle)sender).Tag;
+            var itemPair = (KeyValuePair<ShelfItem, ShelfItem>)((Rectangle)sender).Tag;
             //itemCompPanel.SetItems(itemPair.Key, itemPair.Value);
 
             //if (!itemCompPanel.IsVisible)
@@ -790,16 +823,28 @@ namespace RetailPoC
             //    itemCompPanel.Top = this.Top;
             //}
 
-            //itemScoreTxt.Text =  itemPair.Value.Score.ToString("#,###.##");
+            comparisonGrid.Visibility = Visibility.Visible;
+            setComparisonData(itemPair.Key, itemPair.Value);
+            itemScoreTxt.Text = itemPair.Value.Score.ToString("#,##0.##");
         }
-        
+
+        private void ItemAttributes_Compare_MouseLeave(object sender, MouseEventArgs e)
+        {
+            itemScoreTxt.Text = " ";
+            comparisonGrid.Visibility = Visibility.Hidden;
+            //if (itemCompPanel.IsVisible)
+            //{
+            //    itemCompPanel.Hide();
+            //}
+        }
+
         private void ItemAttributes_MouseEnter(object sender, MouseEventArgs e)
         {           
-            itemScoreTxt.Text = ((ShelfItem)((Rectangle)sender).Tag).Score.ToString("#,###.##");
+            itemScoreTxt.Text = ((ShelfItem)((Rectangle)sender).Tag).Score.ToString("#,##0.##");
         }
         private void ItemAttributes_MouseLeave(object sender, MouseEventArgs e)
         {
-            //itemScoreTxt.Text = " ";
+            itemScoreTxt.Text = " ";
             //if (itemCompPanel.IsVisible)
             //{
             //    itemCompPanel.Hide();
@@ -808,7 +853,7 @@ namespace RetailPoC
 
         private void ItemAttrbutes_MouseEnter_Tensorflow(object sender, MouseEventArgs e)
         {
-            itemScoreTxtTensor.Text = ((ShelfItem)((Rectangle)sender).Tag).Score.ToString("#,###.##");
+            itemScoreTxtTensor.Text = ((ShelfItem)((Rectangle)sender).Tag).Score.ToString("#,##0.##");
         }
 
         private void ItemAttrbutes_MouseLeave_Tensorflow(object sender, MouseEventArgs e)
@@ -828,17 +873,21 @@ namespace RetailPoC
 
         public void UpdateTensorflowResults(PlanogramOptResults results, bool enableSimDisplay = false)
         {
+            if (tokenSource.IsCancellationRequested) return;
+            if (enableSimDisplay)
+                Task.Delay(1);
+
             Dispatcher.Invoke(() =>
             {
-                string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,###.##")} ({results.NumScoreHits})" : results.Score.ToString("#,###.##");
+                string scoreText = (simSettings.SimType == SimulationType.Score) ? $"{results.Score.ToString("#,##0.##")} ({results.NumScoreHits})" : results.Score.ToString("#,##0.##");
                 scoreTxtTensor.Text = scoreText;
                 sessionRunTxtTensor.Text = results.CurrentSession.ToString();
                 timElapseTxtTensor.Text = results.TimeElapsed.ToString();//string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", results.TimeElapsed.Hours, results.TimeElapsed.Minutes, results.TimeElapsed.Seconds, results.TimeElapsed.Milliseconds);
-                minScoreTxtTensor.Text = results.MinScore.ToString("#,###.##");
-                maxScoreTxtTensor.Text = results.MaxScore.ToString("#,###.##");
+                minScoreTxtTensor.Text = results.MinScore.ToString("#,##0.##");
+                maxScoreTxtTensor.Text = results.MaxScore.ToString("#,##0.##");
                 //engineTxtTensor.Text = "Tensorflow";
-                averageScoreTxtTensor.Text = results.AvgScore.ToString("#,###.##");
-                averageScoreOf10TxtTensor.Text = results.AvgLastTen.ToString("#,###.##");
+                averageScoreTxtTensor.Text = results.AvgScore.ToString("#,##0.##");
+                averageScoreOf10TxtTensor.Text = results.AvgLastTen.ToString("#,##0.##");
 
                 if (enableSimDisplay)
                 {
@@ -850,6 +899,8 @@ namespace RetailPoC
 
         public void UpdateTensorflowStatus(string statusMsg, bool isDone = false)
         {
+            if (tokenSource.IsCancellationRequested) return;
+
             Dispatcher.Invoke(() =>
             {
                 statusTxtTensor.Text = statusMsg;
@@ -862,6 +913,8 @@ namespace RetailPoC
 
         public void AddLogDataTensorflow(int session, double score, double seconds)
         {
+            if (tokenSource.IsCancellationRequested) return;
+
             Dispatcher.Invoke(() =>
             {
                 SimulationData logData = new Models.SimulationData();
@@ -888,9 +941,10 @@ namespace RetailPoC
                 this.simSettings.NumShelves = 1;
                 this.simSettings.NumSlots = 24;
 
-                this.dataPanel.NumItems = SMALL_ITEMS_COUNT;
-                this.dataPanel.NumShelves = 1;
-                this.dataPanel.NumSlots = 24;
+                this.isSmallPlangoram = true;
+                //this.dataPanel.NumItems = SMALL_ITEMS_COUNT;
+                //this.dataPanel.NumShelves = 1;
+                //this.dataPanel.NumSlots = 24;
             }
             else if (i == "Large")
             {
@@ -898,9 +952,10 @@ namespace RetailPoC
                 this.simSettings.NumShelves = 12;
                 this.simSettings.NumSlots = 24;
 
-                this.dataPanel.NumItems = LARGE_ITEMS_COUNT;
-                this.dataPanel.NumShelves = 12;
-                this.dataPanel.NumSlots = 24;
+                this.isSmallPlangoram = false;
+                //this.dataPanel.NumItems = LARGE_ITEMS_COUNT;
+                //this.dataPanel.NumShelves = 12;
+                //this.dataPanel.NumSlots = 24;
             }
 
             if (headToHead)
@@ -941,18 +996,19 @@ namespace RetailPoC
 
         private void tfCsvBtn_Click(object sender, RoutedEventArgs e)
         {
+            bool isEncog = (rdbEncog.IsChecked.HasValue && rdbEncog.IsChecked.Value);
             SaveFileDialog saver = new SaveFileDialog();
             saver.Filter = "Csv file (*.csv)|*.csv";
-            saver.FileName = "TF_Results";
+            saver.FileName = (isEncog) ? "ENCOG_Results" : "TF_Results";
             if (saver.ShowDialog() == true)
             {
                 var pathToFile = saver.FileName;
 
-                Logger.ToCsv(pathToFile, true);
+                Logger.ToCsv(pathToFile, (isEncog) ? false : true);
             }
         }
 
-        private TempRLVContainerPanel tmpPanel;
+        
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.CbPlanogramSize.Items.Clear();
@@ -962,8 +1018,12 @@ namespace RetailPoC
                 new Scale { ID = 2, Name = "Large", Description = "Production Scale (5000 items, 288 slots)" }
             };
             this.CbPlanogramSize.DisplayMemberPath = "NameDescription";
+            //dataPanel = new DataPanel();
             setSelectedPlanogramSize();
-            
+            InitializeGrid(planogram, Colors.LightGray, true);
+            InitializeGrid(planogramTensorflow, Colors.LightGray);
+
+
             // TEMPORARY, for now we get the items at start up for debugging purposes
             using (PlanogramContext ctx = new PlanogramContext())
             {
@@ -973,19 +1033,15 @@ namespace RetailPoC
                 simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
             }
         }
-        private int itemRow = -1;
-        private int itemCol = -1;
-        private RlmLearnedSessionDetails tmpSelectedData;
-        private RlmLearnedSessionDetails tmpComparisonData;
+        
         public void DisplayLearningComparisonResults(RlmLearnedSessionDetails selectedData, RlmLearnedSessionDetails comparisonData)
         {
-            if (enableSimulation)
+            if (core.IsComparisonModeOn)
             {
                 tmpSelectedData = selectedData;
                 tmpComparisonData = comparisonData;
             }
             comparisonOverlay.Visibility = Visibility.Visible;
-            enableSimulation = false;
 
             IEnumerable<Shelf> selectedPlanogram = GetShelfData(selectedData);
             IEnumerable<Shelf> comparisonPlanogram = null;
@@ -994,9 +1050,9 @@ namespace RetailPoC
                 comparisonPlanogram = GetShelfData(comparisonData);
             }
 
-            FillGrid(planogram, selectedPlanogram, false, mouseEnterHandler: ItemAttributes_Compare_MouseEnter, mouseLeaveHandler: ItemAttributes_MouseLeave, comparisonResult: comparisonPlanogram);
+            FillGrid(planogram, selectedPlanogram, false, mouseEnterHandler: ItemAttributes_Compare_MouseEnter, mouseLeaveHandler: ItemAttributes_Compare_MouseLeave, comparisonResult: comparisonPlanogram);
 
-            if(!btnComparisonClose.IsEnabled == true)
+            if (!btnComparisonClose.IsEnabled == true)
             {
                 itemRow = _row;
                 itemCol = _col;
@@ -1039,9 +1095,9 @@ namespace RetailPoC
 
         protected override void OnClosed(EventArgs e)
         {
-            if(tmpPanel != null)
+            if(rlvPanel != null)
             {
-                tmpPanel.Close();
+                rlvPanel.Close();
             }
 
             base.OnClosed(e);
@@ -1059,7 +1115,6 @@ namespace RetailPoC
         private void btnComparisonClose_Click(object sender, RoutedEventArgs e)
         {
             comparisonOverlay.Visibility = Visibility.Hidden;
-            enableSimulation = true;
             visualizer.CloseComparisonMode();
             FillGrid(planogram, currentResults.Shelves, false, ItemAttributes_MouseEnter, ItemAttributes_MouseLeave);
             //FillGrid(planogram, Colors.Gray);
@@ -1087,24 +1142,61 @@ namespace RetailPoC
 
         private void MetroWindow_LocationChanged(object sender, EventArgs e)
         {
+            alignPanels();
             //System.Diagnostics.Debug.WriteLine("Hello World");
         }
 
+        
         private void MetroWindow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //if (tmpPanel != null)
-            //{
-            //    //tmpPanel.detailsControl.LoadConfigurationPanel(this);
-            //    RLVConfigurationPanel vsConfig = new RLVConfigurationPanel(tmpPanel.progressionChartControl, tmpPanel.detailsControl);
-            //    vsConfig.Show();
-            //    vsConfig.Top = this.Top;
-            //    vsConfig.Left = this.Left + this.Width;
-            //}
+            if (rlvPanel != null)
+            {
+                //tmpPanel.detailsControl.LoadConfigurationPanel(this);
+                //showRLVConfigurationPanel();
+            }
+        }
+
+        private void showRLVConfigurationPanel()
+        {
+            vsConfig = new RLVConfigurationPanel(rlvPanel.rlv.ChartControl, rlvPanel.rlv.DetailsControl);
+            vsConfig.Show();
+            vsConfig.Top = this.Top;
+            vsConfig.Left = this.Left + this.Width;
         }
 
         private void closeComparisonLink_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             btnComparisonClose_Click(null, null);
+        }
+
+        private void rdbEncog_Checked(object sender, RoutedEventArgs e)
+        {
+            if (rdbEncog.IsChecked.Value)
+            {
+                competitorLbl.Content = "Encog Engine";
+                simSettings.EncogSelected = true;
+            }
+            else
+            {
+                competitorLbl.Content = "Tensorflow Engine";
+                simSettings.EncogSelected = false;
+            }
+        }
+
+        private SolidColorBrush GetBrushFromColor(Color color)
+        {
+            SolidColorBrush retVal = null;
+
+            if (coloredBrushesDict.ContainsKey(color))
+            {
+                retVal = coloredBrushesDict[color];
+            }
+            else
+            {
+                coloredBrushesDict.Add(color, retVal = new SolidColorBrush(color));
+            }
+
+            return retVal;
         }
     }
 }

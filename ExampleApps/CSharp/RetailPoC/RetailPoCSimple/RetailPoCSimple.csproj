@@ -1,0 +1,357 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{854C2E7D-01C3-4BA3-9FCD-384B64B22D1F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RetailPoCSimple</RootNamespace>
+    <AssemblyName>RetailPoCSimple</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LiveCharts, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\LiveCharts.0.9.6\lib\net45\LiveCharts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\LiveCharts.Wpf.0.9.6\lib\net45\LiveCharts.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="DataGeneration\MockData.cs" />
+    <Compile Include="ItemClickedCommand.cs" />
+    <Compile Include="ItemComparisonPanel.xaml.cs">
+      <DependentUpon>ItemComparisonPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MetricPanel.xaml.cs">
+      <DependentUpon>MetricPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Attributes.cs" />
+    <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\PlanogramContext.cs" />
+    <Compile Include="Models\PlanogramOptResults.cs" />
+    <Compile Include="Models\PlanogramOptResultsSettings.cs" />
+    <Compile Include="Models\Shelf.cs" />
+    <Compile Include="Models\ShelfItem.cs" />
+    <Compile Include="Models\SimulationData.cs" />
+    <Compile Include="Models\SimulationSettings.cs" />
+    <Compile Include="Models\SimulationType.cs" />
+    <Compile Include="NoDataNotificationWindow.xaml.cs">
+      <DependentUpon>NoDataNotificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PlanogramOptimizer.cs" />
+    <Compile Include="SampleValueConverter.cs" />
+    <Compile Include="RLVOutputVisualizer.cs" />
+    <Compile Include="SimulationCsvLogger.cs" />
+    <Compile Include="SimulationPanel.xaml.cs">
+      <DependentUpon>SimulationPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TestControl.xaml.cs">
+      <DependentUpon>TestControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TestViewModel.cs" />
+    <Compile Include="VisualizerWindow.xaml.cs">
+      <DependentUpon>VisualizerWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ItemComparisonPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="MetricPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="NoDataNotificationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SimulationPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TestControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VisualizerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="RLVProgressionChartPanel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RLVSelectedDetailsPanel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Resource Include="Fonts\Oswald-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Oswald-ExtraLight.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Oswald-Light.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Oswald-Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Oswald-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Oswald-SemiBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\gear-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1.jpg" />
+    <Resource Include="Images\10.jpg" />
+    <Resource Include="Images\11.jpg" />
+    <Resource Include="Images\12.jpg" />
+    <Resource Include="Images\13.jpg" />
+    <Resource Include="Images\14.jpg" />
+    <Resource Include="Images\15.jpg" />
+    <Resource Include="Images\16.jpg" />
+    <Resource Include="Images\17.jpg" />
+    <Resource Include="Images\18.jpg" />
+    <Resource Include="Images\19.jpg" />
+    <Resource Include="Images\2.jpg" />
+    <Resource Include="Images\20.jpg" />
+    <Resource Include="Images\21.jpg" />
+    <Resource Include="Images\22.jpg" />
+    <Resource Include="Images\23.jpg" />
+    <Resource Include="Images\24.jpg" />
+    <Resource Include="Images\25.jpg" />
+    <Resource Include="Images\26.jpg" />
+    <Resource Include="Images\27.jpg" />
+    <Resource Include="Images\28.jpg" />
+    <Resource Include="Images\29.jpg" />
+    <Resource Include="Images\3.jpg" />
+    <Resource Include="Images\30.jpg" />
+    <Resource Include="Images\31.jpg" />
+    <Resource Include="Images\32.jpg" />
+    <Resource Include="Images\4.jpg" />
+    <Resource Include="Images\5.jpg" />
+    <Resource Include="Images\6.jpg" />
+    <Resource Include="Images\7.jpg" />
+    <Resource Include="Images\8.jpg" />
+    <Resource Include="Images\9.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\RLM\RLM.Models\RLM.Models.csproj">
+      <Project>{f603454e-2199-4366-9a2a-08ec30818a0c}</Project>
+      <Name>RLM.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Core\RLM\RLM\RLM.csproj">
+      <Project>{01eec6ce-a2ca-4637-8133-6288b6e246c3}</Project>
+      <Name>RLM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RyskampLearningVisualizer\ExampleVisualizers\WPFVisualizer\WPFVisualizer.csproj">
+      <Project>{def23aa6-4af7-43be-9a39-b41fcf829f7e}</Project>
+      <Name>WPFVisualizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RyskampLearningVisualizer\RLV.Core\RLV.Core.csproj">
+      <Project>{05dc7651-b6c9-425e-92c9-529ee019cf97}</Project>
+      <Name>RLV.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\100.jpg" />
+    <Resource Include="Images\101.jpg" />
+    <Resource Include="Images\102.jpg" />
+    <Resource Include="Images\103.jpg" />
+    <Resource Include="Images\104.jpg" />
+    <Resource Include="Images\105.jpg" />
+    <Resource Include="Images\33.jpg" />
+    <Resource Include="Images\34.jpg" />
+    <Resource Include="Images\35.jpg" />
+    <Resource Include="Images\36.jpg" />
+    <Resource Include="Images\37.jpg" />
+    <Resource Include="Images\38.jpg" />
+    <Resource Include="Images\39.jpg" />
+    <Resource Include="Images\40.jpg" />
+    <Resource Include="Images\41.jpg" />
+    <Resource Include="Images\42.jpg" />
+    <Resource Include="Images\43.jpg" />
+    <Resource Include="Images\44.jpg" />
+    <Resource Include="Images\45.jpg" />
+    <Resource Include="Images\46.jpg" />
+    <Resource Include="Images\47.jpg" />
+    <Resource Include="Images\48.jpg" />
+    <Resource Include="Images\49.jpg" />
+    <Resource Include="Images\50.jpg" />
+    <Resource Include="Images\51.jpg" />
+    <Resource Include="Images\52.jpg" />
+    <Resource Include="Images\53.jpg" />
+    <Resource Include="Images\54.jpg" />
+    <Resource Include="Images\55.jpg" />
+    <Resource Include="Images\56.jpg" />
+    <Resource Include="Images\57.jpg" />
+    <Resource Include="Images\58.jpg" />
+    <Resource Include="Images\59.jpg" />
+    <Resource Include="Images\60.jpg" />
+    <Resource Include="Images\61.jpg" />
+    <Resource Include="Images\62.jpg" />
+    <Resource Include="Images\63.jpg" />
+    <Resource Include="Images\64.jpg" />
+    <Resource Include="Images\65.jpg" />
+    <Resource Include="Images\66.jpg" />
+    <Resource Include="Images\67.jpg" />
+    <Resource Include="Images\68.jpg" />
+    <Resource Include="Images\69.jpg" />
+    <Resource Include="Images\70.jpg" />
+    <Resource Include="Images\71.jpg" />
+    <Resource Include="Images\72.jpg" />
+    <Resource Include="Images\73.jpg" />
+    <Resource Include="Images\74.jpg" />
+    <Resource Include="Images\75.jpg" />
+    <Resource Include="Images\76.jpg" />
+    <Resource Include="Images\77.jpg" />
+    <Resource Include="Images\78.jpg" />
+    <Resource Include="Images\79.jpg" />
+    <Resource Include="Images\80.jpg" />
+    <Resource Include="Images\81.jpg" />
+    <Resource Include="Images\82.jpg" />
+    <Resource Include="Images\83.jpg" />
+    <Resource Include="Images\84.jpg" />
+    <Resource Include="Images\85.jpg" />
+    <Resource Include="Images\86.jpg" />
+    <Resource Include="Images\87.jpg" />
+    <Resource Include="Images\88.jpg" />
+    <Resource Include="Images\89.jpg" />
+    <Resource Include="Images\90.jpg" />
+    <Resource Include="Images\91.jpg" />
+    <Resource Include="Images\92.jpg" />
+    <Resource Include="Images\93.jpg" />
+    <Resource Include="Images\94.jpg" />
+    <Resource Include="Images\95.jpg" />
+    <Resource Include="Images\96.jpg" />
+    <Resource Include="Images\97.jpg" />
+    <Resource Include="Images\98.jpg" />
+    <Resource Include="Images\99.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

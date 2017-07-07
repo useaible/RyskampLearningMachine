@@ -9,14 +9,14 @@
         mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        ShowCloseButton="false"
+        ShowCloseButton="True"
         ShowSystemMenuOnRightClick="False"
-        SizeToContent="Height"
         ShowTitleBar="True"
-        Title="RLM Visualizer" Height="890.412" Width="823.171" ResizeMode="NoResize" WindowStyle="None">
-    <Grid>
-        <!--<Button x:Name="hideVBtn" FontFamily="Fonts/#Oswald Light" Content="Hide Visualizer" VerticalAlignment="Top" Margin="640,10,18,0" Click="hideVBtn_Click"></Button>-->
-        <Grid.RowDefinitions>
+        Title="RLM Visualizer" Height="792" Width="726.484" ResizeMode="NoResize" WindowStyle="ToolWindow">
+    <rlv:MainVisualizerWindow x:Name="rlv"></rlv:MainVisualizerWindow>
+    <!--<Grid>-->
+    <!--<Button x:Name="hideVBtn" FontFamily="Fonts/#Oswald Light" Content="Hide Visualizer" VerticalAlignment="Top" Margin="640,10,18,0" Click="hideVBtn_Click"></Button>-->
+    <!--<Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
@@ -31,6 +31,6 @@
             <Border BorderBrush="Orange" BorderThickness="2">
                 <rlv:RLVSelectedDetailsPanel x:Name="detailsControl" Height="398" Margin="-2,0"/>
             </Border>
-        </Expander>
-    </Grid>
+        </Expander>-->
+    <!--</Grid>-->
 </Controls:MetroWindow>

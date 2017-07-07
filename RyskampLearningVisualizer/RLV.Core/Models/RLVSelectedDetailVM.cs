@@ -24,141 +24,160 @@ namespace RLV.Core.Models
         private double? previousTime;
         private long? previousCase;
         private double? previousScore;
-
         private ObservableCollection<RLVIODetailsVM> inputDetails = new ObservableCollection<RLVIODetailsVM>();
         private ObservableCollection<RLVIODetailsVM> outputDetails = new ObservableCollection<RLVIODetailsVM>();
+        private string header;
+        private ObservableCollection<RLVItemDisplayVM> labels;
+        private ObservableCollection<RLVItemDisplayVM> values;
 
-        private ObservableCollection<RLVItemDisplayVM> labels = new ObservableCollection<RLVItemDisplayVM>()
+        public RLVSelectedDetailVM()
         {
-            new RLVItemDisplayVM("lblSelectedDetailsHeader")
-            {
-                Value = "Selected Details",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblInputDetailsHeader")
-            {
-                Value = "Input Details",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblOutputDetailsHeader")
-            {
-                Value = "Output Details",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblPreviousHeader")
-            {
-                Value = "Prior To Learned",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblCurrentHeader")
-            {
-                Value = "Learned",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblSessionTitle")
-            {
-                Value = "Session",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblTimeTitle")
-            {
-                Value = "Time",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblCaseTitle")
-            {
-                Value = "Case",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("lblScoreTitle")
-            {
-                Value = "Score",
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            }
-        };
+            this.header = "Selected Details";
 
-        private ObservableCollection<RLVItemDisplayVM> values = new ObservableCollection<RLVItemDisplayVM>()
-        {
-            new RLVItemDisplayVM("inputDetailsGrid")
+            this.labels = new ObservableCollection<RLVItemDisplayVM>()
             {
-                Description = "Input Details",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("outputDetailsGrid")
+                new RLVItemDisplayVM("lblSelectedDetailsHeader")
+                {
+                    Value = "Selected Details",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblInputDetailsHeader")
+                {
+                    Value = "Input Details",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblOutputDetailsHeader")
+                {
+                    Value = "Output Details",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblPreviousHeader")
+                {
+                    Value = "Prior To Learned",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblCurrentHeader")
+                {
+                    Value = "Learned",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblSessionTitle")
+                {
+                    Value = "Session",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblTimeTitle")
+                {
+                    Value = "Time",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblCaseTitle")
+                {
+                    Value = "Case",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblScoreTitle")
+                {
+                    Value = "Score",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblBtnPrevious")
+                {
+                    Value = "Previous",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("lblBtnNext")
+                {
+                    Value = "Next",
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                }
+            };
+
+            this.values = new ObservableCollection<RLVItemDisplayVM>()
             {
-                Description = "Output Details",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("prevSessionVal")
-            {
-                Description = "Previous Learning Point",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("prevTimeVal")
-            {
-                Description = "Previous Learning Time",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = new RLVTimeConverter(Enums.RLVFormatters.Time_Seconds)
-            },
-            new RLVItemDisplayVM("prevCaseVal")
-            {
-                Description = "Previous Learning Event",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("prevScoreValContainer")
-            {
-                Description = "Previous Learning Score",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = new RLVNumberConverter(Enums.RLVFormatters.Numeric_Number)
-            },
-            new RLVItemDisplayVM("currSessionVal")
-            {
-                Description = "Current Learning Point",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("currTimeVal")
-            {
-                Description = "Current Learning Time",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = new RLVTimeConverter(Enums.RLVFormatters.Time_Seconds)
-            },
-            new RLVItemDisplayVM("currCaseVal")
-            {
-                Description = "Current Learning Event",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = null
-            },
-            new RLVItemDisplayVM("currScoreValContainer")
-            {
-                Description = "Current Learning Score",
-                Value = null,
-                Visibility = System.Windows.Visibility.Visible,
-                Converter = new RLVNumberConverter(Enums.RLVFormatters.Numeric_Number)
-            }
-        };
+                new RLVItemDisplayVM("inputDetailsGrid")
+                {
+                    Description = "Input Details",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("outputDetailsGrid")
+                {
+                    Description = "Output Details",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("prevSessionVal")
+                {
+                    Description = "Previous Learning Point",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("prevTimeVal")
+                {
+                    Description = "Previous Learning Time",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = new RLVTimeConverter(Enums.RLVFormatters.Time_Seconds)
+                },
+                new RLVItemDisplayVM("prevCaseVal")
+                {
+                    Description = "Previous Learning Event",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("prevScoreValContainer")
+                {
+                    Description = "Previous Learning Score",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = new RLVNumericConverter(Enums.RLVFormatters.Numeric_Number)
+                },
+                new RLVItemDisplayVM("currSessionVal")
+                {
+                    Description = "Current Learning Point",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("currTimeVal")
+                {
+                    Description = "Current Learning Time",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = new RLVTimeConverter(Enums.RLVFormatters.Time_Seconds)
+                },
+                new RLVItemDisplayVM("currCaseVal")
+                {
+                    Description = "Current Learning Event",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = null
+                },
+                new RLVItemDisplayVM("currScoreValContainer")
+                {
+                    Description = "Current Learning Score",
+                    Value = null,
+                    Visibility = System.Windows.Visibility.Visible,
+                    Converter = new RLVNumericConverter(Enums.RLVFormatters.Numeric_Number)
+                }
+            };
+        }
 
         public long? PreviousSessionId
         {
@@ -234,6 +253,12 @@ namespace RLV.Core.Models
         {
             get { return values; }
             set { values = value;  OnCollectionChanged("Values"); }
+        }
+
+        public string Header
+        {
+            get { return header; }
+            set { header = value; OnPropertyChanged("Header"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -8,7 +8,7 @@
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
     
         mc:Ignorable="d"
-        Title="Simulation Panel" Height="263.09" Width="395.975" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Simulation Panel" Height="367.322" Width="395.975" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
 
         <Grid >
@@ -20,12 +20,20 @@
             <RadioButton x:Name="rdbTime" Content="Time" IsChecked="False" HorizontalAlignment="Left" Margin="104,31,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
             <RadioButton x:Name="rdbScore" Content="Score" IsChecked="False" HorizontalAlignment="Left" Margin="164,31,0,0" VerticalAlignment="Top" Checked="radioButton_Checked"/>
             <Label x:Name="lblSimInput" Content="Number of sessions:" HorizontalAlignment="Left" Margin="23,45,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="330"/>
-            <TextBox x:Name="txtSimInput" HorizontalAlignment="Left" Height="23" Margin="29,71,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="324" Grid.ColumnSpan="2"/>
+            <TextBox x:Name="txtSimInput" PreviewTextInput="NumberValidationScore" HorizontalAlignment="Left" Height="23" Margin="29,71,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="324" Grid.ColumnSpan="2"/>
             <CheckBox x:Name="chkSimDisplay" Content="Enable simulation display" IsChecked="True" HorizontalAlignment="Left" Margin="22,122,0,0" VerticalAlignment="Top" Width="226" Grid.ColumnSpan="2"/>
             <Label x:Name="label" Content="*Enabling this may have a negative effect on performance" HorizontalAlignment="Left" Margin="23,140,0,0" VerticalAlignment="Top" FontStyle="Italic" FontSize="9" Grid.ColumnSpan="2"/>
             <Button x:Name="btnMax" IsEnabled="False" Visibility="Hidden" Content="80% of Max" Grid.Column="1" HorizontalAlignment="Left" Margin="49,64,0,0" VerticalAlignment="Top" Width="76" Height="23" Click="btnMax_Click"/>
             <Slider x:Name="simScoreSlider" Value="85" Minimum="0" Maximum="90" HorizontalAlignment="Left" Margin="29,99,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="283" PreviewMouseUp="simScoreSlider_PreviewMouseUp" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft"/>
             <Label x:Name="simScoreSliderLbl" Content="85%" Grid.Column="1" HorizontalAlignment="Left" Margin="97,94,0,0" VerticalAlignment="Top" Height="23" Width="41" RenderTransformOrigin="0.54,0.163"/>
+            <GroupBox x:Name="grpEncogSettings" Header="Encog Settings" HorizontalAlignment="Left" Margin="23,170,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="343" Height="116">
+                <Grid>
+                    <Label x:Name="label1" Content="Hidden Layers:" HorizontalAlignment="Left" Margin="50,9,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtHiddenLayers" PreviewTextInput="NumberValidationEncog" HorizontalAlignment="Left" Height="23" Margin="143,13,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="177"/>
+                    <Label x:Name="label1_Copy" Content="Hidden Layer Neurons:" HorizontalAlignment="Left" Margin="7,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtHiddenLayerNeurons" PreviewTextInput="NumberValidationEncog" HorizontalAlignment="Left" Height="23" Margin="143,44,0,0" TextWrapping="Wrap" Text="200" VerticalAlignment="Top" Width="177"/>
+                </Grid>
+            </GroupBox>
         </Grid>
 
         <Button x:Name="btnRun" FontFamily="Fonts/#Oswald Light" Content="Run Simulation" Margin="0,0,104,10" Click="btnRun_Click" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="90"/>

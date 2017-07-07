@@ -31,12 +31,47 @@ namespace WPFVisualizer
 
         public void PopulateControls(IRLVSelectedDetailsPanel detailsControl)
         {
+
             // *** The following will create a mapping of elements from the RLVSelectedDetailsPanel to be defined by the user. ***
+
+            // Clear for repopulation of controls
+            labelsGrid.Children.Clear();
+            valuesGrid.Children.Clear();
 
             // == Mapping for the Labels/Text displayed in RLVSelectedDetailsPanel. ==
 
-            double gridHorizontalGap = 43; // Gap between each child elements.
-            foreach (var element in ((RLVSelectedDetailVM)detailsControl.ViewModel).Labels)
+            double gridHorizontalGap = 10; // Gap between each child elements.
+            Grid grid1 = new Grid();
+            grid1.Margin = new Thickness(10, gridHorizontalGap, 10, 0);
+
+            TextBlock panelHeaderLbl = new TextBlock();
+            panelHeaderLbl.TextAlignment = TextAlignment.Right;
+            panelHeaderLbl.HorizontalAlignment = HorizontalAlignment.Left;
+            panelHeaderLbl.Margin = new Thickness(0, 4, 0, 0);
+            panelHeaderLbl.VerticalAlignment = VerticalAlignment.Top;
+            panelHeaderLbl.RenderTransformOrigin = new Point(0.433, -0.385);
+            panelHeaderLbl.Width = 133;
+
+            TextBox panelHeaderTxtVal = new TextBox();
+            panelHeaderTxtVal.HorizontalAlignment = HorizontalAlignment.Left;
+            panelHeaderTxtVal.Height = 23;
+            panelHeaderTxtVal.Margin = new Thickness(138, 0, 0, 0);
+            panelHeaderTxtVal.VerticalAlignment = VerticalAlignment.Top;
+            panelHeaderTxtVal.Width = 155;
+
+            Binding panelHeaderLblBinding = new Binding() { Source = "Panel Header", Mode = BindingMode.OneTime };
+            Binding panelHeaderLblValueBinding = new Binding() { Source = ((IRLVSelectedDetailVM)detailsControl.ViewModel), Path = new PropertyPath("Header"), Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+
+            BindingOperations.SetBinding(panelHeaderLbl, TextBlock.TextProperty, panelHeaderLblBinding);
+            BindingOperations.SetBinding(panelHeaderTxtVal, TextBox.TextProperty, panelHeaderLblValueBinding);
+
+            grid1.Children.Add(panelHeaderLbl);
+            grid1.Children.Add(panelHeaderTxtVal);
+
+            labelsGrid.Children.Add(grid1);
+
+            gridHorizontalGap += 31; // Increase gap between grid after each iteration.
+            foreach (var element in ((IRLVSelectedDetailVM)detailsControl.ViewModel).Labels)
             {
                 // The grid that will contain the following elements, need this to align them side by side.
                 Grid grid = new Grid();
@@ -92,8 +127,8 @@ namespace WPFVisualizer
 
             // == Mapping for the Values displayed in RLVSelectedDetailsPanel. ==
 
-            gridHorizontalGap = 43; // Reset the gap between element grid container for the new set.
-            foreach (var ctrl in ((RLVSelectedDetailVM)detailsControl.ViewModel).Values)
+            gridHorizontalGap = 10; // Reset the gap between element grid container for the new set.
+            foreach (var ctrl in ((IRLVSelectedDetailVM)detailsControl.ViewModel).Values)
             {
                 // The grid that will contain the following elements.
                 Grid grid = new Grid();
@@ -126,6 +161,11 @@ namespace WPFVisualizer
                 formatterDropDown.ItemsSource = Enum.GetValues(typeof(RLVFormatters));
                 formatterDropDown.SelectedIndex = 0;
 
+                if (ctrl.SelectedValueFromConverter != null)
+                {
+                    formatterDropDown.SelectedIndex = ctrl.SelectedValueFromConverter.Value;
+                }
+
                 // An event to get the choosen format.
                 IValueConverter converter = null;
                 formatterDropDown.SelectionChanged += (a, b) =>
@@ -137,38 +177,49 @@ namespace WPFVisualizer
                             converter = null;
                             break;
                         case RLVFormatters.Numeric_General:
-                            converter = new RLVNumberConverter(selected);
+                            converter = new RLVNumericConverter(selected);
+                            ctrl.ConverterType = 0;
                             break;
                         case RLVFormatters.Numeric_Currency:
-                            converter = new RLVNumberConverter(selected);
+                            converter = new RLVNumericConverter(selected);
+                            ctrl.ConverterType = 0;
                             break;
                         case RLVFormatters.Numeric_FixedPoint:
-                            converter = new RLVNumberConverter(selected);
+                            converter = new RLVNumericConverter(selected);
+                            ctrl.ConverterType = 0;
                             break;
                         case RLVFormatters.Numeric_Number:
-                            converter = new RLVNumberConverter(selected);
+                            converter = new RLVNumericConverter(selected);
+                            ctrl.ConverterType = 0;
                             break;
                         case RLVFormatters.Numeric_Percent:
-                            converter = new RLVNumberConverter(selected);
+                            converter = new RLVNumericConverter(selected);
+                            ctrl.ConverterType = 0;
                             break;
                         case RLVFormatters.Time_Days:
                             converter = new RLVTimeConverter(selected);
+                            ctrl.ConverterType = 1;
                             break;
                         case RLVFormatters.Time_Hours:
                             converter = new RLVTimeConverter(selected);
+                            ctrl.ConverterType = 1;
                             break;
                         case RLVFormatters.Time_Minutes:
                             converter = new RLVTimeConverter(selected);
+                            ctrl.ConverterType = 1;
                             break;
                         case RLVFormatters.Time_Seconds:
                             converter = new RLVTimeConverter(selected);
+                            ctrl.ConverterType = 1;
                             break;
                         case RLVFormatters.Time_Milliseconds:
                             converter = new RLVTimeConverter(selected);
+                            ctrl.ConverterType = 1;
                             break;
                     }
 
                     ctrl.Converter = converter;
+                    ctrl.SelectedValueFromConverter = (int)selected;
                     detailsControl.UpdateBindings(ctrl); // Call this to apply the formatting.
                 };
 

@@ -7,11 +7,10 @@
              mc:Ignorable="d" 
              Name="progressionChartControl"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-             xmlns:rlvTooltip="clr-namespace:WPFVisualizer"
              xmlns:oxy="http://oxyplot.org/wpf" Height="397.225" Width="664.878">
     <Grid>
-        <rlvTooltip:RLVScaleSelectionPanel x:Name="scaleSelectionControl" DefaultScale="{Binding DefaultScale, Mode=TwoWay}" SliderLabelText="{Binding SliderLabelText, Mode=TwoWay}" VerticalAlignment="Top" Height="43" Margin="567,23,10,0"/>
-        <lvc:CartesianChart x:Name="progressionChart" BorderBrush="Orange" BorderThickness="1" LegendLocation="Top" Series="{Binding SeriesCollection, ElementName=progressionChartControl, Mode=TwoWay}" DataClick="progressionChart_DataClick" Height="314" VerticalAlignment="Bottom" Canvas.Top="58" Canvas.Left="10" Margin="14,0,10,15" MouseDoubleClick="progressionChart_MouseDoubleClick" >
+        <local:RLVScaleSelectionPanel x:Name="scaleSelectionControl" DefaultScale="{Binding DefaultScale, Mode=TwoWay}" SliderLabelText="{Binding SliderLabelText, Mode=TwoWay}" VerticalAlignment="Top" Height="43" Margin="567,23,10,0"/>
+        <lvc:CartesianChart x:Name="progressionChart" BorderBrush="Orange" BorderThickness="1" LegendLocation="Top" Series="{Binding SeriesCollection, ElementName=progressionChartControl, Mode=TwoWay}" DataClick="progressionChart_DataClick" Height="301" VerticalAlignment="Bottom" Canvas.Top="58" Canvas.Left="10" Margin="14,0,10,28" MouseDoubleClick="progressionChart_MouseDoubleClick" >
             <!--<lvc:CartesianChart.DataTooltip>
                 <local:RLVChartToolTip/>
             </lvc:CartesianChart.DataTooltip>-->
@@ -23,5 +22,6 @@
             <TextBlock x:Name="currTimeVal" Tag="CurrentTime" HorizontalAlignment="Left" Margin="220,23,0,0" TextWrapping="Wrap" Text="00:32:57" VerticalAlignment="Top" FontSize="30" Height="40" FontFamily="Fonts/#Oswald Light" Padding="0"  Foreground="#FF29ABE2" />
             <TextBlock x:Name="currScoreVal" Tag="CurrentScore" HorizontalAlignment="Left" Margin="382,23,-75,0" TextWrapping="Wrap" Text="58,000" VerticalAlignment="Top" FontSize="30" Height="40" FontFamily="Fonts/#Oswald Light" Padding="0"  Foreground="#FF29ABE2" Width="154" />
         </Grid>
+        <Label x:Name="label" Content=" Select a point on the chart to view learning details" HorizontalAlignment="Left" Margin="386,374,0,0" VerticalAlignment="Top" Padding="0"/>
     </Grid>
 </UserControl>

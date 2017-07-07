@@ -1,0 +1,33 @@
+﻿<Controls:MetroWindow x:Class="RetailPoCSimple.VisualizerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RetailPoCSimple"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        BorderBrush="{DynamicResource AccentColorBrush}"
+        BorderThickness="1"
+        ShowSystemMenuOnRightClick="False"
+        xmlns:rlv="clr-namespace:WPFVisualizer;assembly=WPFVisualizer"
+        Title="RLM Visualizer" Height="792" Width="726.484" ResizeMode="NoResize" WindowStyle="ToolWindow" NonActiveWindowTitleBrush="#FFFFAC71">
+    <rlv:MainVisualizerWindow x:Name="rlv"></rlv:MainVisualizerWindow>
+    <!--<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Expander IsExpanded="True" Grid.Row="0" Header="Learning Progression Chart">
+            <Border BorderBrush="Orange" BorderThickness="2">
+                <rlv:RLVProgressionChartPanel x:Name="progressionChartControl" Height="398" Margin="-2,0" 
+                                              SeriesCollection="{Binding SeriesCollection, Mode=TwoWay}" 
+                                              HorizontalAlignment="Left" Width="809"/>
+            </Border>
+        </Expander>
+        <Expander IsExpanded="True" Grid.Row="1" Header="Selected Details">
+            <Border BorderBrush="Orange" BorderThickness="2">
+                <rlv:RLVSelectedDetailsPanel x:Name="detailsControl" Height="398" Margin="-2,0"/>
+            </Border>
+        </Expander>
+    </Grid>-->
+</Controls:MetroWindow>

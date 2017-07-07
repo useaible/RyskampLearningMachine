@@ -24,6 +24,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OxyPlot;
 using LiveCharts.Defaults;
+using Newtonsoft.Json;
+using System.IO;
+using RLV.Core.Converters;
 
 namespace WPFVisualizer
 {
@@ -45,6 +48,7 @@ namespace WPFVisualizer
         public RLVProgressionChartPanel()
         {
             InitializeComponent();
+            getViewModelFromConfig();
             DataContext = ViewModel;
             initChartData();
             ScalePanel = scaleSelectionControl;
@@ -102,7 +106,7 @@ namespace WPFVisualizer
 
             ((SeriesCollection)((IRLVProgressionChartVM)ViewModel).SeriesCollection)[0].Values = chartValues;
 
-            createAxis();
+            //createAxis();
 
             var lastCase = data.FirstOrDefault();
             if (caseId.HasValue || lastCase != null)
@@ -136,10 +140,11 @@ namespace WPFVisualizer
                 if (chartPointsCount == 1)
                     step = max / 20;
 
-                var newStep = Math.Ceiling(max / step);
-                if (chartPointsCount <= 10 && chartPointsCount > 1)
-                    newStep = 10;
+                //var newStep = Math.Ceiling(max / step);
+                //if (chartPointsCount <= 10 && chartPointsCount > 1)
+                //    newStep = 10;
 
+                step = Math.Ceiling(step);
                 xAxis.Separator = new LiveCharts.Wpf.Separator { Step = step, IsEnabled = false };
 
                 xAxis.LabelsRotation = 20;
@@ -180,26 +185,6 @@ namespace WPFVisualizer
                 .Fill(a => a.Selected ? Brushes.Red : Brushes.Orange);
 
             Charting.For<RLVChartData>(chartMapper);
-
-            //Func<double, string> yLabelFormatter = value => value.ToString("#,###.##");
-            //Func<double, string> xLabelFormatter = value => TimeSpan.FromMilliseconds(value*1000).ToString();
-
-            //((IRLVProgressionChartVM)ViewModel).YLabelFormatter = yLabelFormatter;
-            //((IRLVProgressionChartVM)ViewModel).XLabelFormatter = xLabelFormatter;
-
-            //Axis xAxis = new Axis();
-            //xAxis.LabelFormatter = (Func<double, string>)((IRLVProgressionChartVM)ViewModel).XLabelFormatter;
-            //xAxis.Title = ((IRLVProgressionChartVM)ViewModel).XAxisTitle;
-            //xAxis.Labels = new string[] { };
-
-            //progressionChart.AxisX.Add(xAxis);
-
-            //Axis yAxis = new Axis();
-            //yAxis.LabelFormatter = (Func<double, string>)((IRLVProgressionChartVM)ViewModel).YLabelFormatter;
-            //yAxis.Title = ((IRLVProgressionChartVM)ViewModel).YAxisTitle;
-            //yAxis.Labels = new string[] { };
-
-            //progressionChart.AxisY.Add(yAxis);
 
             createAxis();
             progressionChart.LegendLocation = LegendLocation.None;
@@ -256,6 +241,18 @@ namespace WPFVisualizer
 
         public void UpdateBindings(RLVItemDisplayVM userVal)
         {
+            if (userVal.SelectedValueFromConverter != null && userVal.ConverterType != null)
+            {
+                if (userVal.ConverterType == 0) //Number
+                {
+                    userVal.Converter = new RLVNumericConverter((RLV.Core.Enums.RLVFormatters)userVal.SelectedValueFromConverter);
+                }
+                else //1=Time
+                {
+                    userVal.Converter = new RLVTimeConverter((RLV.Core.Enums.RLVFormatters)userVal.SelectedValueFromConverter);
+                }
+            }
+
             var controls = this.chartHeaderComponentsGrid.Children;
             foreach (var control in controls)
             {
@@ -327,7 +324,7 @@ namespace WPFVisualizer
 
         private void setLabelBindings()
         {
-            foreach (var userLabel in ((RLVProgressionChartVM)ViewModel).Labels)
+            foreach (var userLabel in ((IRLVProgressionChartVM)ViewModel).Labels)
             {
                 var controls = this.chartHeaderComponentsGrid.Children;
                 foreach (var control in controls)
@@ -357,7 +354,7 @@ namespace WPFVisualizer
 
         private void setValueBindings()
         {
-            foreach (var userVal in ((RLVProgressionChartVM)ViewModel).Values)
+            foreach (var userVal in ((IRLVProgressionChartVM)ViewModel).Values)
             {
                 this.UpdateBindings(userVal);
             }
@@ -366,6 +363,56 @@ namespace WPFVisualizer
         private void progressionChart_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             createAxis(); // Reset chart zooming/panning on double clicked.
+        }
+
+        private void getViewModelFromConfig()
+        {
+            try
+            {
+                using (StreamReader rdr = File.OpenText("RLVProgressionChartPanel.json"))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.TypeNameHandling = TypeNameHandling.Auto;
+                    serializer.Formatting = Formatting.Indented;
+                    serializer.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+                    serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+                    dynamic viewModel = (dynamic)serializer.Deserialize(rdr, typeof(object));
+
+                    var labels = viewModel.Labels.ToObject<ObservableCollection<RLVItemDisplayVM>>();
+                    var valuesToStr = JsonConvert.SerializeObject(viewModel.Values);
+                    var values = JsonConvert.DeserializeObject<ObservableCollection<RLVItemDisplayVM>>(valuesToStr, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+
+                    ((IRLVProgressionChartVM)ViewModel).Header = viewModel.Header;
+                    ((IRLVProgressionChartVM)ViewModel).Labels = labels;
+                    ((IRLVProgressionChartVM)ViewModel).Values = values;
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("No configuration file found for SelectedDetailsPanel.");
+            }
+        }
+
+        public void SaveConfiguration()
+        {
+            try
+            {
+                FileStream file = File.Open("RLVProgressionChartPanel.json", FileMode.Create);
+                using (StreamWriter st = new StreamWriter(file))
+                {
+                    dynamic obj = new { Header = ((IRLVProgressionChartVM)ViewModel).Header, Labels = ((IRLVProgressionChartVM)ViewModel).Labels, Values = ((IRLVProgressionChartVM)ViewModel).Values };
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.TypeNameHandling = TypeNameHandling.Auto;
+                    serializer.Formatting = Formatting.Indented;
+                    serializer.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+                    serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+                    serializer.Serialize(st, obj);
+                }
+            }
+            catch(Exception e)
+            {
+                throw (e);
+            }
         }
 
         public SeriesCollection SeriesCollection

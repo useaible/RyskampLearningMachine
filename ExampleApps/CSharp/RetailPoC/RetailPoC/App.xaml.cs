@@ -26,5 +26,12 @@ namespace RetailPoC
             this.Resources.Add(new FontFamily("OswaldLight"), "/RetailPoC;component/Fonts/Oswald-Light.ttf");
             base.OnStartup(e);
         }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {            
+            RetailPoC.MainWindow main = new RetailPoC.MainWindow();
+            MainWindow = main;
+            main.Show();
+        }
     }
 }

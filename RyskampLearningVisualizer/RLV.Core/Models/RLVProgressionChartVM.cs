@@ -20,12 +20,13 @@ namespace RLV.Core.Models
         private object xLabelFormatter;
         private object yLabelFormatter;
         private object seriesCollection;
+        private string header;
         private ObservableCollection<RLVItemDisplayVM> labels;
         private ObservableCollection<RLVItemDisplayVM> values;
 
         public RLVProgressionChartVM()
         {
-            Func<double, string> yLabelFormatter = value => value.ToString("#,###.##");
+            Func<double, string> yLabelFormatter = value => value.ToString("#,##0.##");
             Func<double, string> xLabelFormatter = value => TimeSpan.FromMilliseconds(value * 1000).ToString();
 
             this.yLabelFormatter = yLabelFormatter;
@@ -33,6 +34,8 @@ namespace RLV.Core.Models
 
             this.xAxisTitle = "Time";
             this.yAxisTitle = "Score";
+
+            this.header = "Learning Progression Chart";
 
             this.labels = new ObservableCollection<RLVItemDisplayVM>()
             {
@@ -44,7 +47,7 @@ namespace RLV.Core.Models
             this.values = new ObservableCollection<RLVItemDisplayVM>()
             {
                 new RLVItemDisplayVM("currTimeVal") { Description = "Selected Point Time", Visibility = System.Windows.Visibility.Visible, Converter =  new RLVTimeConverter(Enums.RLVFormatters.Time_Seconds) },
-                new RLVItemDisplayVM("currScoreVal") { Description = "Selected Point Score", Visibility = System.Windows.Visibility.Visible, Converter = new RLVNumberConverter(Enums.RLVFormatters.Numeric_Number) }
+                new RLVItemDisplayVM("currScoreVal") { Description = "Selected Point Score", Visibility = System.Windows.Visibility.Visible, Converter = new RLVNumericConverter(Enums.RLVFormatters.Numeric_Number) }
             };
         }
 
@@ -99,6 +102,12 @@ namespace RLV.Core.Models
         {
             get { return values; }
             set { values = value; OnCollectionChanged("Values"); }
+        }
+
+        public string Header
+        {
+            get { return header; }
+            set { header = value; OnPropertyChanged("Header"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

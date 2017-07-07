@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\RLVNumberConverter.cs" />
+    <Compile Include="Converters\RLVNumericConverter.cs" />
     <Compile Include="Converters\RLVTimeConverter.cs" />
     <Compile Include="Enums\RLVFormatters.cs" />
     <Compile Include="Enums\RLVVisibility.cs" />

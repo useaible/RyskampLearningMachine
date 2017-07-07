@@ -25,6 +25,7 @@ clr.AddReference(mahApps)
 #from System.Windows.Controls import *
 
 from System.Windows import Application
+from System.Threading import CancellationToken
 from RetailPoC import *
 from RetailPoC.Models import *
 import random
@@ -33,12 +34,12 @@ from threading import Thread
 from PlanogramOptTensorflow import *
 from ConfigFileManager import *
 
-def tensorflowLogic(items, sim):
-    opt = PlanogramOptTensorflow(items, sim)
+def tensorflowLogic(items, sim, token):
+    opt = PlanogramOptTensorflow(items, sim, token)
     opt.train(0.001, main.UpdateTensorflowResults, main.UpdateTensorflowStatus, main.AddLogDataTensorflow)
 
-def start(items, sim):    
-    t = Thread(target=tensorflowLogic, args=(items, sim,))
+def start(items, sim, token):    
+    t = Thread(target=tensorflowLogic, args=(items, sim, token,))
     t.start()
 
 if __name__ == "__main__":

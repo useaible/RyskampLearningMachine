@@ -1,0 +1,64 @@
+{
+  "$id": "1",
+  "Header": "Flavor Progress Over Time",
+  "Labels": [
+    {
+      "$id": "2",
+      "Name": "lblChartTitleHeader",
+      "Description": null,
+      "Value": "",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "$id": "3",
+      "Name": "lblCurrTime",
+      "Description": null,
+      "Value": "Elapsed Time ",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    },
+    {
+      "$id": "4",
+      "Name": "lblCurrScore",
+      "Description": null,
+      "Value": "Projected Revenue",
+      "Visibility": 1,
+      "Converter": null,
+      "SelectedValueFromConverter": null,
+      "ConverterType": null
+    }
+  ],
+  "Values": [
+    {
+      "$id": "5",
+      "Name": "currTimeVal",
+      "Description": "Selected Point Time",
+      "Value": null,
+      "Visibility": 1,
+      "Converter": {
+        "$id": "6",
+        "$type": "RLV.Core.Converters.RLVTimeConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 9,
+      "ConverterType": 1
+    },
+    {
+      "$id": "7",
+      "Name": "currScoreVal",
+      "Description": "Selected Point Score",
+      "Value": null,
+      "Visibility": 1,
+      "Converter": {
+        "$id": "8",
+        "$type": "RLV.Core.Converters.RLVNumericConverter, RLV.Core"
+      },
+      "SelectedValueFromConverter": 4,
+      "ConverterType": 0
+    }
+  ]
+}

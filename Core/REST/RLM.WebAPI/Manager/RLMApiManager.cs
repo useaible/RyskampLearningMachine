@@ -180,6 +180,48 @@ namespace RLM.WebAPI.Manager
             return hist.GetCaseIOHistory(data.CaseId, data.RneuronId, data.SolutionId);
         }
 
+        public long? GetNextPrevLearnedCaseId(RlmGetNextPrevLearnedCaseIdParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetNextPreviousLearnedCaseId(data.CaseId.Value, data.IsNext);
+        }
+
+        public IEnumerable<RlmLearnedSessionDetails> GetSessionIODetails(RlmGetSessionDetailsParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetSessionIODetails(data.SessionIds);
+        }
+
+        public long? GetRneuronIdFromInputs(RlmGetRneuronIdFromInputs data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetRneuronIdFromInputs(data.InputValuesPair);
+        }
+
+        public long? GetSolutionIdFromOutputs(RlmGetSolutionIdFromOutputs data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetSolutionIdFromOutputs(data.OutputValuesPair);
+        }
+
+        public IEnumerable<RlmLearnedCase> GetLearnedCases(RlmGetLearnedCasesParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetLearnedCases(data.RneuronId, data.SolutionId, data.Scale);
+        }
+
+        public IEnumerable<RlmLearnedCaseDetails> GetCaseDetails(RlmGetCaseDetailsParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetCaseDetails(data.CaseId);
+        }
+
+        public IEnumerable<RlmIODetails>[] GetCaseIODetails(RlmGetCaseIODetailsParams data)
+        {
+            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            return hist.GetCaseIODetails(data.CaseId);
+        }
+
         private RlmNetworkWebAPI LoadNetworkFromCache(RlmParams data)
         {
             RlmNetworkWebAPI retVal = null;

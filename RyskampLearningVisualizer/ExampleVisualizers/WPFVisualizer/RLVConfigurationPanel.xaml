@@ -13,10 +13,10 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Expander IsExpanded="False" Header="RLV Chart Configuration (Axis Labels)" Grid.Row="0" Background="#f45f41">
+        <Expander IsExpanded="False" Header="RLV Chart Configuration (Labels And Formatting)" Grid.Row="0" Background="#f45f41">
             <local:RLVProgressionChartConfigurationPanel x:Name="chartConfig" Margin="0,0,0,0"/>
         </Expander>
-        <Expander IsExpanded="true" Header="RLV Details Configuration (Labels And Formatting)" Grid.Row="1" Background="#f45f41">
+        <Expander IsExpanded="False" Header="RLV Details Configuration (Labels And Formatting)" Grid.Row="1" Background="#f45f41">
             <local:RLVDetailsConfigurationPanel x:Name="detailsConfig" Margin="0,0,0,0"/>
         </Expander>
     </Grid>

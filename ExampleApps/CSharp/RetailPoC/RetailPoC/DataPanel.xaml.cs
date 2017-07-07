@@ -89,11 +89,42 @@ namespace RetailPoC
                 }
             }
         }
-
-        private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
+        
+        private void refreshBtn_Click(object sender, RoutedEventArgs e)
         {
-            DataGridRow row = sender as DataGridRow; // Get the selected row
-            ItemVM itemvm = row.Item as ItemVM; // Convert the selected row to the object bound to
+            // Re-query from the database the list of items and store it to local variables
+            refreshDataGrid(true);
+        }
+
+        void dataPanelProgress(double value)
+        {
+            DataProgressBar.Value = value;
+        }
+
+        void refreshDataGrid(bool refresh)
+        {
+            if (refresh)
+            {
+                this.dataGrid.ItemsSource = dataFactory.Items;
+                this.Items = dataFactory.Items;
+                generateDataBtn.IsEnabled = true;
+                DataProgressBar.Value = 0;
+                DataProgressBar.Visibility = Visibility.Hidden;
+            }
+        }
+
+        public int NumItems { get; set; }
+        public int NumShelves { get; set; }
+        public int NumSlots { get; set; }
+
+        private void dataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            //DataGridRow row = (DataGridRow)(sender as DataGrid).SelectedItem; // Get the selected row
+            //ItemVM itemvm = row.Item as ItemVM; // Convert the selected row to the object bound to
+
+            if (dataGrid.SelectedItem == null) return;
+
+            ItemVM itemvm = (ItemVM)dataGrid.SelectedItem;
             var id = itemvm.ID; // Get the item id
 
             Item item;
@@ -126,32 +157,5 @@ namespace RetailPoC
 
             // Some operations with this row
         }
-
-        private void refreshBtn_Click(object sender, RoutedEventArgs e)
-        {
-            // Re-query from the database the list of items and store it to local variables
-            refreshDataGrid(true);
-        }
-
-        void dataPanelProgress(double value)
-        {
-            DataProgressBar.Value = value;
-        }
-
-        void refreshDataGrid(bool refresh)
-        {
-            if (refresh)
-            {
-                this.dataGrid.ItemsSource = dataFactory.Items;
-                this.Items = dataFactory.Items;
-                generateDataBtn.IsEnabled = true;
-                DataProgressBar.Value = 0;
-                DataProgressBar.Visibility = Visibility.Hidden;
-            }
-        }
-
-        public int NumItems { get; set; }
-        public int NumShelves { get; set; }
-        public int NumSlots { get; set; }
     }
 }

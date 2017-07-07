@@ -7,29 +7,18 @@
         
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"              
         mc:Ignorable="d"
-        Title="Data Panel" Height="543.515" Width="584.309" Topmost="True" WindowStartupLocation="CenterScreen">
-    <Window.DataContext>
+        Title="Data Panel" 
+        Height="543.515" 
+        Width="584.309" 
+        Topmost="True"
+        BorderBrush="LightGray"
+        BorderThickness="1"
+        WindowStartupLocation="CenterScreen">
+    <!--<Window.DataContext>
         <local:DataFactory/>
-    </Window.DataContext>
+    </Window.DataContext>-->
     <Grid>
-        <DataGrid x:Name="dataGrid" Margin="10,58,10,35" ColumnWidth="Auto" SelectionMode="Single" ScrollViewer.CanContentScroll="True">
-            <DataGrid.Resources>
-                <Style TargetType="DataGridRow">
-                    <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"></EventSetter>
-                </Style>
-            </DataGrid.Resources>
-            <!--<DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding ID}" ClipboardContentBinding="{x:Null}" HeaderStringFormat="" Header="ID" Width="*"/>
-                <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Name" Width="*"/>
-                <DataGridTextColumn Binding="{Binding SKU}" ClipboardContentBinding="{x:Null}" Header="SKU" Width="*"/>
-            </DataGrid.Columns>-->
-            <!--<DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <DataGrid ItemsSource="{Binding Attributes}" AutoGenerateColumns="True">
-                    </DataGrid>
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>-->
-        </DataGrid>
+        <DataGrid x:Name="dataGrid" Margin="10,58,10,35" ColumnWidth="Auto" SelectionMode="Single" ScrollViewer.CanContentScroll="True" MouseDoubleClick="dataGrid_MouseDoubleClick" />
         <Grid Height="38" Margin="10,10,10,0" VerticalAlignment="Top">
             <Button x:Name="generateDataBtn" Content="Generate Data" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="104" Click="generateDataBtn_Click"/>
             <Grid Height="38" Margin="0,0,-9,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="263">
@@ -38,6 +27,6 @@
             </Grid>
             <ProgressBar x:Name="DataProgressBar" HorizontalAlignment="Left" Height="20" Margin="129,10,0,0" VerticalAlignment="Top" Width="144"/>
         </Grid>
-        <Button x:Name="refreshBtn" Content="Refresh" HorizontalAlignment="Left" Margin="10,0,0,10" Width="75" Click="refreshBtn_Click" Height="20" VerticalAlignment="Bottom"/>
+        <!--<Button x:Name="refreshBtn" Content="Refresh" HorizontalAlignment="Left" Margin="10,0,0,10" Width="75" Click="refreshBtn_Click" Height="20" VerticalAlignment="Bottom"/>-->
     </Grid>
 </Controls:MetroWindow>

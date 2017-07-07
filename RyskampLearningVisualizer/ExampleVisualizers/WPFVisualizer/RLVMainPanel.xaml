@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="WPFVisualizer.MainVisualizerWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:WPFVisualizer"
+             FontFamily="Fonts/#Oswald Light"
+             mc:Ignorable="d" Width="Auto" Height="Auto">
+    <Viewbox Width="Auto" Height="Auto">
+        <Grid Width="Auto" Height="Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Expander x:Name="chartHeader" IsExpanded="True" Grid.Row="0">
+                <Border BorderBrush="Orange" BorderThickness="2">
+                    <local:RLVProgressionChartPanel x:Name="progressionChartControl" Height="398" Margin="25,5,5,5" 
+                                              SeriesCollection="{Binding SeriesCollection, Mode=TwoWay}" 
+                                              HorizontalAlignment="Left" Width="809"/>
+                </Border>
+            </Expander>
+            <Expander x:Name="detailsHeader" IsExpanded="True" Grid.Row="1">
+                <Border BorderBrush="Orange" BorderThickness="2">
+                    <local:RLVSelectedDetailsPanel x:Name="detailsControl" Height="398" Margin="-2,0"/>
+                </Border>
+            </Expander>
+        </Grid>
+    </Viewbox>
+</UserControl>

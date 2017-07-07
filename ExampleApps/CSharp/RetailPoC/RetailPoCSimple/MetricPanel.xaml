@@ -1,0 +1,43 @@
+﻿<Controls:MetroWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RetailPoCSimple"
+        x:Class="RetailPoCSimple.MetricPanel"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="Criteria Settings" 
+        Height="268.524" 
+        Width="343.177" 
+        BorderBrush="LightGray"
+        BorderThickness="1"
+        WindowStyle="ToolWindow" 
+        ResizeMode="NoResize"  FontFamily="Fonts/#Oswald Light" NonActiveWindowTitleBrush="#FFFFAC71">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="37*"/>
+            <ColumnDefinition Width="170*"/>
+            <ColumnDefinition Width="108*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="metric1Lbl" Text="Revenue" HorizontalAlignment="Left" Margin="18,15,0,0" VerticalAlignment="Top" TextAlignment="Right" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="metric2Lbl" Text="Sales" HorizontalAlignment="Left" Margin="18,41,0,0" VerticalAlignment="Top" TextAlignment="Right"/>
+        <TextBlock x:Name="metric3Lbl" Text="Customer Satisfaction" HorizontalAlignment="Left" Margin="18,67,0,0" VerticalAlignment="Top" TextAlignment="Right" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="metric4Lbl" Text="Sales Per Day" HorizontalAlignment="Left" Margin="18,93,0,0" VerticalAlignment="Top" TextAlignment="Right" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="metric5Lbl" Text="Reviews Per Day" HorizontalAlignment="Left" Margin="18,119,0,0" VerticalAlignment="Top" TextAlignment="Right" Grid.ColumnSpan="2"/>
+        <Slider x:Name="metricSlider1" Value="10" HorizontalAlignment="Left" Margin="79,20,0,0" VerticalAlignment="Top" Minimum="0" Maximum="100" Width="162" AutoToolTipPlacement="TopLeft" PreviewMouseUp="metricSlider1_PreviewMouseUp" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" Grid.Column="1"/>
+        <Slider x:Name="metricSlider2" Value="10" HorizontalAlignment="Left" Margin="79,46,0,0" VerticalAlignment="Top" Minimum="0" Maximum="100" Width="162" AutoToolTipPlacement="TopLeft" PreviewMouseUp="metricSlider2_PreviewMouseUp" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" Grid.Column="1"/>
+        <Slider x:Name="metricSlider3" Value="10" HorizontalAlignment="Left" Margin="79,71,0,0" VerticalAlignment="Top" Minimum="0" Maximum="100" Width="162" AutoToolTipPlacement="TopLeft" PreviewMouseUp="metricSlider3_PreviewMouseUp" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" Grid.Column="1"/>
+        <Slider x:Name="metricSlider4" Value="10" HorizontalAlignment="Left" Margin="79,98,0,0" VerticalAlignment="Top" Minimum="0" Maximum="100" Width="162" AutoToolTipPlacement="TopLeft" PreviewMouseUp="metricSlider4_PreviewMouseUp" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" Grid.Column="1"/>
+        <Slider x:Name="metricSlider5" Value="10" HorizontalAlignment="Left" Margin="79,124,0,0" VerticalAlignment="Top" Minimum="0" Maximum="100" Width="162" AutoToolTipPlacement="TopLeft" PreviewMouseUp="metricSlider5_PreviewMouseUp" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" Grid.Column="1"/>
+
+        <Button x:Name="saveMetricBtn" Content="OK" Margin="0,0,12,10" HorizontalAlignment="Right" Width="93" Height="32" VerticalAlignment="Bottom" Click="saveMetricBtn_Click" Grid.Column="2" FontFamily="Fonts/#Oswald Light" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" FontSize="15" Padding="0"/>
+        <!--<Button x:Name="cancelMetricBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" Width="75" Height="20" VerticalAlignment="Bottom" Click="cancelBtn_Click" Grid.Column="2"/>-->
+        <Label x:Name="totalLbl" Content="Total: 200%" Margin="0,0,12,55" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="76" Grid.Column="2"/>
+        <Label x:Name="percent1" Content="%" HorizontalAlignment="Left" Margin="66,15,0,0" VerticalAlignment="Top" Grid.Column="2"/>
+        <Label x:Name="percent2" Content="%" HorizontalAlignment="Left" Margin="66,41,0,0" VerticalAlignment="Top" Grid.Column="2"/>
+        <Label x:Name="percent3" Content="%" HorizontalAlignment="Left" Margin="66,67,0,0" VerticalAlignment="Top" Grid.Column="2"/>
+        <Label x:Name="percent4" Content="%" HorizontalAlignment="Left" Margin="66,93,0,0" VerticalAlignment="Top" Grid.Column="2"/>
+        <Label x:Name="percent5" Content="%" HorizontalAlignment="Left" Margin="66,119,0,0" VerticalAlignment="Top" Grid.Column="2"/>
+    </Grid>
+</Controls:MetroWindow>

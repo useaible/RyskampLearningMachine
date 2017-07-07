@@ -19,6 +19,7 @@ namespace RLV.Core.Interfaces
         object XLabelFormatter { get; set; }
         object YLabelFormatter { get; set; }
         object SeriesCollection { get; set; }
+        string Header { get; set; }
         ObservableCollection<RLVItemDisplayVM> Labels { get; set; }
         ObservableCollection<RLVItemDisplayVM> Values { get; set; }
     }

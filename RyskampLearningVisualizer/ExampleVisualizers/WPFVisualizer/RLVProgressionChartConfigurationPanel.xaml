@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:local="clr-namespace:WPFVisualizer"
-             mc:Ignorable="d" Width="239.121" Height="190.795">
+             FontFamily="Fonts/#Oswald Light"
+             mc:Ignorable="d" Width="Auto" Height="Auto">
     <Grid>
-        <Grid Margin="10,10,10,0" Height="80" VerticalAlignment="Top">
+        <!--<Grid Margin="10,10,10,0" Height="80" VerticalAlignment="Top">
             <Label Content="Score:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-1.333,-1.28"/>
             <TextBox HorizontalAlignment="Left" Height="23" Margin="42,0,0,0" TextWrapping="Wrap" Text="Enter New Label" VerticalAlignment="Top" Width="168"/>
             <ComboBox HorizontalAlignment="Left" Margin="42,31,0,0" VerticalAlignment="Top" Width="168" Text="Select Format"/>
@@ -18,6 +19,16 @@
             <TextBox HorizontalAlignment="Left" Height="23" Margin="42,0,0,0" TextWrapping="Wrap" Text="Enter New Label" VerticalAlignment="Top" Width="168"/>
             <ComboBox HorizontalAlignment="Left" Margin="42,31,0,0" VerticalAlignment="Top" Width="168" Text="Select Format"/>
             <CheckBox Content="IsVisible" HorizontalAlignment="Left" Margin="42,62,0,0" VerticalAlignment="Top"/>
-        </Grid>
+        </Grid>-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Expander IsExpanded="True" Header="Labels Configuration (Modify Labels and Visibility)" Grid.Row="0">
+            <Grid x:Name="labelsGrid" Height="Auto" Margin="0,0,0,10"/>
+        </Expander>
+        <Expander IsExpanded="True" Header="Values Configuration (Formatting and Visibility)" Grid.Row="1">
+            <Grid x:Name="valuesGrid" Height="Auto" Margin="0,0,0,10"/>
+        </Expander>
     </Grid>
 </UserControl>

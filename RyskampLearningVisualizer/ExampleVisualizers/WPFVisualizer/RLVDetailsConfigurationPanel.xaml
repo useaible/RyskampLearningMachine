@@ -14,10 +14,10 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Expander IsExpanded="True" Header="Labels Configuration (Modify Labels and Visibility)" Grid.Row="0">
-            <Grid x:Name="labelsGrid" Height="Auto" Margin="0,0,-12,10"/>
+            <Grid x:Name="labelsGrid" Height="Auto" Margin="0,0,0,10"/>
         </Expander>
         <Expander IsExpanded="True" Header="Values Configuration (Formatting and Visibility)" Grid.Row="1">
-            <Grid x:Name="valuesGrid" Height="Auto" Margin="0,0,-2,10"/>
+            <Grid x:Name="valuesGrid" Height="Auto" Margin="0,0,0,10"/>
         </Expander>
     </Grid>
 </UserControl>

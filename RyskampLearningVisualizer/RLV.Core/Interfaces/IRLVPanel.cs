@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RLV.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,7 @@ namespace RLV.Core.Interfaces
     public interface IRLVPanel
     {
         object ViewModel { get; }
+        void UpdateBindings(RLVItemDisplayVM userVal);
+        void SaveConfiguration();
     }
 }

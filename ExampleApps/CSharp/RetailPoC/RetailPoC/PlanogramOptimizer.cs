@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RetailPoC
 {
     //public delegate void SessionDone(PlanogramOptResults results);
     public delegate void UpdateUICallback(PlanogramOptResultsSettings results, bool enableSimDisplay);
+    public delegate void UpdateUINonRLMCallback(PlanogramOptResults results, bool enableSimDisplay);
     public delegate void UpdateStatusCallback(string statusMsg, bool isDone = false);
 
     /// <summary>
@@ -115,7 +117,7 @@ namespace RetailPoC
         /// Starts optimization based on the array of items and simulation setting that were passed in during instantiation
         /// </summary>
         /// <returns>The final (predicted) output of the optimization</returns>
-        public PlanogramOptResults StartOptimization()
+        public PlanogramOptResults StartOptimization(CancellationToken? cancelToken = null)
         {
             UpdateStatus?.Invoke("Training...");
 
@@ -150,6 +152,9 @@ namespace RetailPoC
                 // training, train 90% per session batch if not Session Type
                 var trainingTimes = (simSettings.SimType == SimulationType.Sessions) ? sessions : sessions - PREDICT_SESSIONS;
                 retVal = Optimize(trainingTimes, true, simSettings.EnableSimDisplay);
+                
+                if (cancelToken.HasValue && cancelToken.Value.IsCancellationRequested)
+                    return retVal;
 
                 // for non Sessions type, we predict {PREDICT_SESSIONS}-times per session batch
                 if (simSettings.SimType != SimulationType.Sessions)
@@ -214,7 +219,7 @@ namespace RetailPoC
         /// <param name="sessions">Number of session to train/predict for</param>
         /// <param name="learn">Lets the RLM know if we are training or predicting</param>
         /// <returns>The final output for the training or prediction</returns>
-        private PlanogramOptResults Optimize(int sessions, bool learn = true, bool enablePlanogramDisplay = false)
+        private PlanogramOptResults Optimize(int sessions, bool learn = true, bool enablePlanogramDisplay = false, CancellationToken? cancelToken = null)
         {
             var output = new PlanogramOptResultsSettings();
 
@@ -390,7 +395,8 @@ namespace RetailPoC
                     (simSettings.SimType == SimulationType.Score && numScoreHits >= SimulationSettings.NUM_SCORE_HITS))
                     break;
 
-                System.Diagnostics.Debug.WriteLine("Randomness: " + network.RandomnessCurrentValue);
+                if (cancelToken.HasValue && cancelToken.Value.IsCancellationRequested)
+                    return output;
             }
 
             return output;
