@@ -31,7 +31,7 @@
     {
       "Name": "lblPreviousHeader",
       "Description": null,
-      "Value": "Previous Flavor",
+      "Value": "Previous Layout",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
@@ -40,7 +40,7 @@
     {
       "Name": "lblCurrentHeader",
       "Description": null,
-      "Value": "New Flavor",
+      "Value": "New Layout",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
@@ -49,7 +49,7 @@
     {
       "Name": "lblSessionTitle",
       "Description": null,
-      "Value": "Trial",
+      "Value": "Week",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
@@ -58,7 +58,7 @@
     {
       "Name": "lblTimeTitle",
       "Description": null,
-      "Value": "Elapsed Time",
+      "Value": "Learned Time",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
@@ -67,7 +67,7 @@
     {
       "Name": "lblCaseTitle",
       "Description": null,
-      "Value": "Case",
+      "Value": "Day",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
@@ -76,12 +76,12 @@
     {
       "Name": "lblScoreTitle",
       "Description": null,
-      "Value": "Flavor Revenue",
+      "Value": "Day's Revenue",
       "Visibility": 0,
       "Converter": null,
       "SelectedValueFromConverter": null,
       "ConverterType": null
-    },    
+    },
     {
       "Name": "lblBtnPrevious",
       "Description": null,
