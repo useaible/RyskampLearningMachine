@@ -44,6 +44,8 @@ namespace RetailPoCSimple
         private SimulationCsvLogger logger;
         private int numScoreHits = 0;
         private RLM.Enums.RlmInputType inputType;
+        
+        public bool IsTrainingDone { get; set; }
 
         /// <summary>
         /// Instantiates a new instance of the plangoram optimizer
@@ -54,8 +56,10 @@ namespace RetailPoCSimple
         /// <param name="updateStatus">Callback function for sending the current status of the RLM</param>
         /// <param name="logger">Logs the per session stats and allows users to download the CSV file after the training</param>
         /// <remarks>Used a callback instead of an event because we worry that the display might not keep up with the optimization. You can disable the display by setting it in the Simulation panel</remarks>
-        public PlanogramOptimizer(Item[] items, SimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, string dbIdentifier = null)
+        public PlanogramOptimizer(Item[] items, SimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, string dbIdentifier = null, DataPersistenceProgressDelegate dataPersistProgress = null)
         {
+            IsTrainingDone = false;
+
             this.logger = logger;
             this.items = items.ToArray();
             this.simSettings = simSettings;
@@ -70,6 +74,11 @@ namespace RetailPoCSimple
 
             // creates the network (and the underlying DB) with a unique name to have a different network everytime you run a simulation
             network = new RlmNetwork(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" +  Guid.NewGuid().ToString("N"));
+
+            if (dataPersistProgress != null)
+            {
+                network.DataPersistenceProgress += dataPersistProgress;
+            }
 
             // checks if the network structure already exists
             // if not then we proceed to define the inputs and outputs
@@ -167,8 +176,9 @@ namespace RetailPoCSimple
             retVal = Optimize(1, false, true);
 
             network.TrainingDone();
+            IsTrainingDone = true;
 
-            UpdateStatus?.Invoke("Done", true);
+            UpdateStatus?.Invoke("Processing data...", true);
 
             return retVal;
         }
@@ -323,7 +333,7 @@ namespace RetailPoCSimple
 
                 // ends the session with the summed metric score for all items in the planogram
                 network.SessionEnd(totalMetricScore);
-                System.Diagnostics.Debug.WriteLine($"Session #{i}, Score: {totalMetricScore}");
+                //System.Diagnostics.Debug.WriteLine($"Session #{i}, Score: {totalMetricScore}");
 
                 // set statistics and the optimized planogram shelves (and items inside them)
                 output.Shelves = shelves;
@@ -391,12 +401,12 @@ namespace RetailPoCSimple
                     (simSettings.SimType == SimulationType.Score && numScoreHits >= SimulationSettings.NUM_SCORE_HITS))
                     break;
 
-                System.Diagnostics.Debug.WriteLine("Randomness: " + network.RandomnessCurrentValue);
+                //System.Diagnostics.Debug.WriteLine("Randomness: " + network.RandomnessCurrentValue);
             }
 
             return output;
         }
-
+        
         /// <summary>
         /// Calculates the metric for an item based on the attributes it has been assigned
         /// </summary>

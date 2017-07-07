@@ -114,7 +114,7 @@
                 <!--<Label x:Name="lblSessionRun" Content="Session Run" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="0" Grid.Row="2" FontFamily="Fonts/#Oswald Light" Foreground="#FF474747" FontSize="14"/>-->
                 <Label x:Name="lblTimeElapsed" Content="Learning Time Remaining" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="0" Grid.Row="1" FontFamily="Fonts/#Oswald Light" Foreground="#FF474747" FontSize="14" Grid.RowSpan="2"/>
                 <!--<Label x:Name="lblScore" Content="Flavor Revenue" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="0" Grid.Row="4" FontFamily="Fonts/#Oswald Light" Foreground="#FF474747" FontSize="14"/>-->
-                <TextBlock x:Name="txtStatus"  HorizontalAlignment="Left" Height="36" TextWrapping="Wrap" VerticalAlignment="Top" Width="125" FontFamily="Fonts/#Oswald Light" Foreground="#FF29ABE2" FontSize="25" Padding="0" Margin="0,13,0,0" Grid.RowSpan="2"/>
+                <TextBlock x:Name="txtStatus"  HorizontalAlignment="Left" Height="36" TextWrapping="Wrap" VerticalAlignment="Top" Width="183" FontFamily="Fonts/#Oswald Light" Foreground="#FF29ABE2" FontSize="25" Padding="0" Margin="0,13,0,0" Grid.RowSpan="2"/>
                 <!--<TextBlock x:Name="txtSessionRun" HorizontalAlignment="Left" Height="42" Grid.Row="2" TextWrapping="Wrap" Text="99" VerticalAlignment="Top" Width="120" FontFamily="Fonts/#Oswald Light" Foreground="#FF29ABE2" FontSize="32" Padding="0" Margin="0,10,0,0" Grid.RowSpan="2" Grid.ColumnSpan="2"/>-->
                 <TextBlock x:Name="txtTimeElapsed" HorizontalAlignment="Left" Height="34" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="125" FontFamily="Fonts/#Oswald Light" Foreground="#FF29ABE2" FontSize="25" Padding="0" Margin="0,10,0,0" Grid.RowSpan="2"/>
                 <!--<TextBlock x:Name="txtItemScore" HorizontalAlignment="Left" Height="36" Grid.Row="5" TextWrapping="Wrap" VerticalAlignment="Center" Width="120" FontFamily="Fonts/#Oswald Light" Foreground="#FF29ABE2" FontSize="25" Padding="0" Grid.ColumnSpan="2"/>-->
@@ -163,6 +163,7 @@
             </TextBlock>
             <TextBlock Margin="0,290,10,0" TextWrapping="Wrap" Text="Hover over flavor with orange border to see change." VerticalAlignment="Top" Foreground="Orange" FontSize="15" TextAlignment="Center"/>
         </Grid>
+        <Grid x:Name="trainingOverlay" HorizontalAlignment="Left" Height="195" VerticalAlignment="Top" Width="407" Background="#000000" Opacity="0.1" Panel.ZIndex="5000" Visibility="Hidden" Margin="10,28,10,10" Grid.Row="1"/>
         <!--<Border x:Name="comparisonGrid" Background="#FFFFFF" Panel.ZIndex="2000" Visibility="Hidden" Margin="244,8,7,58" Grid.Row="1" BorderBrush="OrangeRed" BorderThickness="1">
             <Grid >
             <Viewbox Height="Auto" Width="Auto">

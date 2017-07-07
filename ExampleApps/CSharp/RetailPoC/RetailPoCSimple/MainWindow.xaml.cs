@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace RetailPoCSimple
         private Random rnd;
         private IDictionary<Color, SolidColorBrush> coloredBrushesDict = new Dictionary<Color, SolidColorBrush>();
         private IDictionary<int, ImageBrush> imageBrushesDict = new Dictionary<int, ImageBrush>();
-
+        
         public List<Attributes> attributes;
         public List<Item> items;
         public List<string> flavors;
@@ -283,7 +284,7 @@ namespace RetailPoCSimple
 
         private SimulationSettings simSettings = new SimulationSettings()
         {
-            SimType = SimulationType.Time,            
+            SimType = SimulationType.Time,
             NumItems = LARGE_ITEMS_COUNT,
             Sessions = 10000,
             Metric1 = 20,
@@ -750,7 +751,7 @@ namespace RetailPoCSimple
             Dispatcher.Invoke(() =>
             {
                 txtStatus.Text = statusMsg;
-                if (isDone)
+                if (isDone) 
                     EnableControlButtons(true);
             });
         }
@@ -762,6 +763,7 @@ namespace RetailPoCSimple
 
         private void startOptimizing()
         {
+            trainingOverlay.Visibility = Visibility.Visible;
             selectedSlotIndex = -1;
             _row = -1;
             _col = -1;
@@ -836,7 +838,7 @@ namespace RetailPoCSimple
                     }
 
                     // initialize and start RLM training
-                    optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier);
+                    optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier, OnRLMDataPersistProgress);
                     //optimizer.OnSessionDone += Optimizer_OnSessionDone;
                     optimizer.StartOptimization();
                 });
@@ -965,6 +967,36 @@ namespace RetailPoCSimple
         private void closeComparisonLink_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             btnComparisonClose_Click(null, null);
+        }
+
+        //private void OnRLMDataPersistComplete()
+        //{
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        trainingOverlay.Visibility = Visibility.Hidden;
+        //        // TODO ryan's code for removing the overlay
+        //        txtStatus.Text = "Ready";
+        //        watch.Stop();
+
+        //        //MessageBox.Show($"Data persistence done! {watch.Elapsed}");
+        //    });
+        //}
+
+        private void OnRLMDataPersistProgress(long processed, long total)
+        {
+            System.Diagnostics.Debug.WriteLine($"{processed} / {total}");
+
+            if (processed >= total && optimizer.IsTrainingDone)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    trainingOverlay.Visibility = Visibility.Hidden;
+                    // TODO ryan's code for removing the overlay
+                    txtStatus.Text = "Ready";
+
+                    //MessageBox.Show($"Data persistence done! {watch.Elapsed}");
+                });
+            }
         }
     }
 }
