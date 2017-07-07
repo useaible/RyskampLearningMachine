@@ -1,10 +1,12 @@
 ![RLM Banner](http://i.imgur.com/VtUAQUh.png)
 
-## Documentation Overview ##
+## Current Papers and Documents ##
 
-UseAIble documentation is designed to provide resources for business research around the RLM framework. UseAIble does not provide scientific journal submissions or academic papers in this documentation because it is not applicable to the business needs of UseAIble’s customers. What will be provided within our documentation is developer guides, business practical collateral, API documentation and other resources to help users in implementing the RLM framework into their development.  
+**RLM and Explainability.pdf**
 
-## Current Documents ##
+ - A deep dive into the functionality and importance of the RLM revolutionary explainability. 
+ - A look the the AI "black box" and how the RLM solves it
+
 
 **Developer Guide.pdf**
 
@@ -26,10 +28,6 @@ UseAIble documentation is designed to provide resources for business research ar
 **The RLM-A technical Overview.pdf**
  
 - Technical overview of the RLM
- 
-**The RLM and Machine Learning Explainability**
- 
-- A deep dive into the functionality and importance of the RLM revolutionary explainability. 
 
 ## Upcoming Documents ##
 
