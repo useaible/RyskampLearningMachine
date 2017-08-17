@@ -10,7 +10,7 @@ namespace RLM.Models.Interfaces
     {
         event DataPersistenceCompleteDelegate DataPersistenceComplete;
         event DataPersistenceProgressDelegate DataPersistenceProgress;
-
+        bool PersistData { get; }
         long CurrentNetworkID { get; }
         string CurrentNetworkName { get; }
         string DatabaseName { get; }

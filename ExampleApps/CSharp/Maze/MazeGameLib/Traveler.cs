@@ -9,7 +9,7 @@ namespace MazeGameLib
     public class Traveler
     {
 
-        public MazeGame GameRef;
+        public IMazeGame GameRef;
         public TravelerLocation location;
 
         public Traveler()
@@ -17,7 +17,7 @@ namespace MazeGameLib
             location = new TravelerLocation();
         }
 
-        public Traveler(MazeGame gameref)
+        public Traveler(IMazeGame gameref)
             : this()
         {
             GameRef = gameref;

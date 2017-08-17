@@ -17,13 +17,13 @@ namespace MazeGameLib
     public delegate void RunThreadUI_Delegate(Action act);
 
     //Structs
-    public struct TravelerLocation
+    public class TravelerLocation
     {
         public int X { get; set; }
         public int Y { get; set; }
     }
 
-    public struct MazeCycleOutcome
+    public class MazeCycleOutcome
     {
         public Boolean BumpedIntoWall { get; set; }
         public Boolean GameOver { get; set; }
@@ -32,39 +32,39 @@ namespace MazeGameLib
         public int Moves { get; set; }
     }
 
-    public struct MazeGameFinalOutcome
+    public class MazeGameFinalOutcome
     {
         public int CycleCount { get; set; }
         public double FinalScore { get; set; }
     }
 
-    public struct MazeCursorState
+    public class MazeCursorState
     {
         public Boolean IsDarkened { get; set; }
     }
 
 
-    public class MazeGame
+    public class MazeGame : IMazeGame
     {
         //Events
         public event GameStartedOccurred_Delegate GameStartEvent;
         public event GameCycleCompleteOccurred_Delegate GameCycleEvent;
         public event GameOverOccurred_Delegate GameOverEvent;
 
-        public Boolean CancelGame = false;
-        public Traveler traveler;
-        public MazeCursorState cursorstate;
-        public TravelerLocation GoalLocation = new TravelerLocation();
-        public TravelerLocation OldLocation = new TravelerLocation();
-        public int Width = -1;
-        public int Height = -1;
-        public bool BumpIntoWall = false;
-        public int Moves = 0;
+        public Boolean CancelGame { get; set; } = false;
+        public Traveler traveler { get; set; }
+        public MazeCursorState cursorstate { get; set; } = new MazeCursorState();
+        public TravelerLocation GoalLocation { get; set; } = new TravelerLocation();
+        public TravelerLocation OldLocation { get; set; } = new TravelerLocation();
+        public int Width { get; set; } = -1;
+        public int Height { get; set; } = -1;
+        public bool BumpIntoWall { get; set; } = false;
+        public int Moves { get; set; } = 0;
         //Perfect Game
         Int16 PerfectGameMovesCount = 49;
 
         //Multi-threaded directions stack
-        public ConcurrentQueue<Int16> DirectionsStack = new ConcurrentQueue<short>();
+        public ConcurrentQueue<Int16> DirectionsStack { get; set; } = new ConcurrentQueue<short>();
 
         //Build Grid
         public Boolean[,] TheMazeGrid;
@@ -74,7 +74,7 @@ namespace MazeGameLib
             traveler = new Traveler();
         }
 
-        public void InitGame(MazeInfo maze)
+        public virtual void InitGame(MazeInfo maze)
         {
             //Set Goal Location
             TheMazeGrid = maze.Grid;
@@ -92,7 +92,7 @@ namespace MazeGameLib
             }
         }
 
-        public void StartGame(Traveler SpecificTraveler = null, int currentIteration = 1, bool windowless = false)
+        public virtual void StartGame(Traveler SpecificTraveler = null, int currentIteration = 1, bool windowless = false)
         {
             //Set Default Traveler
             if (SpecificTraveler == null)
@@ -162,7 +162,7 @@ namespace MazeGameLib
             }
         }
 
-        public MazeCycleOutcome CycleMaze(int direction)
+        public virtual MazeCycleOutcome CycleMaze(int direction)
         {
             MazeCycleOutcome outcome = new MazeCycleOutcome();
             outcome.BumpedIntoWall = false;
@@ -175,7 +175,7 @@ namespace MazeGameLib
             //Calculate new location
             switch (direction)
             {
-                case 0:
+                case 0: // up
                     if (traveler.location.Y <= 0)
                     {
                         //OutOfBoundsOccurred();
@@ -186,7 +186,7 @@ namespace MazeGameLib
                     new_location.X = traveler.location.X;
                     new_location.Y = traveler.location.Y - 1;
                     break;
-                case 1:
+                case 1: // right
                     if (traveler.location.X >= Width - 1)
                     {
                         //OutOfBoundsOccurred();
@@ -197,7 +197,7 @@ namespace MazeGameLib
                     new_location.X = traveler.location.X + 1;
                     new_location.Y = traveler.location.Y;
                     break;
-                case 2:
+                case 2: // down
                     if (traveler.location.Y >= Height - 1)
                     {
                         //OutOfBoundsOccurred();
@@ -208,7 +208,7 @@ namespace MazeGameLib
                     new_location.X = traveler.location.X;
                     new_location.Y = traveler.location.Y + 1;
                     break;
-                case 3:
+                case 3: // left
                     if (traveler.location.X <= 0)
                     {
                         //OutOfBoundsOccurred();
@@ -225,7 +225,7 @@ namespace MazeGameLib
 
 
             //Is BumpedIntoWall?
-            if (this.TheMazeGrid[new_location.X, new_location.Y])
+            if (BumpedIntoObject(new_location))
             {
                 BumpIntoWall = true;
                 outcome.BumpedIntoWall = true;
@@ -236,13 +236,14 @@ namespace MazeGameLib
                 return outcome;
             }
 
+
             //New location is now current location
             //TravelerLocation old_location = traveler.location;
             OldLocation = traveler.location;
             traveler.location = new_location;
 
             //Is GameOver?
-            if (traveler.location.X == GoalLocation.X && traveler.location.Y == GoalLocation.Y)
+            if (IsGameOver())
             {
                 outcome.GameOver = true;
                 return outcome;
@@ -251,7 +252,17 @@ namespace MazeGameLib
             return outcome;
         }
 
-        public double CalculateFinalScore(Int32 i)
+        public virtual bool BumpedIntoObject(TravelerLocation location)
+        {
+            return this.TheMazeGrid[location.X, location.Y];
+        }
+
+        public virtual bool IsGameOver()
+        {
+            return traveler.location.X == GoalLocation.X && traveler.location.Y == GoalLocation.Y;
+        }
+
+        public virtual double CalculateFinalScore(Int32 i)
         {
             double val;
             try

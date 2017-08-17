@@ -23,6 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using WPFVisualizer;
+using PoCTools.Settings;
 
 namespace RetailPoCSimple
 {
@@ -63,7 +64,7 @@ namespace RetailPoCSimple
         public bool NoData { get; set; }
         public Item[] ItemsCache { get { return itemsCache; } }
         public SimulationCsvLogger Logger { get; set; } = new SimulationCsvLogger();
-        public SimulationSettings SimulationSettings { get { return simSettings; } }
+        public RPOCSimpleSimSettings SimulationSettings { get { return simSettings; } }
 
         private MockData mock = null;
         public MainWindow()
@@ -282,7 +283,7 @@ namespace RetailPoCSimple
             }
         }
 
-        private SimulationSettings simSettings = new SimulationSettings()
+        private RPOCSimpleSimSettings simSettings = new RPOCSimpleSimSettings()
         {
             SimType = SimulationType.Time,
             NumItems = LARGE_ITEMS_COUNT,

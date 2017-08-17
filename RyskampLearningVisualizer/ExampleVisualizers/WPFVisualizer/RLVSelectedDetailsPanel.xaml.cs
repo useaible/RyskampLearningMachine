@@ -133,8 +133,11 @@ namespace WPFVisualizer
 
         private void showSessionBreakdown(IEnumerable<IRLVItemDisplay> breakdown)
         {
-            RLVSessionScoreBreakdown bd = new RLVSessionScoreBreakdown(breakdown);
-            bd.ShowDialog();
+            if (breakdown != null)
+            {
+                RLVSessionScoreBreakdown bd = new RLVSessionScoreBreakdown(breakdown);
+                bd.ShowDialog();
+            }
         }
 
         public void LoadScalePanel(ref IRLVScaleSelectionPanel panel)

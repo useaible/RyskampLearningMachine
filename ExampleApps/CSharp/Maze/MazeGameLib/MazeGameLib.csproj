@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMazeGame.cs" />
     <Compile Include="MazeGame.cs" />
     <Compile Include="MazeGenerator.cs" />
     <Compile Include="MazeInfo.cs" />

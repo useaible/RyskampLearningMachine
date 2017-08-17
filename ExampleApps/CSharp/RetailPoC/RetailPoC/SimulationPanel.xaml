@@ -6,12 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RetailPoC"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-    
+        SizeToContent="Height"
         mc:Ignorable="d"
-        Title="Simulation Panel" Height="367.322" Width="395.975" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Simulation Panel" Height="Auto" Width="395.975" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" BorderBrush="LightGray" BorderThickness="2"><!---->
     <Grid>
 
-        <Grid >
+        <Grid Height="Auto">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="215*"/>
                 <ColumnDefinition Width="133*"/>
@@ -26,7 +26,7 @@
             <Button x:Name="btnMax" IsEnabled="False" Visibility="Hidden" Content="80% of Max" Grid.Column="1" HorizontalAlignment="Left" Margin="49,64,0,0" VerticalAlignment="Top" Width="76" Height="23" Click="btnMax_Click"/>
             <Slider x:Name="simScoreSlider" Value="85" Minimum="0" Maximum="90" HorizontalAlignment="Left" Margin="29,99,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="283" PreviewMouseUp="simScoreSlider_PreviewMouseUp" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft"/>
             <Label x:Name="simScoreSliderLbl" Content="85%" Grid.Column="1" HorizontalAlignment="Left" Margin="97,94,0,0" VerticalAlignment="Top" Height="23" Width="41" RenderTransformOrigin="0.54,0.163"/>
-            <GroupBox x:Name="grpEncogSettings" Header="Encog Settings" HorizontalAlignment="Left" Margin="23,170,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="343" Height="116">
+            <GroupBox x:Name="grpEncogSettings" Header="Encog Settings" HorizontalAlignment="Left" Margin="23,170,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="343" Height="116" Visibility="Hidden">
                 <Grid>
                     <Label x:Name="label1" Content="Hidden Layers:" HorizontalAlignment="Left" Margin="50,9,0,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="txtHiddenLayers" PreviewTextInput="NumberValidationEncog" HorizontalAlignment="Left" Height="23" Margin="143,13,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="177"/>

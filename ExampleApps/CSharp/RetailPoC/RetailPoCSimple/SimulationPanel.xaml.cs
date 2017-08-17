@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
+using PoCTools.Settings;
 
 namespace RetailPoCSimple
 {
@@ -33,7 +34,7 @@ namespace RetailPoCSimple
             }
         }
 
-        private SimulationSettings simSettings;
+        private RPOCSimpleSimSettings simSettings;
         private double maxScore = -1;
         private double MAX_SCORE = 0;
         //private const int DEFAULT_SCORE_PERCENTAGE = 85;
@@ -45,7 +46,7 @@ namespace RetailPoCSimple
             this.mock = mock;
         }
 
-        public void SetSimSettings(SimulationSettings simSettings)
+        public void SetSimSettings(RPOCSimpleSimSettings simSettings)
         {
             if (simSettings != null)
             {

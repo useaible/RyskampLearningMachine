@@ -80,7 +80,8 @@ namespace RLV.Core
         {
             IsComparisonModeOn = true;
             IEnumerable<RlmLearnedSessionDetails> results = GetComparisonData(sessionId, prevSessId);
-            LearningComparisonResultsEvent?.Invoke(results.First(a => a.IsCurrent), results.FirstOrDefault(a => !a.IsCurrent));
+            if (results.Count() > 0)
+                LearningComparisonResultsEvent?.Invoke(results.First(a => a.IsCurrent), results.FirstOrDefault(a => !a.IsCurrent));
         }
 
         public void IRLVSelectedDetailsPanel_NextPrevCaseChangedHandler(long caseId, bool next)

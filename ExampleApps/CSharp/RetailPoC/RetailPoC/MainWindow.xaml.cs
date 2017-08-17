@@ -25,10 +25,11 @@ using RLV.Core.Models;
 using RLV.Core.Enums;
 using RLM.Models;
 using System.Threading;
+using PoCTools.Settings;
 
 namespace RetailPoC
 {
-    public delegate void SimulationStart(Item[] items, SimulationSettings simSettings, CancellationToken token);
+    public delegate void SimulationStart(Item[] items, RPOCSimulationSettings simSettings, CancellationToken token);
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -45,7 +46,7 @@ namespace RetailPoC
         private bool isSmallPlangoram = false;
         //private DataPanel dataPanel;
 
-        private SimulationSettings simSettings = new SimulationSettings()
+        private RPOCSimulationSettings simSettings = new RPOCSimulationSettings()
         {
             //SimType = SimulationType.Sessions,
             NumItems = LARGE_ITEMS_COUNT,
@@ -105,16 +106,19 @@ namespace RetailPoC
 
         public SimulationCsvLogger Logger { get; set; } = new SimulationCsvLogger();
         public string HelpPath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
-        public SimulationSettings SimulationSettings { get { return simSettings; } }
+        public RPOCSimulationSettings SimulationSettings { get { return simSettings; } }
         public Item[] ItemsCache { get { return itemsCache; } }
         public bool NoData { get; set; } = true;
 
 
-        public MainWindow(bool enableTensorflow = false)
+        public MainWindow(bool enableTensorflow = false, bool htoh = false)
         {
             InitializeComponent();
-            headToHead = true;
+            headToHead = htoh;
             Title += " - Head to Head";
+
+            if(!headToHead)
+                Width = 560;
 
             //InitializeGrid(planogram, Colors.LightGray, true);
             //InitializeGrid(planogramTensorflow, Colors.LightGray);
@@ -325,7 +329,7 @@ namespace RetailPoC
                     }
 
                     // let's tensorflow (or other listeners) know that it should start training
-                    //OnSimulationStart?.Invoke(items, simSettings); //return;
+                    //OnSimulationStart?.Invoke(items, simSettings, tokenSource.Token); return;
 
                     // initialize and start RLM training
                     optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier);

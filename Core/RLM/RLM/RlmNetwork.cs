@@ -35,12 +35,15 @@ namespace RLM
         const int CACHE_MARGIN = 0;
         const bool USE_MOM_AVG = false;
 
+        protected bool consoleDisplay = false;
+
         //Events
         public event SessionCompleteDelegate SessionComplete;
         public event CycleCompleteDelegate CycleComplete;
         public event DataPersistenceCompleteDelegate DataPersistenceComplete;
         public event DataPersistenceProgressDelegate DataPersistenceProgress;
-
+        
+        public bool PersistData { get; private set; }
         public IManager MemoryManager { get; private set; }
 
         public Case CurrentCase { get; internal set; }
@@ -295,9 +298,12 @@ namespace RLM
         /// <summary>
         /// default contstructor, creates "RyskampLearningMachine" database
         /// </summary>
-        public RlmNetwork()
+        /// <param name="persistData">Allows you to turn on/off the data persistence feature of the RLM. Turned on by default.</param>
+        public RlmNetwork(bool persistData = true)
         {
-            DatabaseName = RlmDbEntities.DetermineDbName();
+            PersistData = persistData;
+            if (PersistData)
+                DatabaseName = RlmDbEntities.DetermineDbName();
             Initialize();
         }
         /// <summary>
@@ -306,6 +312,7 @@ namespace RLM
         /// <param name="databaseName">database name</param>
         public RlmNetwork(string databaseName)
         {
+            PersistData = true;
             DatabaseName = databaseName;
             Initialize();
             //MemoryManager.StartRnnDbWorkers();
@@ -334,9 +341,10 @@ namespace RLM
             CurrentNetworkName = newnet.Name;
 
             // initialize Case Order
-            CaseOrder = 0; 
-            
-            Console.WriteLine("Create new network: " + newnet.Name);
+            CaseOrder = 0;
+
+            if (consoleDisplay)
+                Console.WriteLine("Create new network: " + newnet.Name);
 
             //Inputs
             var inputsForDb = new List<Input>();
@@ -384,7 +392,10 @@ namespace RLM
             SessionCountInitial = SessionCount;
 
             //create new network
-            MemoryManager.NewNetwork(newnet, ioTypesForDb, inputsForDb, outputsForDb, this);
+            if (PersistData)
+            {
+                MemoryManager.NewNetwork(newnet, ioTypesForDb, inputsForDb, outputsForDb, this);
+            }
         }
 
         /// <summary>
@@ -419,17 +430,24 @@ namespace RLM
         /// <returns>Returns true if network is successfully loaded</returns>
         public bool LoadNetwork(string name)
         {
-            var result = MemoryManager.LoadNetwork(name);
+            bool retVal = false;
 
-            if (result.Loaded)
+            if (PersistData)
             {
-                CurrentNetworkID = result.CurrentNetworkId;
-                CurrentNetworkName = result.CurrentNetworkName;
-                CaseOrder = result.CaseOrder;
-                SessionCountInitial = SessionCount = result.SessionCount;
+                var result = MemoryManager.LoadNetwork(name);
+
+                if (result.Loaded)
+                {
+                    CurrentNetworkID = result.CurrentNetworkId;
+                    CurrentNetworkName = result.CurrentNetworkName;
+                    CaseOrder = result.CaseOrder;
+                    SessionCountInitial = SessionCount = result.SessionCount;
+                }
+
+                retVal = result.Loaded; 
             }
 
-            return result.Loaded;
+            return retVal;
         }
 
         public void ResetNetwork()
@@ -481,7 +499,10 @@ namespace RLM
                 if (MemoryManager.Sessions.TryAdd(session.ID, session))
                 {
                     //save session to db
-                    MemoryManager.AddSessionToQueue(CurrentSessionID, session);
+                    if (PersistData)
+                    {
+                        MemoryManager.AddSessionToQueue(CurrentSessionID, session);
+                    }
 
                     // reset input momentums
                     foreach(var item in InputMomentums)
@@ -551,7 +572,10 @@ namespace RLM
                 session.Hidden = false;
 
                 //update session to db
-                MemoryManager.AddSessionUpdateToQueue(session);
+                if (PersistData)
+                {
+                    MemoryManager.AddSessionUpdateToQueue(session);
+                }
 
                 //Throw the endsession event
                 if (SessionComplete != null) SessionComplete(CurrentSessionID, this);
@@ -597,7 +621,10 @@ namespace RLM
             MemoryManager.BestSolutionStaging.Add(bsol);
 
             //save case to db
-            MemoryManager.AddCaseToQueue(cycleId, CurrentCase);
+            if (PersistData)
+            {
+                MemoryManager.AddCaseToQueue(cycleId, CurrentCase);
+            }
 
             CurrentCase = null;
         }
@@ -612,7 +639,10 @@ namespace RLM
         /// </summary>   
         public void TrainingDone()
         {
-            MemoryManager.TrainingDone();
+            if (PersistData)
+            {
+                MemoryManager.TrainingDone();
+            }
         }
 
         /// <summary>
@@ -642,7 +672,8 @@ namespace RLM
 
             //Create Type
             iot = new Input_Output_Type() { ID = Util.GenerateHashKey(io.DotNetType), Name = io.DotNetType, DotNetTypeName = io.DotNetType };
-            Console.WriteLine("Creating new Input_Output_Type: " + io.DotNetType);
+            if (consoleDisplay)
+                Console.WriteLine("Creating new Input_Output_Type: " + io.DotNetType);
 
             if (!ProcessAsOutput)
             {
@@ -652,7 +683,8 @@ namespace RLM
                 Input newio = new Input() { ID = Util.GenerateHashKey(io.Name), Name = io.Name, Rnetwork_ID = net.ID, Input_Output_Type_ID = iot.ID, Input_Output_Type = iot, Min = io.Min, Max = io.Max, Type = io.Type };
                 io.ID = newio.ID;
                 retVal = newio;
-                Console.WriteLine("Create new Input: " + newio.Name);
+                if (consoleDisplay)
+                    Console.WriteLine("Create new Input: " + newio.Name);
             }
             else
             {
@@ -662,7 +694,8 @@ namespace RLM
                 Output newio = new Output() { ID = Util.GenerateHashKey(io.Name), Name = io.Name, Rnetwork_ID = net.ID, Input_Output_Type_ID = iot.ID, Input_Output_Type = iot, Min = io.Min, Max = io.Max };
                 io.ID = newio.ID;
                 retVal = newio;
-                Console.WriteLine("Create new Output: " + newio.Name);
+                if (consoleDisplay)
+                    Console.WriteLine("Create new Output: " + newio.Name);
             }
 
             return retVal;

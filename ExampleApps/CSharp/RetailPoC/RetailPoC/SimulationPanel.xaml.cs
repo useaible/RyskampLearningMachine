@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using System.Text.RegularExpressions;
+using PoCTools.Settings;
 
 namespace RetailPoC
 {
@@ -36,7 +37,7 @@ namespace RetailPoC
         public int HiddenLayers { get; private set; }
         public int HiddenLayerNeurons { get; private set; }
 
-        private SimulationSettings simSettings;
+        private RPOCSimulationSettings simSettings;
         private double maxScore = -1;
         private double MAX_SCORE = 0;
         private Regex regexNumbersOnly = new Regex("[^0-9]+");
@@ -47,7 +48,7 @@ namespace RetailPoC
             InitializeComponent();
         }
 
-        public void SetSimSettings(SimulationSettings simSettings)
+        public void SetSimSettings(RPOCSimulationSettings simSettings)
         {
             if (simSettings != null)
             {

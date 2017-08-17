@@ -107,7 +107,7 @@ namespace RLM.Memory
             solution_queue = new BlockingCollection<Solution>();
             case_queue = new BlockingCollection<Case>();
 
-            rlmDb = new RlmDbMgr(network.DatabaseName);
+            rlmDb = (network.PersistData) ? new RlmDbMgr(network.DatabaseName) : null;
             rlmDbEnqueuer = new RlmObjectEnqueuer();
 
             ctSourceSessions = new CancellationTokenSource();
@@ -803,7 +803,6 @@ namespace RLM.Memory
             savedSession_queue.CompleteAdding();
 
             ctSourceSessions.Cancel();
-            ctSourceSessions.Dispose();
 
             sessionsDone = true;
             totalSessionsCount = Sessions.Count;
@@ -816,7 +815,6 @@ namespace RLM.Memory
             case_queue.CompleteAdding();
 
             ctSourceCases.Cancel();
-            ctSourceCases.Dispose();
 
             dbSavingTime.Stop();
 

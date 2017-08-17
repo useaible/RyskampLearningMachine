@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using PoCTools.Settings;
 
 namespace RetailPoC
 {
@@ -22,7 +23,7 @@ namespace RetailPoC
     {
         // modify this to enforce how many duplicate items allowed in the planogram
         // -1 = infinite
-        int MAX_ITEMS = SimulationSettings.MAX_ITEMS; //10 Facings max of any single item        
+        int MAX_ITEMS = RPOCSimulationSettings.MAX_ITEMS; //10 Facings max of any single item        
         const int START_RANDOMNESS = 2;
         const int END_RANDOMNESS = 0;
         //const int MAX_LINEAR = 0;
@@ -33,7 +34,7 @@ namespace RetailPoC
 
         private RlmNetwork network;
         private Item[] items;
-        private SimulationSettings simSettings;
+        private RPOCSimulationSettings simSettings;
         private List<int> currentItemIndexes;
 
         //public event SessionDone OnSessionDone;
@@ -56,7 +57,7 @@ namespace RetailPoC
         /// <param name="updateStatus">Callback function for sending the current status of the RLM</param>
         /// <param name="logger">Logs the per session stats and allows users to download the CSV file after the training</param>
         /// <remarks>Used a callback instead of an event because we worry that the display might not keep up with the optimization. You can disable the display by setting it in the Simulation panel</remarks>
-        public PlanogramOptimizer(Item[] items, SimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, string dbIdentifier = null)
+        public PlanogramOptimizer(Item[] items, RPOCSimulationSettings simSettings, UpdateUICallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, string dbIdentifier = null)
         {
             this.logger = logger;
             this.items = items.ToArray();
@@ -160,13 +161,13 @@ namespace RetailPoC
                 if (simSettings.SimType != SimulationType.Sessions)
                 {
                     int predictTimes = PREDICT_SESSIONS;
-                    if (simSettings.SimType == SimulationType.Score && predictTimes < SimulationSettings.NUM_SCORE_HITS)
-                        predictTimes = SimulationSettings.NUM_SCORE_HITS;
+                    if (simSettings.SimType == SimulationType.Score && predictTimes < RPOCSimulationSettings.NUM_SCORE_HITS)
+                        predictTimes = RPOCSimulationSettings.NUM_SCORE_HITS;
                     retVal = Optimize(predictTimes, false, simSettings.EnableSimDisplay);
                 }
 
             } while ((simSettings.SimType == SimulationType.Time && simSettings.EndsOn > DateTime.Now) ||
-                (simSettings.SimType == SimulationType.Score && SimulationSettings.NUM_SCORE_HITS > numScoreHits));
+                (simSettings.SimType == SimulationType.Score && RPOCSimulationSettings.NUM_SCORE_HITS > numScoreHits));
 
             // we do a final prediction and to ensure we update the plangoram display for the final output
             retVal = Optimize(1, false, true);
@@ -392,7 +393,7 @@ namespace RetailPoC
                 // checks if we have already by passed the time or score that was set
                 // if we did, then we stop the training and end it abruptly
                 if ((simSettings.SimType == SimulationType.Time && simSettings.EndsOn.Value <= DateTime.Now) ||
-                    (simSettings.SimType == SimulationType.Score && numScoreHits >= SimulationSettings.NUM_SCORE_HITS))
+                    (simSettings.SimType == SimulationType.Score && numScoreHits >= RPOCSimulationSettings.NUM_SCORE_HITS))
                     break;
 
                 if (cancelToken.HasValue && cancelToken.Value.IsCancellationRequested)
@@ -407,7 +408,7 @@ namespace RetailPoC
         /// </summary>
         /// <param name="item">The item reference with its attributes</param>
         /// <returns>The calculated metric</returns>
-        public static double GetCalculatedWeightedMetrics(Item item, SimulationSettings simSettings)
+        public static double GetCalculatedWeightedMetrics(Item item, RPOCSimulationSettings simSettings)
         {
             double retVal = 0;
             double[] metrics = GetCalculatedWeightedMetricArray(item, simSettings);
@@ -418,7 +419,7 @@ namespace RetailPoC
             return retVal;
         }
 
-        public static double[] GetCalculatedWeightedMetricArray(Item item, SimulationSettings simSettings)
+        public static double[] GetCalculatedWeightedMetricArray(Item item, RPOCSimulationSettings simSettings)
         {
             double[] retVal = new double[10];
 

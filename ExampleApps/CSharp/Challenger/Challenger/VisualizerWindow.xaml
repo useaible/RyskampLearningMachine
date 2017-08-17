@@ -1,0 +1,87 @@
+﻿<Window x:Class="Challenger.VisualizerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Challenger"
+        xmlns:rlv="clr-namespace:WPFVisualizer;assembly=WPFVisualizer"
+        mc:Ignorable="d"
+        x:Name="main"
+        Title="RLM Visualizer" Height="792" Width="Auto" ResizeMode="NoResize" SizeToContent="Width" WindowStyle="ToolWindow">
+    <Grid>
+        <rlv:MainVisualizerWindow x:Name="rlv" HorizontalAlignment="Left" Width="720"/>
+        <Expander IsExpanded="True" ExpandDirection="Right" Margin="725,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <!--View Options Header-->
+                <Grid Grid.Column="0" Grid.Row="0">
+                    <Border Background="#FFFE8F41" x:Name="panelNormalViewHeader">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,-15">
+                                <RadioButton x:Name="radioAllMoves" Margin="5,5,5,0" Content="All" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="radioAllMoves_Checked" FontFamily="Fonts/#Oswald Light" FontWeight="Bold"/>
+                                <RadioButton x:Name="radioRecentMoves" Margin="5,5,5,0" Content="Recent Moves" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="radioRecentMoves_Checked" FontFamily="Fonts/#Oswald Light" FontWeight="Bold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#FFFE8F41"  x:Name="panelComparisonViewHeader">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="btnCloseComparison" Margin="5" Content="Close Comparison" Click="btnCloseComparison_Click" FontFamily="Fonts/#Oswald Light" Width="112" FontWeight="Bold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!--Normal View-->
+                <Grid Grid.Row="1" x:Name="gridNormalView">
+                    <ScrollViewer x:Name="viewerAllMoves">
+                        <Grid Margin="10">
+                            <StackPanel x:Name="lvMoves"></StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                    <ScrollViewer HorizontalContentAlignment="Center" x:Name="viewerPredictedMoves">
+                        <Grid Margin="10">
+                            <StackPanel x:Name="lvPredictedMoves"></StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+
+                <!--Comparison View-->
+                <Grid Grid.Row="1" x:Name="gridComparisonView">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Prior To Learned" TextAlignment="Center" Margin="5" TextDecorations="Underline" FontFamily="Fonts/#Oswald Light" FontWeight="Bold"></TextBlock>
+                            <ScrollViewer Grid.Row="1">
+                                <Grid Margin="5">
+                                    <StackPanel x:Name="lvPreviousMoves">
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
+                        </Grid>
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Learned" Margin="5" TextAlignment="Center" TextDecorations="Underline" FontFamily="Fonts/#Oswald Light" FontWeight="Bold"></TextBlock>
+                            <ScrollViewer Grid.Row="1">
+                                <Grid Margin="5">
+                                    <StackPanel x:Name="lvCurrentMoves">
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Expander>
+    </Grid>
+</Window>

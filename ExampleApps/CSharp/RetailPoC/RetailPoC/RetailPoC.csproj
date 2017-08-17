@@ -184,8 +184,7 @@
     <Compile Include="Models\PlanogramOptResults.cs" />
     <Compile Include="Models\Shelf.cs" />
     <Compile Include="Models\ShelfItem.cs" />
-    <Compile Include="Models\SimulationSettings.cs" />
-    <Compile Include="Models\SimulationType.cs" />
+    <Compile Include="Models\RPOCSimulationSettings.cs" />
     <Compile Include="PlanogramOptimizer.cs" />
     <Compile Include="Models\PlanogramContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -258,6 +257,10 @@
     <ProjectReference Include="..\..\..\..\RyskampLearningVisualizer\RLV.Core\RLV.Core.csproj">
       <Project>{05dc7651-b6c9-425e-92c9-529ee019cf97}</Project>
       <Name>RLV.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\UtilityTools\Tools\Tools.csproj">
+      <Project>{928f7b86-f0cc-4f5c-b1b3-fcd154111e48}</Project>
+      <Name>Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
