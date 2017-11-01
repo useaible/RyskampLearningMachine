@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>System.Data.HashFunction.xxHash</name>
+    </assembly>
+    <members>
+        <member name="T:System.Data.HashFunction.xxHash">
+            <summary>
+            Implements xxHash as specified at https://code.google.com/p/xxhash/source/browse/trunk/xxhash.c and 
+              https://code.google.com/p/xxhash/.
+            </summary>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.#ctor">
+            <remarks>
+            Defaults <see cref="P:System.Data.HashFunction.xxHash.InitVal"/> to 0.  <inheritdoc cref="M:System.Data.HashFunction.xxHash.#ctor(System.UInt64)"/>
+            </remarks>
+            <inheritdoc cref="M:System.Data.HashFunction.xxHash.#ctor(System.UInt64)"/>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.#ctor(System.Int32)">
+            <remarks>
+            Defaults <see cref="P:System.Data.HashFunction.xxHash.InitVal"/> to 0.
+            </remarks>
+            <inheritdoc cref="M:System.Data.HashFunction.xxHash.#ctor(System.Int32,System.UInt64)"/>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.#ctor(System.UInt64)">
+            <remarks>
+            Defaults <see cref="P:System.Data.HashFunction.HashFunctionBase.HashSize"/> to 32.
+            </remarks>
+            <inheritdoc cref="M:System.Data.HashFunction.xxHash.#ctor(System.Int32,System.UInt64)"/>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.#ctor(System.Int32,System.UInt64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Data.HashFunction.xxHash"/> class.
+            </summary>
+            <param name="hashSize"><inheritdoc cref="P:System.Data.HashFunction.HashFunctionBase.HashSize"/></param>
+            <param name="initVal"><inheritdoc cref="P:System.Data.HashFunction.xxHash.InitVal"/></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">hashSize;hashSize must be contained within xxHash.ValidHashSizes</exception>
+            <inheritdoc cref="M:System.Data.HashFunction.HashFunctionBase.#ctor(System.Int32)"/>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.ComputeHashInternal(System.Data.HashFunction.Utilities.UnifiedData.UnifiedData)">
+            <exception cref="T:System.InvalidOperationException">HashSize set to an invalid value.</exception>
+            <inheritdoc/>
+        </member>
+        <member name="M:System.Data.HashFunction.xxHash.ComputeHashAsyncInternal(System.Data.HashFunction.Utilities.UnifiedData.UnifiedData)">
+            <exception cref="T:System.InvalidOperationException">HashSize set to an invalid value.</exception>
+            <inheritdoc/>
+        </member>
+        <member name="P:System.Data.HashFunction.xxHash.InitVal">
+            <summary>
+            Seed value for hash calculation.
+            </summary>
+            <value>
+            The seed value for hash calculation.
+            </value>
+        </member>
+        <member name="P:System.Data.HashFunction.xxHash.ValidHashSizes">
+            <summary>
+            The list of possible hash sizes that can be provided to the <see cref="T:System.Data.HashFunction.xxHash"/> constructor.
+            </summary>
+            <value>
+            The list of valid hash sizes.
+            </value>
+        </member>
+    </members>
+</doc>
