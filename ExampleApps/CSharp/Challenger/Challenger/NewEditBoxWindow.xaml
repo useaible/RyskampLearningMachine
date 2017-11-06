@@ -1,0 +1,112 @@
+﻿<Controls:MetroWindow x:Name="NewEditBoxWindow1" x:Class="Challenger.NewEditBoxWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:local="clr-namespace:Challenger"
+        mc:Ignorable="d"
+        Title="New Simulation Object Window" Height="598.883" Width="1117.071" ResizeMode="NoResize" SizeToContent="Height" BorderBrush="LightGray" BorderThickness="1" Loaded="NewEditBoxWindow1_Loaded">
+    <!--Main Grid-->
+    <Grid>
+        <Border HorizontalAlignment="Left" Width="395" BorderBrush="LightGray" BorderThickness="1" Margin="10,10,0,10">
+            <StackPanel>
+                <GroupBox Header="Configuration Details" Height="200" FontFamily="Fonts/#Oswald Light">
+                    <Grid x:Name="BlockSettingsGrid" Margin="0,0,0,-12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="26*"/>
+                            <ColumnDefinition Width="101*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="NameLabel" Content="Name" Margin="10,32,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="42" FontFamily="Fonts/#Oswald Light"/>
+                        <Label x:Name="ScoreLabel" Content="Score" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.558,2.086" FontFamily="Fonts/#Oswald Light"/>
+                        <TextBox x:Name="NameField" Height="23" Margin="60,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="273" FontFamily="Fonts/#Oswald Light" Grid.ColumnSpan="2"/>
+                        <TextBox x:Name="ScoreField" Height="23" Margin="60,86,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="273" FontFamily="Fonts/#Oswald Light" Grid.ColumnSpan="2"/>
+                        <Button x:Name="OkayButton" Content="Save" HorizontalAlignment="Left" Margin="90.68,134,0,0" VerticalAlignment="Top" Width="75" Click="OkayButton_Click" Grid.Column="1" FontFamily="Fonts/#Oswald Light"/>
+                        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="177.68,134,0,0" VerticalAlignment="Top" Width="75" Click="CancelButton_Click" Grid.Column="1" FontFamily="Fonts/#Oswald Light"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Simulation Object Types" Height="200">
+                    <Grid x:Name="BoxTypeGrid">
+                        <ListView x:Name="BlockTypeListView" SelectionChanged="BlockTypeListView_SelectionChanged" Margin="10" >
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" HorizontalAlignment="Stretch" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
+                                        <Image Height="50" Width="50" Source="{Binding Icon}" HorizontalAlignment="Center" VerticalAlignment="Top" Stretch="UniformToFill" />
+                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </Border>
+        <Border Margin="426,10,10,10" BorderBrush="LightGray" BorderThickness="1">
+            <StackPanel>
+                <GroupBox Header="Simulation Object Icons" Height="544" FontFamily="Fonts/#Oswald Light">
+                    <Grid Margin="0,10,-2,-12">
+                        <Grid Margin="10,0,0,0" Height="26" VerticalAlignment="Top" Width="274" HorizontalAlignment="Left">
+                            <!--<Label Content="Simulation Object Icon" HorizontalAlignment="Left" VerticalAlignment="Top" Width="148"/>-->
+                            <Button x:Name="IconUploadButton" Content="↑" HorizontalAlignment="Left" VerticalAlignment="Top" Width="37" Height="26" Click="IconUploadButton_Click"/>
+                        </Grid>
+                        <Grid x:Name="BoxIconGrid" Margin="10,31,10,10">
+                            <ListView x:Name="BlockIconListView" SelectionChanged="BlockIconGrid_SelectionChanged" Margin="0,0,0,10">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="3" HorizontalAlignment="Stretch" />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                            <Image Height="50" Width="50" Source="{Binding Path}" HorizontalAlignment="Stretch" VerticalAlignment="top" Stretch="Uniform"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.ContainerStyle>
+                                            <Style TargetType="{x:Type GroupItem}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Expander IsExpanded="True">
+                                                                <Expander.Header>
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="Gray" FontSize="22" VerticalAlignment="Bottom" />
+                                                                        <TextBlock Text="{Binding ItemCount}" FontSize="22" Foreground="Green" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                                        <TextBlock Text=" item(s)" FontSize="22" Foreground="Silver" FontStyle="Italic" VerticalAlignment="Bottom" />
+                                                                    </StackPanel>
+                                                                </Expander.Header>
+                                                                <ItemsPresenter />
+                                                            </Expander>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </GroupStyle.ContainerStyle>
+                                    </GroupStyle>
+                                </ListView.GroupStyle>
+                            </ListView>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Controls:MetroWindow>

@@ -45,7 +45,7 @@ def start(items, sim, token):
 if __name__ == "__main__":
     mgr = ConfigFileManager()
     if (mgr.configure()):        
-        main = MainWindow(True)
+        main = MainWindow(True, True)
         main.OnSimulationStart += start
         helpPath = os.environ['PYTHONPATH'].split(os.pathsep)[0]
         main.HelpPath = helpPath

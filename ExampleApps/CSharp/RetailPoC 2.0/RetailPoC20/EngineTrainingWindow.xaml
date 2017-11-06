@@ -1,0 +1,97 @@
+﻿<Controls:MetroWindow x:Class="RetailPoC.EngineTrainingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RetailPoC"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="Shelve Space Layout" Closing="Window_Closing" LocationChanged="MetroWindow_LocationChanged" Width="728.034" Height="419.385" BorderBrush="LightGray" BorderThickness="0.6">
+    <Controls:MetroWindow.Resources>
+        <SolidColorBrush x:Key="comparisonBlack" Color="Black" Opacity="0.8"></SolidColorBrush>
+    </Controls:MetroWindow.Resources>
+    
+    <Viewbox Width="Auto" Height="Auto">
+        <Grid>
+            <DockPanel HorizontalAlignment="Stretch" Height="Auto" LastChildFill="False" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="Auto">
+                <Grid x:Name="comparisonLinkGrid" DockPanel.Dock="Top" Background="Black" Opacity="0.7" Visibility="Collapsed">
+                    <TextBlock x:Name="closeComparisonLink" TextWrapping="Wrap" VerticalAlignment="Bottom" FontFamily="Fonts/#Oswald Light" FontSize="24" 
+                               FontWeight="ExtraBold" TextAlignment="Center" PreviewMouseDown="closeComparisonLink_PreviewMouseDown">
+                        <Hyperlink Foreground="White" >
+                            <Run Text="Close Comparison"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </Grid>
+                <Grid HorizontalAlignment="Left" Margin="0,0,0,0" Width="Auto" ShowGridLines="True" x:Name="planogram" Height="Auto" VerticalAlignment="Top">
+                    <Grid.RowDefinitions>
+                        <!--<RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />-->
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <!--<ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>-->
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </DockPanel>
+
+            <Grid x:Name="comparisonOverlay" Visibility="Hidden">
+                <Viewbox>
+                    <Grid x:Name="comparisonGrid" Margin="0,0,0,0" Background="#FFFFFF" Visibility="Hidden" Panel.ZIndex="1000" Opacity="0.805">
+                        <Grid Height="230">
+                            <Grid Margin="10,33,8,4">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="52*"/>
+                                    <RowDefinition Height="27*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="15*"/>
+                                    <ColumnDefinition Width="15*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="txtPrevName" Text="Name" VerticalAlignment="Top" Grid.Row="1" Margin="5,3,5,0" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                                <TextBlock x:Name="txtPrevScore" Text="Score" Margin="5,31,5,0" VerticalAlignment="Top" Grid.Row="1" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="23"  Foreground="#FF29ABE2"/>
+                                <TextBlock x:Name="txtCurrName" Text="Name" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="5,3,6,0" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                                <TextBlock x:Name="txtCurrScore" Text="Score" Margin="5,31,6,0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="23"  Foreground="#FF29ABE2"/>
+                                <Rectangle x:Name="rectPrev" Fill="#FFF4F4F5" Margin="5,0" Stroke="Black"/>
+                                <Rectangle x:Name="rectCurr" Fill="#FFF4F4F5" Margin="5,0,6,0" Stroke="Black" Grid.Column="1"/>
+                            </Grid>
+                            <TextBlock x:Name="label" Text="Previous" Margin="34,-4,144,0" VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                            <TextBlock x:Name="label_Copy1" Text="Current" Margin="147,-4,37,0" VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Fonts/#Oswald Light" FontSize="18"/>
+                        </Grid>
+                    </Grid>
+                </Viewbox>
+            </Grid>
+        </Grid>
+    </Viewbox>
+</Controls:MetroWindow>

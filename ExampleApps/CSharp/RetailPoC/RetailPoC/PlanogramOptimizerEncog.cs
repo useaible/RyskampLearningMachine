@@ -16,13 +16,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using PoCTools.Settings;
 
 namespace RetailPoC
 {
     public class PlanogramOptimizerEncog
     {
         //private Item[] items;
-        private SimulationSettings simSettings;
+        private RPOCSimulationSettings simSettings;
         private SimulationCsvLogger logger;
 
         private BasicNetwork network;
@@ -32,7 +33,7 @@ namespace RetailPoC
         private UpdateUINonRLMCallback updateUI;
         private UpdateStatusCallback updateStatus;
 
-        public PlanogramOptimizerEncog(Item[] items, SimulationSettings simSettings, UpdateUINonRLMCallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, bool anneal = true)
+        public PlanogramOptimizerEncog(Item[] items, RPOCSimulationSettings simSettings, UpdateUINonRLMCallback updateUI = null, UpdateStatusCallback updateStatus = null, SimulationCsvLogger logger = null, bool anneal = true)
         {
             updateStatus?.Invoke("Initializing...");
 
@@ -81,7 +82,7 @@ namespace RetailPoC
 
             } while ((simSettings.SimType == SimulationType.Sessions && simSettings.Sessions > planogramScore.SessionNumber) ||
                 (simSettings.SimType == SimulationType.Time && simSettings.EndsOn > DateTime.Now) ||
-                (simSettings.SimType == SimulationType.Score && SimulationSettings.NUM_SCORE_HITS > planogramScore.NumScoreHits));
+                (simSettings.SimType == SimulationType.Score && RPOCSimulationSettings.NUM_SCORE_HITS > planogramScore.NumScoreHits));
 
             // display for final results only
             if (!simSettings.EnableSimDisplay)
@@ -116,7 +117,7 @@ namespace RetailPoC
 
         public int SessionNumber { get; set; } = 0;
         public int NumScoreHits { get; set; } = 0;
-        public SimulationSettings SimSettings { get; set; }
+        public RPOCSimulationSettings SimSettings { get; set; }
         public Item[] Items { get; set; }
         public UpdateUINonRLMCallback UpdateUI { get; set; }
         public SimulationCsvLogger Logger { get; set; }
@@ -194,12 +195,12 @@ namespace RetailPoC
         private readonly NormalizedField slotNormalizer;
         private readonly NormalizedField itemNormalizer;        
         private readonly BasicNetwork network;
-        private readonly SimulationSettings simSettings;
+        private readonly RPOCSimulationSettings simSettings;
         private readonly Item[] items;
 
         public static int CycleCount { get; set; }
 
-        public PlanogramSimulation(BasicNetwork network, Item[] items, SimulationSettings simSettings)
+        public PlanogramSimulation(BasicNetwork network, Item[] items, RPOCSimulationSettings simSettings)
         {
             slotNormalizer = new NormalizedField(NormalizationAction.Normalize, "Slot", (simSettings.NumSlots * simSettings.NumShelves) - 1, 0, -1, 1);
             itemNormalizer = new NormalizedField(NormalizationAction.Normalize, "Item", items.Length - 1, 0, -1, 1);

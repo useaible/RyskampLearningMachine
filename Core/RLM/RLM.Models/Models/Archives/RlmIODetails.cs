@@ -17,5 +17,6 @@ namespace RLM.Models
         public long CaseId { get; set; }
         public double CycleScore { get; set; }
         public long SessionId { get; set; }
+        public long CycleOrder { get; set; }
     }
 }

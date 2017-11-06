@@ -24,7 +24,7 @@ namespace MazeGameLib
         private const double CORRECT_SCORE = 100;
         private const double WRONG_SCORE = 0;
         private const int TIMER_TIMEOUT = 5000; // milliseconds
-        private RlmNetwork rlmNet;
+        protected RlmNetwork rlmNet;
         private Int64 currentSessionID;
         private Int64 currentCycleID;
         private SetRandomnessLeftDelegate SetRandomnessLeft;
@@ -58,7 +58,7 @@ namespace MazeGameLib
 
         }
         // for window version
-        public RLMMazeTraveler(MazeInfo maze, MazeGame gameref, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, SetRandomnessLeftDelegate setRandomnessLeft = null)
+        public RLMMazeTraveler(MazeInfo maze, IMazeGame gameref, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, SetRandomnessLeftDelegate setRandomnessLeft = null)
             : base(gameref)
         {
             Learn = learn;
@@ -80,6 +80,17 @@ namespace MazeGameLib
             tmr.Elapsed += Tmr_Elapsed;
         }
 
+        public RLMMazeTraveler(IMazeGame gameRef, bool learn = false)
+            : base (gameRef)
+        {
+            Learn = learn;
+            GameRef.GameStartEvent += GameRef_GameStartEvent;
+            GameRef.GameCycleEvent += GameRef_GameCycleEvent;
+            //GameRef.GameOverEvent += GameRef_GameOverEvent;
+                        
+            tmr.Elapsed += Tmr_Elapsed;
+        }
+
         private int timeout = 0;
         private System.Timers.Timer tmr = new System.Timers.Timer();
         private void Tmr_Elapsed(object sender, ElapsedEventArgs e)
@@ -89,7 +100,7 @@ namespace MazeGameLib
 
         public bool Learn { get; set; }
 
-        public RlmNetwork CreateOrLoadNetwork(MazeInfo maze)
+        public virtual RlmNetwork CreateOrLoadNetwork(MazeInfo maze)
         {
             var rlmNet = new RlmNetwork("RLM_maze_" + maze.Name); //+ "_" + Guid.NewGuid().ToString("N"));
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
@@ -122,7 +133,7 @@ namespace MazeGameLib
             return rlmNet;
         }
 
-        private void RlmNet_DataPersistenceProgress(long processed, long total)
+        protected virtual void RlmNet_DataPersistenceProgress(long processed, long total)
         {
             if (ShowDataPersistenceProgress)
             {
@@ -130,7 +141,7 @@ namespace MazeGameLib
             }
         }
 
-        private void RlmNet_DataPersistenceComplete()
+        protected virtual void RlmNet_DataPersistenceComplete()
         {
             DataPersistenceDone = true;
             Console.WriteLine("RLM Data Persistence done.");
@@ -149,15 +160,21 @@ namespace MazeGameLib
             rlmNet.ResetRandomizationCounter();
         }
 
+        public virtual IMazeGame GetNewGameInstance()
+        {
+            var game = new MazeGame();
+            game.traveler = this;
+            game.InitGame(maze);
+            return game;
+        }
+
         /// <summary>
         /// This method will let the AI play the maze for one game (windowless)
         /// </summary>
-        public MazeCycleOutcome Travel(int timerTimeout = 5000)
+        public virtual MazeCycleOutcome Travel(int timerTimeout = 5000)
         {
-            MazeGame game = new MazeGame();
-            game.traveler = this;
-            game.InitGame(maze);
-
+            IMazeGame game = GetNewGameInstance();
+            
             MazeCycleOutcome outcome = new MazeCycleOutcome();
 
             // Start AI Training
@@ -208,7 +225,7 @@ namespace MazeGameLib
             return outcome;
         }
 
-        private void Rlm_net_CycleComplete(RlmCyclecompleteArgs e)
+        protected virtual void Rlm_net_CycleComplete(RlmCyclecompleteArgs e)
         {
             if (e.RlmType != RlmNetworkType.Supervised) // Unsupervised & Predict only
             {
@@ -221,7 +238,7 @@ namespace MazeGameLib
             }
         }
 
-        void GameRef_GameStartEvent(Traveler traveler, int currentIteration = 1)
+        protected virtual void GameRef_GameStartEvent(Traveler traveler, int currentIteration = 1)
         {
             try
             {
@@ -251,7 +268,7 @@ namespace MazeGameLib
             }
         }
 
-        public void GameRef_GameOverEvent(MazeGameFinalOutcome final)
+        public virtual void GameRef_GameOverEvent(MazeGameFinalOutcome final)
         {
             System.Diagnostics.Debug.WriteLine($"Randomness left: {rlmNet.RandomnessCurrentValue}");
 
@@ -259,7 +276,7 @@ namespace MazeGameLib
             rlmNet.SessionEnd(final.FinalScore);
         }
 
-        void GameRef_GameCycleEvent(MazeCycleOutcome mazeCycle, Traveler traveler)
+        protected virtual void GameRef_GameCycleEvent(MazeCycleOutcome mazeCycle, Traveler traveler)
         {
             try
             {
@@ -291,7 +308,7 @@ namespace MazeGameLib
             }
         }
 
-        private double ScoreAI(MazeCycleOutcome mazeCycle, Traveler traveler)
+        protected virtual double ScoreAI(MazeCycleOutcome mazeCycle, Traveler traveler)
         {
             double retVal = WRONG_SCORE;
 
@@ -307,7 +324,7 @@ namespace MazeGameLib
             return retVal;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (rlmNet != null)
             {
@@ -322,7 +339,7 @@ namespace MazeGameLib
             }
         }
 
-        public void TrainingDone()
+        public virtual void TrainingDone()
         {
             rlmNet.TrainingDone();
         }

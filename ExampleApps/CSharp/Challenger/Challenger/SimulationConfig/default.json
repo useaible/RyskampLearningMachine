@@ -1,0 +1,437 @@
+{
+  "Name": "default",
+  "Width": 10,
+  "Height": 10,
+  "StartingLocation": {
+    "X": 9,
+    "Y": 0
+  },
+  "BlockTemplates": [
+    {
+      "X": 6,
+      "Y": 7,
+      "Score": 5.0,
+      "BlockID": "b18ef4e8d2054f3c81c7c3957fd12f67",
+      "ID": 3,
+      "Name": "House",
+      "Icon": "Icons\\Building\\building2.png",
+      "IsEndSimulation": false
+    },
+    {
+      "X": 6,
+      "Y": 8,
+      "Score": -5.0,
+      "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+      "ID": 3,
+      "Name": "Demolish",
+      "Icon": "Icons\\Building\\construction.png",
+      "IsEndSimulation": false
+    },
+    {
+      "X": 6,
+      "Y": 5,
+      "Score": 20.0,
+      "BlockID": "b44d941663594493bb9531eef3a3087e",
+      "ID": 3,
+      "Name": "Government Aid",
+      "Icon": "Icons\\Building\\government.png",
+      "IsEndSimulation": false
+    },
+    {
+      "X": 0,
+      "Y": 9,
+      "Score": 0.0,
+      "BlockID": "48cdf8ee45a54fdba1195325dcf07527",
+      "ID": 2,
+      "Name": "Deal",
+      "Icon": "Icons\\Business\\deal.png",
+      "IsEndSimulation": true
+    },
+    {
+      "X": 9,
+      "Y": 0,
+      "Score": 0.0,
+      "BlockID": "54dfb0e6c13846b8ac5eb3d8629f62ca",
+      "ID": 1,
+      "Name": "Engineer",
+      "Icon": "Icons\\Business\\engineer.png",
+      "IsEndSimulation": false
+    }
+  ],
+  "Blocks": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "X": 0,
+        "Y": 9,
+        "Score": 0.0,
+        "BlockID": "48cdf8ee45a54fdba1195325dcf07527",
+        "ID": 2,
+        "Name": "Deal",
+        "Icon": "Icons\\Business\\deal.png",
+        "IsEndSimulation": true
+      }
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      {
+        "X": 2,
+        "Y": 2,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 3,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 4,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 5,
+        "Score": 20.0,
+        "BlockID": "b44d941663594493bb9531eef3a3087e",
+        "ID": 3,
+        "Name": "Government Aid",
+        "Icon": "Icons\\Building\\government.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 6,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 7,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 2,
+        "Y": 8,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null
+    ],
+    [
+      null,
+      null,
+      {
+        "X": 3,
+        "Y": 2,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 3,
+        "Y": 3,
+        "Score": 5.0,
+        "BlockID": "b18ef4e8d2054f3c81c7c3957fd12f67",
+        "ID": 3,
+        "Name": "House",
+        "Icon": "Icons\\Building\\building2.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 3,
+        "Y": 4,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null,
+      {
+        "X": 3,
+        "Y": 6,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 3,
+        "Y": 7,
+        "Score": 5.0,
+        "BlockID": "b18ef4e8d2054f3c81c7c3957fd12f67",
+        "ID": 3,
+        "Name": "House",
+        "Icon": "Icons\\Building\\building2.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 3,
+        "Y": 8,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      {
+        "X": 5,
+        "Y": 2,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 5,
+        "Y": 3,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 5,
+        "Y": 4,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null,
+      {
+        "X": 5,
+        "Y": 6,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 5,
+        "Y": 7,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 5,
+        "Y": 8,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null
+    ],
+    [
+      null,
+      null,
+      {
+        "X": 6,
+        "Y": 2,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 3,
+        "Score": 5.0,
+        "BlockID": "b18ef4e8d2054f3c81c7c3957fd12f67",
+        "ID": 3,
+        "Name": "House",
+        "Icon": "Icons\\Building\\building2.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 4,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 5,
+        "Score": 20.0,
+        "BlockID": "b44d941663594493bb9531eef3a3087e",
+        "ID": 3,
+        "Name": "Government Aid",
+        "Icon": "Icons\\Building\\government.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 6,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 7,
+        "Score": 5.0,
+        "BlockID": "b18ef4e8d2054f3c81c7c3957fd12f67",
+        "ID": 3,
+        "Name": "House",
+        "Icon": "Icons\\Building\\building2.png",
+        "IsEndSimulation": false
+      },
+      {
+        "X": 6,
+        "Y": 8,
+        "Score": -5.0,
+        "BlockID": "2eb38652e755424da3526d1d8c7c2f82",
+        "ID": 3,
+        "Name": "Demolish",
+        "Icon": "Icons\\Building\\construction.png",
+        "IsEndSimulation": false
+      },
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      {
+        "X": 9,
+        "Y": 0,
+        "Score": 0.0,
+        "BlockID": "54dfb0e6c13846b8ac5eb3d8629f62ca",
+        "ID": 1,
+        "Name": "Engineer",
+        "Icon": "Icons\\Business\\engineer.png",
+        "IsEndSimulation": false
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "FreeMoves": 1000,
+  "MoveFactor": 100.0
+}

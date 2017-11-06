@@ -19,7 +19,7 @@ namespace RLM.Models
         [ForeignKey("Rnetwork_ID")]
         public virtual Rnetwork Rnetwork { get; set; }
         public virtual ICollection<Case> Cases { get; set; }
-        public virtual ICollection<Input_Values_Rneuron> Input_Values_Reneurons { get; set; }
+        public ICollection<Input_Values_Rneuron> Input_Values_Reneurons { get; set; }
 
         [NotMapped]
         public bool SavedToDb { get; set; }

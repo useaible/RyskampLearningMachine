@@ -40,7 +40,7 @@ namespace RetailPoC
             rnd = new Random();
         }
 
-        public double GetItemMinimumScore(SimulationSettings simSettings)
+        public double GetItemMinimumScore(RPOCSimulationSettings simSettings)
         {
             double retVal = double.MinValue;
             retVal = _context.Database.SqlQuery<double>(@"
@@ -69,7 +69,7 @@ namespace RetailPoC
             return retVal;
         }
 
-        public double GetItemMaximumScore(SimulationSettings simSettings)
+        public double GetItemMaximumScore(RPOCSimulationSettings simSettings)
         {
             double retVal = double.MinValue;
             retVal = _context.Database.SqlQuery<double>(@"
@@ -98,11 +98,11 @@ namespace RetailPoC
             return retVal;
         }
 
-        public double GetItemMaxScoreForTop(SimulationSettings simSettings)
+        public double GetItemMaxScoreForTop(RPOCSimulationSettings simSettings)
         {
             double retVal = 0;
             int numSlots = simSettings.NumShelves * simSettings.NumSlots;
-            double top = Math.Ceiling(Convert.ToDouble(numSlots) / Convert.ToDouble(SimulationSettings.MAX_ITEMS));
+            double top = Math.Ceiling(Convert.ToDouble(numSlots) / Convert.ToDouble(RPOCSimulationSettings.MAX_ITEMS));
 
             var topItems = _context.Database.SqlQuery<double>($@"
                     select top {top}

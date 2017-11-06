@@ -40,7 +40,7 @@ namespace RetailPoCSimple
         }
 
         // Set values to metric sliders
-        public void SetMetricSliderValues(SimulationSettings settings)
+        public void SetMetricSliderValues(RPOCSimpleSimSettings settings)
         {
             this.metricSlider1.Value = settings.Metric1; // for metric1 slider
             this.metricSlider2.Value = settings.Metric2; // for metric2 slider

@@ -15,18 +15,38 @@ namespace RLM.Database
 {
     public class RlmDbMgr
     {
+        private const int CASES_TASKS = 5;
+        
+        private int currCaseQueue = 0;
+        public BlockingCollection<Case[]>[] CaseWorkerQueues { get; private set; }
+
         private bool networkLoaded = true;
         private string databaseName;
         private long networkID;
         private Rnetwork rlm;
         private RlmDbBatchProcessor batchProcessor;
-        public RlmDbMgr(string databaseName)
+        private bool persistData;
+        public RlmDbMgr(string databaseName, bool persistData = true)
         {
+            this.persistData = persistData;
             this.databaseName = databaseName;
-            this.batchProcessor = new RlmDbBatchProcessor(databaseName);
+
+            if (persistData)
+            {
+                this.batchProcessor = new RlmDbBatchProcessor(databaseName);
+
+                CaseWorkerQueues = new BlockingCollection<Case[]>[CASES_TASKS];
+                for (int i = 0; i < CASES_TASKS; i++)
+                {
+                    CaseWorkerQueues[i] = new BlockingCollection<Case[]>();
+                    int caseIndex = i;
+                    Task.Run(async () => { await saveCase(CaseWorkerQueues[caseIndex]); });
+                }
+            }
         }
 
         public int TaskDelay { get; private set; } = 50;
+        public int TaskRetryDelay { get; private set; } = 1000;
 
         private long taskCompletedCounter = 0;
         public long TotalTaskCompleted
@@ -40,11 +60,11 @@ namespace RLM.Database
 
         public Task StartSessionWorkerForCreate(BlockingCollection<Session> sessionqueue, CancellationToken ct)
         {
-            Task T1 = Task.Run(() =>
+            Task T1 = Task.Run(async () =>
             {
                 foreach (Session session in sessionqueue.GetConsumingEnumerable())
                 {
-                    createSession(session);
+                    await createSession(session);
                     Interlocked.Increment(ref taskCompletedCounter);
                     //Task.Delay(TaskDelay).Wait();
                 }
@@ -56,11 +76,11 @@ namespace RLM.Database
 
         public Task StartSessionWorkerForUpdate(BlockingCollection<Session> sessionqueue, CancellationToken ct)
         {
-            Task T1 = Task.Run(() =>
+            Task T1 = Task.Run(async () =>
             {
                 foreach (Session session in sessionqueue.GetConsumingEnumerable())
                 {
-                    updateSession(session);
+                    await updateSession(session);
                     Interlocked.Increment(ref taskCompletedCounter);
                 }
             }, ct);
@@ -71,7 +91,7 @@ namespace RLM.Database
         private ConcurrentQueue<Case> caseBox = new ConcurrentQueue<Case>();
         public Task StartCaseWorker(BlockingCollection<Case> casesQueue, CancellationToken ct)
         {
-            Task T1 = Task.Run(async () =>
+            Task T1 = Task.Run(() =>
             {
                 Stopwatch st = new Stopwatch();
                 st.Start();
@@ -86,15 +106,20 @@ namespace RLM.Database
                     Interlocked.Increment(ref taskCompletedCounter);
                     if (cnt % 10 == 0)
                     {
-                        await saveCase(cases.ToList());
+                        CaseWorkerQueues[currCaseQueue].Add(cases.ToArray());
                         cases.Clear();
+                        currCaseQueue++;
+                        if (currCaseQueue >= CASES_TASKS)
+                        {
+                            currCaseQueue = 0;
+                        }
                         //Task.Delay(TaskDelay).Wait();
                     }
                 }
 
-                if(cases.Count > 0)
+                if (cases.Count > 0)
                 {
-                    await saveCase(cases);
+                    CaseWorkerQueues[currCaseQueue].Add(cases.ToArray());
                 }
 
                 st.Stop();
@@ -216,7 +241,7 @@ namespace RLM.Database
         }
 
         //save session (create and update)
-        private async void createSession(Session session)
+        private async Task createSession(Session session)
         {
             using (RlmDbEntities db = new RlmDbEntities(databaseName))
             {
@@ -239,7 +264,7 @@ namespace RLM.Database
             }
         }
 
-        private async void updateSession(Session session)
+        private async Task updateSession(Session session)
         {
             using (RlmDbEntities db = new RlmDbEntities(databaseName))
             {
@@ -266,7 +291,7 @@ namespace RLM.Database
                                 break;
                             }
 
-                            Task.Delay(50).Wait();
+                            //Task.Delay(50).Wait();
                         }
                     }
                 }
@@ -313,38 +338,55 @@ namespace RLM.Database
         }
 
         //save case
-        private async Task saveCase(IEnumerable<Case> cases)
+        private async Task saveCase(BlockingCollection<Case[]> cases)
         {
-            using (RlmDbEntities db = new RlmDbEntities(databaseName))
+            Exception error = null;
+            int retryCnt = 0;
+            foreach (var item in cases.GetConsumingEnumerable())
             {
-                db.Cases.AddRange(cases);
-                start:
-
-                try
+                do
                 {
-                    await db.SaveChangesAsync();
+                    try
+                    {
+                        error = null;
+                        using (RlmDbEntities db = new RlmDbEntities(databaseName))
+                        {
+                            db.Cases.AddRange(item);
 
-                    //if (theCase.Rneuron != null)
-                    //{
-                    //    theCase.Rneuron.SavedToDb = true;
-                    //}
+                            await db.SaveChangesAsync();
 
-                    //if (theCase.Solution != null)
-                    //{
-                    //    theCase.Solution.SavedToDb = true;
-                    //}
+                            //if (theCase.Rneuron != null)
+                            //{
+                            //    theCase.Rneuron.SavedToDb = true;
+                            //}
 
-                    //theCase.SavedToDb = true;
+                            //if (theCase.Solution != null)
+                            //{
+                            //    theCase.Solution.SavedToDb = true;
+                            //}
 
-                    //RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
-                }
-                catch (Exception ex)
-                {
-                    RlmDbLogger.Error(ex, databaseName, "saveCase");
-                    Task.Delay(TaskDelay).Wait();
-                    goto start;
-                }
+                            //theCase.SavedToDb = true;
+
+                            //RlmDbLogger.Info(string.Format("\n[{0:d/M/yyyy HH:mm:ss:ms}]: Saving case...", DateTime.Now), databaseName);
+                        }
+
+                        if (retryCnt > 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Cases saved after {retryCnt}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        RlmDbLogger.Error(ex, databaseName, "saveCase");
+                        error = ex;
+                        retryCnt++;
+                        Task.Delay(TaskRetryDelay).Wait();
+                    }
+                } while (error != null);
+
+                retryCnt = 0;
             }
+          
 
             // TODO needs more testing and fix for Sessions concurrency bug
             //await batchProcessor.InsertCases(cases);
@@ -465,36 +507,128 @@ namespace RLM.Database
             List<Input> inputs = new List<Input>();
             List<Output> outputs = new List<Output>();
 
-            using (RlmDbEntities db = new RlmDbEntities(databaseName))
+            var watch = new Stopwatch();
+            watch.Start();
+
+            Rnetwork network;
+            try
             {
-                try
+                using (RlmDbEntities db = new RlmDbEntities(databaseName))
                 {
                     //find network by name
-                    var network = from net in db.Rnetworks
-                                  where net.Name.ToLower() == name.ToLower()
-                                  select net;
+                    network = db.Rnetworks.FirstOrDefault(a => a.Name == name);
+                }
 
-                    if (network.Count() == 0)
+                if (network == null)
+                {
+                    //Throw an error
+                    Console.WriteLine("Network name '" + name + "' does not exist in the database:" + databaseName);
+                }
+                else
+                {
+                    this.rlm = network;
+
+                    // set rnetwork details
+                    retVal.CurrentNetworkId = networkID = this.rlm.ID;
+                    retVal.CurrentNetworkName = this.rlm.Name;
+
+                    List<Input> rnnInputs = null;
+                    List<Output> rnnOutputs = null;
+                        
+                    var tasks = new List<Task>();
+
+
+                    int taskCnt = Environment.ProcessorCount / 2;
+                    int batchSizeRn = 0;
+                    int batchSizeIvr = 0;
+                    var rnCountTask = Task.Run(() =>
                     {
-                        //Throw an error
-                        Console.WriteLine("Network name '" + name + "' does not exist in the database:" + db.Database.Connection.ToString());
-                    }
-                    else
+                        Stopwatch cntWatch = new Stopwatch();
+                        cntWatch.Start();
+
+                        var subTasks = new Task[3];
+                        int totalInputs = 0;
+                        int totalRneurons = 0;
+                        int totalIvrs = 0;
+
+                        subTasks[0] = Task.Run(() =>
+                        {
+                            using (var ctx = new RlmDbEntities(databaseName))
+                            {
+                                totalInputs = ctx.Inputs.Count();
+                            }
+                        });
+
+                        subTasks[1] = Task.Run(() =>
+                        {
+                            using (var ctx = new RlmDbEntities(databaseName))
+                            {
+                                totalRneurons = ctx.Rneurons.Count();
+                            }
+                        });
+
+                        subTasks[2] = Task.Run(() =>
+                        {
+                            using (var ctx = new RlmDbEntities(databaseName))
+                            {
+                                totalIvrs = ctx.Input_Values_Reneurons.Count();
+                            }
+                        });
+
+                        Task.WaitAll(subTasks);
+
+                        batchSizeRn = Convert.ToInt32(Math.Ceiling(totalRneurons / (double)taskCnt));
+                        batchSizeIvr = Convert.ToInt32(Math.Ceiling(totalIvrs / (double)taskCnt));
+
+                        while (batchSizeIvr % totalInputs != 0)
+                        {
+                            batchSizeIvr++;
+                        }
+                            
+                        cntWatch.Stop();
+                        System.Diagnostics.Debug.WriteLine($"Count elapsed: {cntWatch.Elapsed}");
+                    });
+                    tasks.Add(rnCountTask);
+
+                    var bestSolTask = Task.Run(() =>
                     {
-                        var rnetworkFromDb = network.First<Rnetwork>();
-                        this.rlm = rnetworkFromDb;
+                        IEnumerable<BestSolution> bestSolutions = null;
+                        using (var ctx = new RlmDbEntities(databaseName))
+                        {
+                            bestSolutions = ctx.Database.SqlQuery<BestSolution>(@"
+                                SELECT 
+	                                main.[Rneuron_ID] as [RneuronId],
+	                                main.[Solution_ID] as [SolutionId],
+	                                MAX(main.[CycleScore]) as [CycleScore],
+	                                MAX(sess.[SessionScore]) as [SessionScore],
+	                                MAX(main.[CycleEndTime]) as [CycleEndTime]
+                                FROM [Cases] main
+                                INNER JOIN [Sessions] sess ON main.[Session_ID] = sess.[ID]
+                                GROUP BY main.[Rneuron_ID], main.[Solution_ID]").ToList();
+                        }
 
-                        // set rnetwork details
-                        retVal.CurrentNetworkId = networkID = this.rlm.ID;
-                        retVal.CurrentNetworkName = this.rlm.Name;
+                        if (bestSolutions != null)
+                        {
+                            foreach (var item in bestSolutions)
+                            {
+                                rnetwork.MemoryManager.SetBestSolution(item);
+                            }
+                        }
+                    });
+                    tasks.Add(bestSolTask);
 
-                        // get inputs
-                        var rnnInputs = db.Inputs
-                            .Include(a => a.Input_Output_Type)
-                            .OrderBy(a=>a.Order)
-                            .ToList();
+                    var inputTask = Task.Run(() =>
+                    {
+                        using (var ctx = new RlmDbEntities(databaseName))
+                        {
+                            // get inputs
+                            rnnInputs = ctx.Inputs
+                                .Include(a => a.Input_Output_Type)
+                                .OrderBy(a => a.Order)
+                                .ToList();
+                        }
 
-                        rnetwork.Inputs = rnnInputs.Select(a => new RlmIO()
+                        retVal.Inputs = rnetwork.Inputs = rnnInputs.Select(a => new RlmIO()
                         {
                             ID = a.ID,
                             Name = a.Name,
@@ -505,21 +639,30 @@ namespace RLM.Database
                         });
 
                         rnetwork.InputMomentums.Clear();
-                        foreach(var item in rnetwork.Inputs)
+                        foreach (var item in rnetwork.Inputs)
                         {
                             if (item.Type == Enums.RlmInputType.Linear)
                             {
                                 rnetwork.InputMomentums.Add(item.ID, new RlmInputMomentum() { InputID = item.ID });
                             }
                         }
+                        retVal.InputMomentums = rnetwork.InputMomentums;
+                        
+                    });
+                    tasks.Add(inputTask);
 
-                        // get outputs
-                        var rnnOutputs = db.Outputs
-                            .Include(a => a.Input_Output_Type)
-                            .OrderBy(a => a.Order)
-                            .ToList();
+                    var outputTask = Task.Run(() =>
+                    {
+                        using (var ctx = new RlmDbEntities(databaseName))
+                        {
+                            // get outputs
+                            rnnOutputs = ctx.Outputs
+                                .Include(a => a.Input_Output_Type)
+                                .OrderBy(a => a.Order)
+                                .ToList();
+                        }
 
-                        rnetwork.Outputs = rnnOutputs.Select(a => new RlmIO()
+                        retVal.Outputs = rnetwork.Outputs = rnnOutputs.Select(a => new RlmIO()
                         {
                             ID = a.ID,
                             Name = a.Name,
@@ -533,54 +676,137 @@ namespace RLM.Database
                             // add dynamic output collection
                             rnetwork.MemoryManager.DynamicOutputs.TryAdd(output.ID, new HashSet<SolutionOutputSet>());
                         }
+                    });
+                    tasks.Add(outputTask);
 
-                        // initialize MemoryManager dictionaries (Rneurons, Solutions, etc...)
-                        //rnetwork.MemoryManager.InitStorage(rnetwork.Inputs.Select(a =>
-                        //{
-                        //    return new Input
-                        //    {
-                        //        ID = a.ID,
-                        //        Max = a.Max,
-                        //        Min = a.Min,
-                        //        Name = a.Name,
-                        //        Rnetwork_ID = rnetwork.CurrentNetworkID,
-                        //        Type = a.Type
-                        //    };
-                        //}).ToList(), rnetwork.Outputs.Select(a => {
-                        //    return new Output
-                        //    {
-                        //        ID = a.ID,
-                        //        Max = a.Max,
-                        //        Min = a.Min,
-                        //        Name = a.Name,
-                        //        Rnetwork_ID = rnetwork.CurrentNetworkID
-                        //    };
-                        //}).ToList());
-
-                        // get sessions and save to MemoryManager cache
-                        var sessions = db.Sessions.OrderBy(a=>a.DateTimeStart).ToList();
-                        foreach (var item in sessions)
+                    var sessionsTask = Task.Run(() =>
+                    {
+                        IEnumerable<Session> sessions = null;
+                        using (var ctx = new RlmDbEntities(databaseName))
                         {
-                            rnetwork.MemoryManager.Sessions.TryAdd(item.ID, item);
+                            // get sessions and save to MemoryManager cache
+                            sessions = ctx.Sessions.OrderBy(a => a.DateTimeStart).ToList();
+                            
+                            // set CaseOrder to the last case saved in db
+                            retVal.CaseOrder = ctx.Cases.OrderByDescending(a => a.Order).Select(a => a.Order).FirstOrDefault();
                         }
 
-                        //set sessions count
-                        retVal.SessionCount = sessions.Count;
-
-                        // set CaseOrder to the last case saved in db
-                        var lastCase = db.Cases.OrderByDescending(a => a.Order).FirstOrDefault();
-                        if (lastCase != null)
+                        if (sessions != null)
                         {
-                            retVal.CaseOrder = lastCase.Order;
+                            //set sessions count
+                            retVal.SessionCount = sessions.Count();
+                            foreach (var item in sessions)
+                            {
+                                rnetwork.MemoryManager.Sessions.TryAdd(item.ID, item);
+                            }
                         }
+                    });
+                    tasks.Add(sessionsTask);
+                        
+                    var rneuronsTask = Task.WhenAll(inputTask, rnCountTask).ContinueWith((t) =>
+                    {
+                        Stopwatch rn_sw = new Stopwatch();
+                        rn_sw.Start();
+                       
+                        var subTasks = new List<Task>();
 
                         // made input dictionary to help in setting the Dynamic inputs
                         var inputDic = rnnInputs.ToDictionary(a => a.ID, a => a);
 
-                        // get Rneurons and save to MemoryManager cache
-                        //var rneurons = db.Rneurons.Include(a => a.Input_Values_Reneurons).ToList();
+                        var rneurons = new ConcurrentBag<Rneuron>();
+                        var ivrs = new ConcurrentDictionary<long, List<Input_Values_Rneuron>>();
+                        //IEnumerable<Rneuron> rneurons = null;
+                        
+                        Stopwatch subProcessWatch = new Stopwatch();
+                        subProcessWatch.Start();
 
-                        //batching
+                        for (int i = 0; i < taskCnt; i++)
+                        {
+                            int batchNum = i;
+                            subTasks.Add(Task.Run(() =>
+                            {
+                                Rneuron[] results;
+                                using (var ctx = new RlmDbEntities(databaseName))
+                                {
+                                    results = ctx.Rneurons.OrderBy(a => a.ID).Skip(batchNum * batchSizeRn).Take(batchSizeRn).ToArray();
+                                }
+                                foreach(var item in results)
+                                {
+                                    rneurons.Add(item);
+                                }
+                            }));
+
+                            subTasks.Add(Task.Run(() => 
+                            {
+                                Input_Values_Rneuron[] results;
+                                using (var ctx = new RlmDbEntities(databaseName))
+                                {
+                                    results = ctx.Input_Values_Reneurons.OrderBy(a => a.Rneuron_ID).Skip(batchNum * batchSizeIvr).Take(batchSizeIvr).ToArray();
+                                }
+                                foreach(var item in results.GroupBy(a => a.Rneuron_ID))
+                                {
+                                    ivrs.TryAdd(item.Key, item.ToList());
+                                }
+                            }));
+                        }
+
+                        Task.WaitAll(subTasks.ToArray());
+                        subProcessWatch.Stop();
+                        System.Diagnostics.Debug.WriteLine($"Get data: {subProcessWatch.Elapsed}");
+                        
+                        subTasks.Clear();
+
+                        subProcessWatch.Restart();
+
+                        for (int i = 0; i < taskCnt; i++)
+                        {
+                            int batchNum = i;
+                            subTasks.Add(Task.Run(() =>
+                            {
+                                //Stopwatch sw = new Stopwatch();
+                                //sw.Start();
+
+                                //IEnumerable<Rneuron> rneurons = null;
+                                //using (var ctx = new RlmDbEntities(databaseName))
+                                //{
+                                //    rneurons = ctx.Rneurons
+                                //        .Include(a => a.Input_Values_Reneurons)
+                                //        .OrderBy(a => a.ID)
+                                //        .Skip(batchNum * batchSizeRn)
+                                //        .Take(batchSizeRn)
+                                //        .ToList();
+                                //}
+
+                                //sw.Stop();
+                                //System.Diagnostics.Debug.WriteLine($"Task: {Task.CurrentId}, Get Data: {sw.Elapsed}");
+
+                                //sw.Restart();
+
+                                //sw.Start();
+
+                                foreach (var item in rneurons.Skip(batchNum * batchSizeRn).Take(batchSizeRn))
+                                {
+                                    // set input type and dotnettype
+                                    item.Input_Values_Reneurons = ivrs[item.ID];
+                                    foreach (var ivr in item.Input_Values_Reneurons)
+                                    {
+                                        var input = inputDic[ivr.Input_ID];
+                                        ivr.InputType = input.Type;
+                                        ivr.DotNetType = input.Input_Output_Type.DotNetTypeName;
+                                        ivr.Input = input;
+                                    }
+
+                                    item.Input_Values_Reneurons = item.Input_Values_Reneurons.OrderBy(a => a.Input.Order).ToList();
+
+                                    rnetwork.MemoryManager.SetRneuronWithInputs(item);
+                                }
+
+                                //sw.Stop();
+                                //System.Diagnostics.Debug.WriteLine($"Task: {Task.CurrentId}, Process Data: {sw.Elapsed}");
+                            }));
+                        }
+
+                        /** old batching code
                         int totalRneurons = db.Rneurons.Count();
                         int pageCount = 100;
                         var helper = new StaticPagedList<Rneuron>(
@@ -608,69 +834,68 @@ namespace RLM.Database
                                     rnetwork.MemoryManager.SetRneuronWithInputs(item);
                                 }
                             }
-                        });
-                        //end batching
+                        }); 
 
-                        //foreach (var item in rneurons)
-                        //{
-                        //    // set input type and dotnettype
-                        //    foreach (var ivr in item.Input_Values_Reneurons)
-                        //    {
-                        //        var input = inputDic[ivr.Input_ID];
-                        //        ivr.InputType = input.Type;
-                        //        ivr.DotNetType = input.Input_Output_Type.DotNetTypeName;
-                        //        ivr.Input = input;
-                        //    }
-
-                        //    item.Input_Values_Reneurons = item.Input_Values_Reneurons.OrderBy(a => a.Input.Order).ToList();
-
-                        //    rnetwork.MemoryManager.SetRneuronWithInputs(item);
-                        //}
-
-                        // get solutions and save to MemoryManager cache
-                        var solutions = db.Solutions.Include(a => a.Output_Values_Solutions).ToList();
-                        foreach (var item in solutions)
+                        if (rneurons != null)
                         {
-                            rnetwork.MemoryManager.SetSolutionWithOutputs(item);
+                            foreach (var item in rneurons)
+                            {
+                                // set input type and dotnettype
+                                foreach (var ivr in item.Input_Values_Reneurons)
+                                {
+                                    var input = inputDic[ivr.Input_ID];
+                                    ivr.InputType = input.Type;
+                                    ivr.DotNetType = input.Input_Output_Type.DotNetTypeName;
+                                    ivr.Input = input;
+                                }
+
+                                item.Input_Values_Reneurons = item.Input_Values_Reneurons.OrderBy(a => a.Input.Order).ToList();
+
+                                rnetwork.MemoryManager.SetRneuronWithInputs(item);
+                            }
+                        } */
+
+                        Task.WaitAll(subTasks.ToArray());                        
+                        subProcessWatch.Stop();
+                        System.Diagnostics.Debug.WriteLine($"Process data: {subProcessWatch.Elapsed}");
+                        
+                        rn_sw.Stop();
+                        System.Diagnostics.Debug.WriteLine($"Total rneuron task elapsed: {rn_sw.Elapsed}");
+                        ;
+                    });
+                    tasks.Add(rneuronsTask);
+
+                    var solutionTask = outputTask.ContinueWith((t) => 
+                    {
+                        IEnumerable<Solution> solutions = null;
+                        using (var ctx = new RlmDbEntities(databaseName))
+                        {
+                            // get solutions and save to MemoryManager cache
+                            solutions = ctx.Solutions.Include(a => a.Output_Values_Solutions).ToList();
                         }
 
-                        // get best solutions and save to MemoryManager cache
-                        //var solCount = db.Database.SqlQuery<Int32>(@"SELECT COUNT(*) FROM(SELECT 
-
-                        //        main.[Rneuron_ID] as [RneuronId],
-                        //        main.[Solution_ID] as [SolutionId],
-                        //        MAX(main.[CycleScore]) as [CycleScore],
-                        //        MAX(sess.[SessionScore]) as [SessionScore],
-                        //        MAX(main.[CycleEndTime]) as [CycleEndTime]
-                        //    FROM[Cases] main
-                        //    INNER JOIN[Sessions] sess ON main.[Session_ID] = sess.[ID]
-                        //    GROUP BY main.[Rneuron_ID], main.[Solution_ID]) AS a").First();
-
-
-                        var bestSolutions = db.Database.SqlQuery<BestSolution>(@"
-                            SELECT 
-	                            main.[Rneuron_ID] as [RneuronId],
-	                            main.[Solution_ID] as [SolutionId],
-	                            MAX(main.[CycleScore]) as [CycleScore],
-	                            MAX(sess.[SessionScore]) as [SessionScore],
-	                            MAX(main.[CycleEndTime]) as [CycleEndTime]
-                            FROM [Cases] main
-                            INNER JOIN [Sessions] sess ON main.[Session_ID] = sess.[ID]
-                            GROUP BY main.[Rneuron_ID], main.[Solution_ID]")
-                            .ToList();
-                        foreach (var item in bestSolutions)
+                        if (solutions != null)
                         {
-                            rnetwork.MemoryManager.SetBestSolution(item);
+                            foreach (var item in solutions)
+                            {
+                                rnetwork.MemoryManager.SetSolutionWithOutputs(item);
+                            }
                         }
-
-                        retVal.Loaded = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    RlmDbLogger.Error(ex, databaseName, "LoadNetwork");
+                    });
+                    tasks.Add(solutionTask);
+                        
+                    Task.WaitAll(tasks.ToArray());
+                        
+                    retVal.Loaded = true;
                 }
             }
+            catch (Exception ex)
+            {
+                RlmDbLogger.Error(ex, databaseName, "LoadNetwork");
+            }
+
+            watch.Stop();
+            System.Diagnostics.Debug.WriteLine($"Load Network Elapsed: {watch.Elapsed}");
 
             return retVal;
         }

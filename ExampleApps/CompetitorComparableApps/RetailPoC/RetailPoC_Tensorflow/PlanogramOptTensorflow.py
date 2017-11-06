@@ -6,6 +6,9 @@ from RetailPoC import *
 from RetailPoC.Models import *
 from System import TimeSpan
 from System.Threading import CancellationToken
+from PoCTools.Settings import SimulationSettings
+from PoCTools.Settings import SimulationType
+
 
 import time
 import datetime
@@ -40,7 +43,11 @@ class PlanogramOptTensorflow():
                 return True
         return False
 
-    def train(self, lr, ui_results_callback, ui_status_callback, ui_logger):
+    def train(self, lr, ui_results_callback, ui_status_callback, ui_logger):        
+        n_nodes_hl1 = 500
+        n_nodes_hl2 = 500
+        n_nodes_hl3 = 500
+
         ui_status_callback("Initializing...")          
 
         tf.reset_default_graph() #Clear the Tensorflow graph.      
@@ -48,8 +55,37 @@ class PlanogramOptTensorflow():
         #These lines established the feed-forward part of the network. The agent takes a state and produces an action.
         self.slot_in = tf.placeholder(shape=[1],dtype=tf.int32)
         slot_in_OH = slim.one_hot_encoding(self.slot_in, self.numSlots)
-        output = slim.fully_connected([slot_in_OH],self.numOutputs,\
-            biases_initializer=None,activation_fn=tf.nn.sigmoid,weights_initializer=tf.zeros_initializer())
+        #output = slim.fully_connected([slot_in_OH],self.numOutputs,\
+        #    biases_initializer=None,activation_fn=tf.nn.sigmoid,weights_initializer=tf.zeros_initializer())
+
+
+        hidden_1_layer = {'weights':tf.Variable(tf.random_normal([self.numSlots, n_nodes_hl1]), name="hl_w_1"),
+                      'biases':tf.Variable(tf.random_normal([n_nodes_hl1]), name="hl_b_1")}
+
+        hidden_2_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl1, n_nodes_hl2]), name="hl_w_2"),
+                          'biases':tf.Variable(tf.random_normal([n_nodes_hl2]), name="hl_b_2")}
+
+        hidden_3_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl3, self.numSlots]), name="hl_w_3"),
+                          'biases':tf.Variable(tf.random_normal([self.numSlots]), name="hl_b_3")}
+
+        output_layer = {'weights':tf.Variable(tf.random_normal([self.numSlots, self.numOutputs]), name="out_w"),
+                        'biases':tf.Variable(tf.random_normal([self.numSlots, self.numOutputs]), name="out_b"),}
+
+
+        l1 = tf.add(tf.matmul(slot_in_OH,hidden_1_layer['weights']), hidden_1_layer['biases'])
+        l1 = tf.nn.sigmoid(l1)
+
+        l2 = tf.add(tf.matmul(l1,hidden_2_layer['weights']), hidden_2_layer['biases'])
+        l2 = tf.nn.sigmoid(l2)
+
+        l3 = tf.add(tf.matmul(l2,hidden_3_layer['weights']), hidden_3_layer['biases'])
+        l3 = tf.nn.sigmoid(l3)
+
+        output = tf.matmul(l3,output_layer['weights']) + output_layer['biases']
+        
+
+
+
         self.output = tf.reshape(output,[-1])
         self.chosen_action = tf.argmax(self.output,0)
 
@@ -59,16 +95,19 @@ class PlanogramOptTensorflow():
         self.action_holder = tf.placeholder(shape=[1],dtype=tf.int32)
         self.responsible_weight = tf.slice(self.output,self.action_holder,[1])
         self.loss = -(tf.log(self.responsible_weight)*self.reward_holder)
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=lr)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=lr) #tf.train.GradientDescentOptimizer(learning_rate=lr)
         self.update = optimizer.minimize(self.loss)        
-        weights = tf.trainable_variables()[0] #The weights we will evaluate to look into the network.
+        weights = tf.trainable_variables()[6] #The weights we will evaluate to look into the network.
  
+        
+        print(tf.trainable_variables())
         totalMetricScoreArr = []
         avgMetricScoreLastTen = []
         flag = 0
         startTime = time.time()
         sessionCounter = 0                
         init = tf.initialize_all_variables()
+        randomness = 0.1
 
         ui_status_callback("Training...")
 
@@ -78,12 +117,13 @@ class PlanogramOptTensorflow():
             highestPossibleSessionScore = self.simSettings.ItemMetricMax * self.numSlots
             lowestPossibleSessionScore = self.simSettings.ItemMetricMin * self.numSlots
 
+            matrix = {};
             while (not self.endTraining(flag)):     
                 totalMetricScore = 0
                 results = PlanogramOptResults()
                 sessionStartTime = time.time()
-
                 actionsPerSlot = {}
+                hasDupItems = False
 
                 #Reset facings list
                 facingsList = {}
@@ -91,6 +131,7 @@ class PlanogramOptTensorflow():
                     facingsList[it.ID] = 0
                 
                 #Train                
+                hasDupItems = False
                 for sl in range(self.numSlots):
                     reward = 0
                     while(reward != 1):
@@ -111,22 +152,59 @@ class PlanogramOptTensorflow():
                             totalMetricScore += metricScore
                         else:
                             reward = -1
+                            hasDupItems = True
                                             
                 #Update network
                 #print (totalMetricScore)
-                sessionScoreNormalized = self.normalize(lowestPossibleSessionScore, highestPossibleSessionScore, 0, 1, totalMetricScore)
+                if (hasDupItems):
+                    totalMetricScore = 0
+                    sessionScoreNormalized = 0
+                else:
+                    sessionScoreNormalized = self.normalize(lowestPossibleSessionScore, highestPossibleSessionScore, 0, 1, totalMetricScore)
+
                 for sl in range(self.numSlots):
                     feed_dict={self.reward_holder:[sessionScoreNormalized],self.action_holder:[actionsPerSlot[sl]],self.slot_in:[sl]}
-                    _,matrix = sess.run([self.update,weights], feed_dict=feed_dict)
-                
+                    _,matrix = sess.run([self.update,output], feed_dict=feed_dict)
+
+                #if (sessionCounter == 0):
+                #    matrix = sess.run([output], feed_dict={self.slot_in: [0]})
+
+                #Reset facings list
+                facingsList = {}
+                for it in self.items:
+                    facingsList[it.ID] = 0
+
                 totalMetricScore = 0
                 #Extract updated results from matrix
                 shelfItems = []                
                 for slotIndex in range(self.numSlots):
+                    #itemIndex = -1
+
+                    #if (np.random.rand(1) < randomness):
+                    #    itemIndex = np.random.randint(self.numOutputs)
+                    #else:
+                    #    slotArr = 0
+                    #    if (sessionCounter == 0) :
+                    #        slotArr = matrix[0][slotIndex]
+                    #    else:
+                    #        slotArr = matrix[slotIndex]
+
+                    #    itemIndex = np.argmax(slotArr)
+
                     slotArr = matrix[slotIndex]
                     itemIndex = np.argmax(slotArr)
                     item = self.items[itemIndex]   
                     shelfItems.append(item)
+                    #actionsPerSlot[slotIndex] = itemIndex
+
+                    dupItemVal = facingsList[item.ID] #Get item number of facings
+
+                    if(dupItemVal < 10):
+                        dupItemVal = dupItemVal + 1 #Increment item number of facings
+                        facingsList[item.ID] = dupItemVal #Update item number of facings in the list
+                    else:
+                        hasDupItems = True
+
                     if ((slotIndex+1) % 24 == 0):
                         shelf = Shelf()
                         for ii in range(len(shelfItems)):                                 
@@ -134,7 +212,17 @@ class PlanogramOptTensorflow():
                             totalMetricScore += metricScore
                             shelf.Add(shelfItems[ii], metricScore)
                         shelfItems = []
-                        results.Shelves.Add(shelf)                    
+                        results.Shelves.Add(shelf)   
+                                         
+                if (hasDupItems):
+                    totalMetricScore = 0
+                #    sessionScoreNormalized = 0
+                #else:
+                #    sessionScoreNormalized = self.normalize(lowestPossibleSessionScore, highestPossibleSessionScore, 0, 1, totalMetricScore)
+
+                #for sl in range(self.numSlots):
+                #    feed_dict={self.reward_holder:[sessionScoreNormalized],self.action_holder:[actionsPerSlot[sl]],self.slot_in:[sl]}
+                #    _,matrix = sess.run([self.update,output], feed_dict=feed_dict)
 
                 sessionCounter+=1
                 currentTime = time.time()

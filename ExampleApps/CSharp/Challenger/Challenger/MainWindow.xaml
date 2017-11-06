@@ -1,0 +1,170 @@
+﻿<Controls:MetroWindow x:Class="Challenger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Challenger"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="" Height="{Binding SystemParameters.PrimaryScreenHeight}" Width="{Binding SystemParameters.PrimaryScreenWidth}" d:DesignWidth="1392.5" d:DesignHeight="947.5" BorderBrush="LightGray" BorderThickness="1" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="332*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="459*"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Grid.Row="0">
+            <Grid x:Name="gridTopControls">
+                <Button x:Name="btnNewConfiguration" Content="New Configuration" Margin="0,6,-112,0" VerticalAlignment="Top" Click="btnNewConfiguration_Click" FontFamily="Fonts/#Oswald Light" Height="24" HorizontalAlignment="Right" Width="102" FontSize="10" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0"/>
+                <Button x:Name="btnLoadConfig" Content="Load Configuration" VerticalAlignment="Top" Click="btnLoadConfig_Click" FontFamily="Fonts/#Oswald Light" Height="24" HorizontalAlignment="Right" Width="104" FontSize="10" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0" Margin="0,6,-232,0"/>
+                <Button x:Name="btnClearConfigGrid" Content="Clear" HorizontalAlignment="Left" Margin="11,6,0,0" VerticalAlignment="Top" Width="96" RenderTransformOrigin="0.44,0" Click="btnClearConfigGrid_Click" FontFamily="Fonts/#Oswald Light" Height="24" FontSize="10" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0"/>
+                <CheckBox x:Name="checkAllowCopy"  Content="Allow Copy" Margin="112,11,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" Checked="checkAllowCopy_Checked" Unchecked="checkAllowCopy_Unchecked" Visibility="Visible"/>
+                <Image ToolTip="This feature allows you to duplicate Simulation objects by dragging it into another point in the Play Area." Stretch="Fill" HorizontalAlignment="Left" Height="19" Margin="182,11,0,0" VerticalAlignment="Top" Width="19" Source="/Challenger;component/Images/help.png"/>
+                <Button x:Name="btnVisualizer" IsEnabled="False" Click="btnVisualizer_Click" Content="Open Visualizer" Margin="0,6,10,0" VerticalAlignment="Top"  FontFamily="Fonts/#Oswald Light" Height="24" HorizontalAlignment="Right" Width="92" FontSize="10" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0"/>
+
+
+
+            </Grid>
+            <Grid x:Name="gridMain" Height="Auto" Width="Auto" Margin="17,36,10,9" Background="LightGray">
+                <!-- AllowDrop="True" DragEnter="gridMain_DragEnter" Drop="gridMain_Drop" -->
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="17"/>
+                <RowDefinition Height="251"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!--<Button x:Name="btnLoadConfig" Content="Load Configuration" HorizontalAlignment="Left" Margin="143,8,0,0" VerticalAlignment="Top" Width="91" Click="btnLoadConfig_Click" FontFamily="Fonts/#Oswald Light" Grid.Column="1" />-->
+            <Grid x:Name="gridConfigProperties" Margin="10,0"  VerticalAlignment="Top" Grid.Row="1" >
+                <TextBlock x:Name="lblName" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Margin="0,19,0,0" />
+                <TextBox x:Name="txtName" HorizontalAlignment="Left" Height="23" Margin="0,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="224" TextChanged="txtName_TextChanged" FontFamily="Fonts/#Oswald Light" />
+                <TextBlock x:Name="lblHeight" HorizontalAlignment="Left" Margin="0,66,0,0" TextWrapping="Wrap" Text="Rows" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+                <TextBox x:Name="txtHeight" HorizontalAlignment="Left" Height="23" Margin="0,85,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="94" TextChanged="txtHeight_TextChanged" PreviewTextInput="txtHeight_PreviewTextInput" FontFamily="Fonts/#Oswald Light" />
+                <TextBlock x:Name="lblWidth" HorizontalAlignment="Left" Margin="132,67,0,0" TextWrapping="Wrap" Text="Columns" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" />
+                <TextBox x:Name="txtWidth" HorizontalAlignment="Left" Height="23" Margin="132,85,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="92" TextChanged="txtWidth_TextChanged" PreviewTextInput="txtWidth_PreviewTextInput" FontFamily="Fonts/#Oswald Light"  />
+                <Button x:Name="btnInitialize" Click="btnInitialize_Click" Content="Initialize Settings" HorizontalAlignment="Left" Margin="124,214,0,0" VerticalAlignment="Top" Width="104" Height="28" FontFamily="Fonts/#Oswald Light" FontSize="12" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0"/>
+                <TextBox x:Name="txtFreeMoves" HorizontalAlignment="Left" Height="24" Margin="0,132,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="224" FontFamily="Fonts/#Oswald Light" TextChanged="txtFreeMoves_TextChanged" PreviewTextInput="txtFreeMoves_PreviewTextInput"/>
+                <TextBlock x:Name="lblFreeMoves" HorizontalAlignment="Left" Margin="1,115,0,0" TextWrapping="Wrap" Text="Number of Free Moves" VerticalAlignment="Top" Height="16" Width="122" FontFamily="Fonts/#Oswald Light"/>
+                <TextBlock x:Name="lblMoveFactor" HorizontalAlignment="Left" Margin="2,167,0,0" TextWrapping="Wrap" Text="Move Factor:" VerticalAlignment="Top" Height="16" Width="76" FontFamily="Fonts/#Oswald Light"/>
+                <TextBlock x:Name="lblMoveFactorValue" HorizontalAlignment="Left" Margin="86,169,0,0" TextWrapping="Wrap" Text="0%" VerticalAlignment="Top" Height="16" Width="62"/>
+                <Slider x:Name="sliderMoveFactor" Minimum="0" Maximum="100" HorizontalAlignment="Left" Margin="3,189,0,0" VerticalAlignment="Top" Width="223" Height="20" PreviewMouseUp="sliderMoveFactor_PreviewMouseUp" ValueChanged="sliderMoveFactor_ValueChanged" IsSnapToTickEnabled="True"/>
+                <Button x:Name="btnSaveConfig" Content="Save Settings" HorizontalAlignment="Left" Margin="0,214,0,0" VerticalAlignment="Top" Width="101" Height="28" FontFamily="Fonts/#Oswald Light" Click="btnSaveConfig_Click" FontSize="12" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Padding="0"/>
+            </Grid>
+            <Grid  Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition MaxHeight="175"/>
+                </Grid.RowDefinitions>
+                <!--<Image x:Name="exampleImage" Source="/Challenger;component/Icons/money.png" ></Image>-->
+                <Grid x:Name="gridSimulationBlocks" Grid.Row="0">
+
+                    <TextBlock x:Name="lblBlocks" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Simulation Objects" VerticalAlignment="Top" Margin="0,23,0,0" FontFamily="Fonts/#Oswald Light" FontSize="20"></TextBlock>
+                    <Button x:Name="AddBlockButton" Content="Add Object" HorizontalAlignment="Left" Margin="136,25,0,0" VerticalAlignment="Top" Width="102" FontSize="12" Height="26" Click="AddBlockButton_Click" FontFamily="Fonts/#Oswald Light"  BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" RenderTransformOrigin="0.5,0.5" Padding="0">
+                        <Button.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="0.475"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Button.RenderTransform>
+                    </Button>
+                    <Grid Margin="0,58,0,0">
+                        <ScrollViewer>
+                            <WrapPanel x:Name="gridBlocks" Background="#FFECECEC">
+                                <Grid Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"></ColumnDefinition>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0" Source="/Challenger;component/Icons/Miscellaneous/money.png" Width="70" Height="70" />
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Width="100" Text="Start Simulation" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Background="#FFFE8F41" Foreground="White" TextAlignment="Center" Margin="0,3,0,0"/>
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="10,14,0,0" />
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="6,43,0,0" />
+                                </Grid>
+                                <Grid Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"></ColumnDefinition>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0" Source="/Challenger;component/Icons/Miscellaneous/money.png" Width="70" Height="70" />
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Width="100" Text="Start Simulation" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Background="#FFFE8F41" Foreground="White" TextAlignment="Center" Margin="0,3,0,0"/>
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="10,14,0,0" />
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="6,43,0,0" />
+                                </Grid>
+                                <Grid Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"></ColumnDefinition>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0" Source="/Challenger;component/Icons/Miscellaneous/money.png" Width="70" Height="70" />
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Width="100" Text="Start Simulation" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Background="#FFFE8F41" Foreground="White" TextAlignment="Center" Margin="0,3,0,0"/>
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="10,14,0,0" />
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" Margin="6,43,0,0" />
+                                </Grid>
+
+                                <!--<Image x:Name="exampleImage_Copy" Source="Icons/Miscellaneous/money.png" Height="30" Width="30" Margin="132,14,68,101"/>
+                                <Label x:Name="lblIconName_Copy" Content="Money" HorizontalAlignment="Left" Margin="162,5,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.766,-0.462" FontFamily="Fonts/#Oswald Light" FontSize="15"/>
+                                <TextBlock x:Name="lblEditIcon_Copy" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" Margin="166,31,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <TextBlock x:Name="lblDeleteIcon_Copy" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" Margin="184,31,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <Image x:Name="exampleImage_Copy1" Source="Icons/Miscellaneous/money.png" Height="30" Width="30" Margin="15,62,185,55"/>
+                                <Label x:Name="lblIconName_Copy1" Content="Money" HorizontalAlignment="Left" Margin="45,52,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.766,-0.462" FontFamily="Fonts/#Oswald Light" FontSize="15"/>
+                                <TextBlock x:Name="lblEditIcon_Copy1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" Margin="49,78,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <TextBlock x:Name="lblDeleteIcon_Copy1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" Margin="67,78,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <Image x:Name="exampleImage_Copy2" Source="Icons/Miscellaneous/money.png" Height="30" Width="30" Margin="124,63,76,56"/>
+                                <Label x:Name="lblIconName_Copy2" Content="Money" HorizontalAlignment="Left" Margin="154,52,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.766,-0.462" FontFamily="Fonts/#Oswald Light" FontSize="15"/>
+                                <TextBlock x:Name="lblEditIcon_Copy2" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" Margin="158,78,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <TextBlock x:Name="lblDeleteIcon_Copy2" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" Margin="176,78,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <Image x:Name="exampleImage_Copy3" Source="Icons/Miscellaneous/money.png" Height="30" Width="30" Margin="10,110,190,11"/>
+                                <Label x:Name="lblIconName_Copy3" Content="Money" HorizontalAlignment="Left" Margin="40,98,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.766,-0.462" FontFamily="Fonts/#Oswald Light" FontSize="15"/>
+                                <TextBlock x:Name="lblEditIcon_Copy3" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" Margin="44,124,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <TextBlock x:Name="lblDeleteIcon_Copy3" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" Margin="62,124,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <Image x:Name="exampleImage_Copy4" Source="Icons/Miscellaneous/money.png" Height="30" Width="30" Margin="124,111,76,12"/>
+                                <Label x:Name="lblIconName_Copy4" Content="Money" HorizontalAlignment="Left" Margin="154,98,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.766,-0.462" FontFamily="Fonts/#Oswald Light" FontSize="15"/>
+                                <TextBlock x:Name="lblEditIcon_Copy4" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Edit" VerticalAlignment="Top" Margin="158,124,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />
+                                <TextBlock x:Name="lblDeleteIcon_Copy4" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Delete" VerticalAlignment="Top" Margin="176,124,0,0" FontFamily="Fonts/#Oswald Light" Foreground="#FF1A8CB2" FontSize="8" />-->
+
+                            </WrapPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+
+                    <!--<Rectangle Fill="#FFB8B8B8" HorizontalAlignment="Left" Height="2" Margin="0,266,0,0" VerticalAlignment="Top" Width="230"/>-->
+
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Button x:Name="btnPlay" Content="Play" HorizontalAlignment="Left" Width="230"  FontFamily="Fonts/#Oswald Light" Click="btnPlay_Click" FontSize="14" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Foreground="#FFFFFF" Margin="10,5,0,0" Height="32" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="lblStatus" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Status:" VerticalAlignment="Top" Margin="11,56,0,0" FontFamily="Fonts/#Oswald Light" Height="19" />
+                    <TextBlock x:Name="txtStatus" HorizontalAlignment="Left" TextWrapping="Wrap" Text="text Container" VerticalAlignment="Top" Margin="11,71,0,0" FontFamily="Fonts/#Oswald Light" FontSize="23" Foreground="#FF29ABE2" Height="35"/>
+                    <TextBlock x:Name="lblSessionScore" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Current Score:" VerticalAlignment="Top" Margin="132,56,0,0" FontFamily="Fonts/#Oswald Light" Height="19" />
+                    <TextBlock x:Name="txtSessionScore" HorizontalAlignment="Left" TextWrapping="Wrap" Text="text Container" VerticalAlignment="Top" Margin="132,71,0,0" FontFamily="Fonts/#Oswald Light" FontSize="23" Foreground="#FF29ABE2" Height="35"/>
+                    <TextBlock x:Name="lblSessionMoves" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Moves:" VerticalAlignment="Top" Margin="11,115,0,0" FontFamily="Fonts/#Oswald Light" Height="18" />
+                    <TextBlock x:Name="txtSessionMoves" HorizontalAlignment="Left" TextWrapping="Wrap" Text="text Container" VerticalAlignment="Top" Margin="11,130,0,0" FontFamily="Fonts/#Oswald Light" FontSize="23" Foreground="#FF29ABE2" Height="35"/>
+                    <TextBlock x:Name="lblTopScore" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Top Score:" VerticalAlignment="Top" Margin="132,116,0,0" FontFamily="Fonts/#Oswald Light" Height="18" />
+                    <TextBlock x:Name="txtTopScore" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Score Container" VerticalAlignment="Top" Margin="132,130,-13,-25" FontFamily="Fonts/#Oswald Light" FontSize="23" Foreground="#FF29ABE2" Height="70" Width="131"/>
+                </Grid>
+
+
+
+
+
+            </Grid>
+            <Rectangle Fill="#FFB8B8B8" HorizontalAlignment="Left" Height="2" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="240"/>
+        </Grid>
+    </Grid>
+</Controls:MetroWindow>

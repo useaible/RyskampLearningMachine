@@ -49,6 +49,8 @@ namespace RLM.Models.Interfaces
         GetSolutionResult GetSolutionFromOutputs(IEnumerable<RlmIOWithValue> outputs);
         void SetSolutionWithOutputs(Solution solution);
         void StartRlmDbWorkers();
+        void StopRlmDbWorkersSessions();
+        void StopRlmDbWorkersCases();
         void TrainingDone();
         void InitStorage(List<Input> inputs, List<Output> outputs);
         void SetProgressInterval(int milliseconds);
