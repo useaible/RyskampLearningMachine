@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleApps", "ExampleApps", "{AC49F9AD-6797-47AC-B081-9A204352AE6B}"
 EndProject
@@ -90,6 +90,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Challenger", "ExampleApps\CSharp\Challenger\Challenger\Challenger.csproj", "{092FFE5D-8373-48A1-8546-734815C0DE91}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChallengerLib", "ExampleApps\CSharp\Challenger\ChallengerLib\ChallengerLib.csproj", "{5DB790EC-E0AD-473E-AB4A-22725CDD7EB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RetailPoC 2.0", "RetailPoC 2.0", "{94055AE5-322D-4D57-B6A2-9B800936BB55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailPoC20", "ExampleApps\CSharp\RetailPoC 2.0\RetailPoC20\RetailPoC20.csproj", "{C176C182-E402-4102-89E1-40C1B1A71014}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RetailPoC 2.0", "RetailPoC 2.0", "{0D08DAA8-474D-4DD1-8840-83A7F19EF15D}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RetailPoC20", "ExampleApps\CompetitorComparableApps\RetailPoC 2.0\RetailPoC20_Tensorflow\RetailPoC20.pyproj", "{4373FA1D-7060-4F22-9EBA-1D46D786CE84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,6 +201,12 @@ Global
 		{5DB790EC-E0AD-473E-AB4A-22725CDD7EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DB790EC-E0AD-473E-AB4A-22725CDD7EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DB790EC-E0AD-473E-AB4A-22725CDD7EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C176C182-E402-4102-89E1-40C1B1A71014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C176C182-E402-4102-89E1-40C1B1A71014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C176C182-E402-4102-89E1-40C1B1A71014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C176C182-E402-4102-89E1-40C1B1A71014}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4373FA1D-7060-4F22-9EBA-1D46D786CE84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4373FA1D-7060-4F22-9EBA-1D46D786CE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,5 +253,12 @@ Global
 		{854C2E7D-01C3-4BA3-9FCD-384B64B22D1F} = {916EF767-9E1F-46A3-B49B-812034164C1B}
 		{092FFE5D-8373-48A1-8546-734815C0DE91} = {9E976D8F-D0DC-4343-AE0E-D0616B5BF1F9}
 		{5DB790EC-E0AD-473E-AB4A-22725CDD7EB9} = {9E976D8F-D0DC-4343-AE0E-D0616B5BF1F9}
+		{94055AE5-322D-4D57-B6A2-9B800936BB55} = {58F58DCE-4D43-434B-821D-67B326F13924}
+		{C176C182-E402-4102-89E1-40C1B1A71014} = {94055AE5-322D-4D57-B6A2-9B800936BB55}
+		{0D08DAA8-474D-4DD1-8840-83A7F19EF15D} = {84A5D4E4-36A7-42A1-81EF-090F21FD72EC}
+		{4373FA1D-7060-4F22-9EBA-1D46D786CE84} = {0D08DAA8-474D-4DD1-8840-83A7F19EF15D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2551AB39-DAB9-44B5-BB16-E3DB44F6AB98}
 	EndGlobalSection
 EndGlobal

@@ -15,7 +15,7 @@ namespace RLM
     public class RlmNetworkLegacy : RlmNetwork
     {
         public RlmNetworkLegacy() : base() { }
-        public RlmNetworkLegacy(string dbName) : base(dbName) { }
+        public RlmNetworkLegacy(string dbName, bool persistData = true) : base(dbName, persistData) { }
 
         public override long SessionStart()
         {

@@ -56,6 +56,7 @@
     <Compile Include="Interfaces\IManager.cs" />
     <Compile Include="Interfaces\IRlmNetwork.cs" />
     <Compile Include="Models\Archives\RlmIODetails.cs" />
+    <Compile Include="Models\Archives\RlmLearnedSession.cs" />
     <Compile Include="Models\Archives\RlmLearnedSessionDetails.cs" />
     <Compile Include="Models\GetSolutionResult.cs" />
     <Compile Include="Models\GetRneuronResult.cs" />

@@ -107,7 +107,7 @@ namespace RLM.Memory
             solution_queue = new BlockingCollection<Solution>();
             case_queue = new BlockingCollection<Case>();
 
-            rlmDb = (network.PersistData) ? new RlmDbMgr(network.DatabaseName) : null;
+            rlmDb = new RlmDbMgr(network.DatabaseName, network.PersistData);
             rlmDbEnqueuer = new RlmObjectEnqueuer();
 
             ctSourceSessions = new CancellationTokenSource();
@@ -370,6 +370,8 @@ namespace RLM.Memory
 
             return retVal;
         }
+
+        object lockDynamicInputs = new object();
         /// <summary>
         /// Sets the Rneuron
         /// </summary>
@@ -400,10 +402,13 @@ namespace RLM.Memory
                     if (lastInputValue.RelatedInputs == null)
                         lastInputValue.RelatedInputs = new SortedList<RlmInputKey, RlmInputValue>(i.InputType == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
 
-                    if (!lastInputValue.RelatedInputs.TryGetValue(inputKey, out inputVal))
+                    lock (lastInputValue.RelatedInputs)
                     {
-                        inputVal = new RlmInputValue();
-                        lastInputValue.RelatedInputs.Add(inputKey, inputVal);
+                        if (!lastInputValue.RelatedInputs.TryGetValue(inputKey, out inputVal))
+                        {
+                            inputVal = new RlmInputValue();
+                            lastInputValue.RelatedInputs.Add(inputKey, inputVal);
+                        }
                     }
 
                     lastInputValue = inputVal;
@@ -414,12 +419,14 @@ namespace RLM.Memory
                         DynamicInputs = new SortedList<RlmInputKey, RlmInputValue>(i.InputType == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
 
                     isFirstInput = false;
-                    if (!DynamicInputs.TryGetValue(inputKey, out inputVal))
+                    lock (lockDynamicInputs)
                     {
-                        inputVal = new RlmInputValue();
-                        DynamicInputs.Add(inputKey, inputVal);
+                        if (!DynamicInputs.TryGetValue(inputKey, out inputVal))
+                        {
+                            inputVal = new RlmInputValue();
+                            DynamicInputs.Add(inputKey, inputVal);
+                        }
                     }
-
                     lastInputValue = inputVal;
                 }
                 cnt++;
@@ -813,7 +820,7 @@ namespace RLM.Memory
         public void StopRlmDbWorkersCases()
         {
             case_queue.CompleteAdding();
-
+            
             ctSourceCases.Cancel();
 
             dbSavingTime.Stop();
@@ -831,6 +838,11 @@ namespace RLM.Memory
             // notify parent network that db background workers are done
             DataPersistenceComplete?.Invoke();
             progressUpdater.Stop();
+            
+            foreach (var item in rlmDb.CaseWorkerQueues)
+            {
+                item.CompleteAdding();
+            }
         }
         /// <summary>
         /// Loads the network result
@@ -840,7 +852,7 @@ namespace RLM.Memory
         public LoadRnetworkResult LoadNetwork(string networkName)
         {
             var result = rlmDb.LoadNetwork(networkName, Network);
-            if (result.Loaded)
+            if (result.Loaded && Network.PersistData)
             {
                 StartRlmDbWorkers();
             }
@@ -886,7 +898,7 @@ namespace RLM.Memory
                     //}
 
                     if (sessionsDone && 
-                        rlmDb.DistinctCaseSessionsCount() == totalSessionsCount && 
+                        //rlmDb.DistinctCaseSessionsCount() == totalSessionsCount && 
                         MASTER_CASE_QUEUE.Count == 1 && 
                         MASTER_CASE_QUEUE.ElementAt(0).Count == 0)
                     {

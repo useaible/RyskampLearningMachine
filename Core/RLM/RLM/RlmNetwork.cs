@@ -309,10 +309,11 @@ namespace RLM
         /// <summary>
         /// sets your preferred database name
         /// </summary>
-        /// <param name="databaseName">database name</param>
-        public RlmNetwork(string databaseName)
+        /// <param name="databaseName">Uses a custom database name instead of the default generated name</param>
+        /// <param name="persistData">Allows you to turn on/off the data persistence feature of the RLM. Turned on by default.</param>
+        public RlmNetwork(string databaseName, bool persistData = true)
         {
-            PersistData = true;
+            PersistData = persistData;
             DatabaseName = databaseName;
             Initialize();
             //MemoryManager.StartRnnDbWorkers();
@@ -404,20 +405,27 @@ namespace RLM
         /// <returns>Returns true if network is successfully loaded</returns>
         public bool LoadNetwork()
         {
-            string networkName = null;
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            bool retVal = false;
+
+            if (PersistData)
             {
-                networkName = db.Rnetworks.Select(a => a.Name).FirstOrDefault();
+                string networkName = null;
+                using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+                {
+                    networkName = db.Rnetworks.Select(a => a.Name).FirstOrDefault();
+                }
+
+                if (networkName == null)
+                {
+                    retVal = false;
+                }
+                else
+                {
+                    retVal = LoadNetwork(networkName);
+                }
             }
 
-            if (networkName == null)
-            {
-                return false;
-            }
-            else
-            {
-                return LoadNetwork(networkName);
-            }
+            return retVal;
         }
 
         /// <summary>
@@ -442,12 +450,44 @@ namespace RLM
                     CurrentNetworkName = result.CurrentNetworkName;
                     CaseOrder = result.CaseOrder;
                     SessionCountInitial = SessionCount = result.SessionCount;
+                    Inputs = result.Inputs;
+                    Outputs = result.Outputs;
+                    InputMomentums = result.InputMomentums;
                 }
 
-                retVal = result.Loaded; 
+                retVal = result.Loaded;
             }
 
             return retVal;
+        }
+
+        public bool LoadNetwork(IRlmNetwork networkToCopy)
+        {   
+            MemoryManager.Sessions = new ConcurrentDictionary<long, Session>(networkToCopy.MemoryManager.Sessions.ToList());
+            MemoryManager.BestSolutions = new ConcurrentDictionary<long, Dictionary<long, BestSolution>>(networkToCopy.MemoryManager.BestSolutions.ToList());
+            MemoryManager.Rneurons = new ConcurrentDictionary<long, Rneuron>(networkToCopy.MemoryManager.Rneurons.ToList());
+            MemoryManager.Solutions = new ConcurrentDictionary<long, Solution>(networkToCopy.MemoryManager.Solutions.ToList());
+            MemoryManager.DynamicInputs = new SortedList<RlmInputKey, RlmInputValue>(networkToCopy.MemoryManager.DynamicInputs.Comparer);
+            foreach(var item in networkToCopy.MemoryManager.DynamicInputs)
+            {
+                MemoryManager.DynamicInputs.Add(item.Key, item.Value);
+            }
+            MemoryManager.DynamicOutputs = new ConcurrentDictionary<long, HashSet<SolutionOutputSet>>(networkToCopy.MemoryManager.DynamicOutputs.ToList());
+            
+            CurrentNetworkID = networkToCopy.CurrentNetworkID;
+            CurrentNetworkName = networkToCopy.CurrentNetworkName;
+            CaseOrder = networkToCopy.CaseOrder;
+            SessionCountInitial = SessionCount = networkToCopy.SessionCount;
+            Inputs = networkToCopy.Inputs.ToList();
+            Outputs = networkToCopy.Outputs.ToList();
+
+            InputMomentums = new Dictionary<long, RlmInputMomentum>();
+            foreach (var item in networkToCopy.InputMomentums)
+            {
+                InputMomentums.Add(item.Key, new RlmInputMomentum() { InputID = item.Value.InputID });
+            }
+
+            return true;
         }
 
         public void ResetNetwork()
