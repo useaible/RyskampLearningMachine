@@ -1,5 +1,5 @@
-﻿using RetailPoC.Models;
-using RetailPoC.ViewModels;
+﻿using RetailPoC20.Models;
+using RetailPoC20.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public class DataFactory
     {

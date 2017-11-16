@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RetailPoC.Properties {
+namespace RetailPoC20.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

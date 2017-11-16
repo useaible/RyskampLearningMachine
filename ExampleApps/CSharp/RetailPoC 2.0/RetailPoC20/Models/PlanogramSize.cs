@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RetailPoC.Models
+namespace RetailPoC20.Models
 {
     public class PlanogramSize
     {

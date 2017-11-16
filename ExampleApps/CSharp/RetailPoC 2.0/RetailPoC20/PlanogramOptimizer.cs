@@ -1,4 +1,4 @@
-﻿using RetailPoC.Models;
+﻿using RetailPoC20.Models;
 using RLM;
 using RLM.Models;
 using System;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PoCTools.Settings;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     //public delegate void SessionDone(PlanogramOptResults results);
     public delegate void UpdateUICallback(PlanogramOptResultsSettings results, bool enableSimDisplay);
@@ -73,7 +73,7 @@ namespace RetailPoC
 
             // creates the network (and the underlying DB) with a unique name to have a different network everytime you run a simulation
             network = new RlmNetwork(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" +  Guid.NewGuid().ToString("N"));
-
+            network.DataPersistenceComplete += Network_DataPersistenceComplete;
             // checks if the network structure already exists
             // if not then we proceed to define the inputs and outputs
 
@@ -96,6 +96,13 @@ namespace RetailPoC
                 network.NewNetwork("planogram", inputs, outputs);
             }
         }
+
+        private void Network_DataPersistenceComplete()
+        {
+            DataPersistenceCompleteEvent?.Invoke();
+        }
+
+        public event DataPersistenceCompleteDelegate DataPersistenceCompleteEvent;
 
         private int GetEquivalentIndex(int index)
         {
@@ -329,7 +336,6 @@ namespace RetailPoC
 
                 // ends the session with the summed metric score for all items in the planogram
                 network.SessionEnd(totalMetricScore);
-                System.Diagnostics.Debug.WriteLine($"Session #{i}, Score: {totalMetricScore}");
 
                 // set statistics and the optimized planogram shelves (and items inside them)
                 output.Shelves = shelves;

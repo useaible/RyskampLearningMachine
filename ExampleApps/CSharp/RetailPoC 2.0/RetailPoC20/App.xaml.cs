@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Navigation;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -22,14 +22,14 @@ namespace RetailPoC
             this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml") });
             this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/Orange.xaml") });
             this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml") });
-            this.Resources.Add(new FontFamily("OswaldBold"), "/RetailPoC;component/Fonts/Oswald-Bold.ttf");
-            this.Resources.Add(new FontFamily("OswaldLight"), "/RetailPoC;component/Fonts/Oswald-Light.ttf");
+            this.Resources.Add(new FontFamily("OswaldBold"), "/RetailPoC20;component/Fonts/Oswald-Bold.ttf");
+            this.Resources.Add(new FontFamily("OswaldLight"), "/RetailPoC20;component/Fonts/Oswald-Light.ttf");
             base.OnStartup(e);
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {            
-            RetailPoC.MainWindow main = new RetailPoC.MainWindow();
+            RetailPoC20.MainWindow main = new RetailPoC20.MainWindow();
             MainWindow = main;
             main.Show();
         }

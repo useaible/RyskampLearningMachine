@@ -4,7 +4,7 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace RetailPoC.Models
+namespace RetailPoC20.Models
 {
     public class PlanogramContext : DbContext
     {

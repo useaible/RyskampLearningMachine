@@ -1,4 +1,4 @@
-﻿using RetailPoC.Models;
+﻿using RetailPoC20.Models;
 using RLM.Models;
 using RLV.Core.Interfaces;
 using RLV.Core.Models;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public interface IRLVPlangoramOutputVisualizer : IRLVOutputVisualizer
     {

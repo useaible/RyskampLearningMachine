@@ -1,5 +1,5 @@
-﻿using RetailPoC.Models;
-using RetailPoC.ViewModels;
+﻿using RetailPoC20.Models;
+using RetailPoC20.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using System.ComponentModel;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     /// <summary>
     /// doubleeraction logic for MetricPanel2.xaml

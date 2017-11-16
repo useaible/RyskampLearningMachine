@@ -3,15 +3,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:RetailPoC"
-    xmlns:Properties="clr-namespace:RetailPoC.Properties" x:Class="RetailPoC.MainWindow"
+    xmlns:local="clr-namespace:RetailPoC20"
+    xmlns:Properties="clr-namespace:RetailPoC20.Properties" x:Class="RetailPoC20.MainWindow"
     xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:progressionChart="clr-namespace:WPFVisualizer;assembly=WPFVisualizer"
     mc:Ignorable="d"
-    Title="Retail Proof of Concept" Height="792" Width="1530.576" WindowStartupLocation="CenterScreen" 
+    Title="Retail Proof of Concept" Height="850" Width="1530.576" WindowStartupLocation="CenterScreen" 
     Loaded="Window_Loaded" ResizeMode="CanResize"
     LocationChanged="MetroWindow_LocationChanged" 
-    NonActiveWindowTitleBrush="#FFFFAC71">
+    NonActiveWindowTitleBrush="#FFFFAC71" BorderThickness="0" BorderBrush="Black">
     <Controls:MetroWindow.Resources>
         <SolidColorBrush x:Key="comparisonBlack" Color="Black" Opacity="0.8"></SolidColorBrush>
         <Style TargetType="Image">
@@ -62,28 +62,50 @@
         </Style>
     </Controls:MetroWindow.Resources>
     <Viewbox Width="Auto" Height="Auto">
-        <DockPanel HorizontalAlignment="Stretch" Height="Auto" LastChildFill="False" Margin="0,0,0,0" VerticalAlignment="Stretch" Width="Auto">
-            <Grid DockPanel.Dock="Left" Width="978" Height="Auto" HorizontalAlignment="Left">
-                <Image x:Name="FlowchartImgContainer" HorizontalAlignment="Center" Height="708" VerticalAlignment="Top" Width="963" Source="Img/Flowchart.png" Margin="15,24,0,0"/>
-                <Rectangle x:Name="GenerateRandomProducts" Fill="Transparent" HorizontalAlignment="Left" Height="90" Margin="118,24,0,0" VerticalAlignment="Top" Width="152" Cursor="Hand" MouseDown="GenerateRandomProducts_MouseDown"/>
-                <Rectangle x:Name="CreateRetailConstraints" Fill="Transparent" HorizontalAlignment="Left" Height="90" Margin="742,24,0,0" VerticalAlignment="Top" Width="153" Cursor="Hand" MouseDown="CreateRetailConstraints_MouseDown"/>
-                <Rectangle x:Name="CreateShelfSpace" Fill="Transparent" HorizontalAlignment="Left" Height="92" Margin="278,345,0,0" VerticalAlignment="Top" Width="151" Cursor="Hand" PreviewMouseLeftButtonDown="CreateShelfSpace_PreviewMouseLeftButtonDown"/>
-                <Rectangle x:Name="StartFlowChart" Fill="Transparent" HorizontalAlignment="Left" Height="68" Margin="94,595,0,0" VerticalAlignment="Top" Width="163" Cursor="Hand" MouseDown="StartFlowChart_MouseDown"/>
-                <Image x:Name="ProductCheck" HorizontalAlignment="Left" Height="20" Margin="182,92,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png" RenderTransformOrigin="0.772,0.737"/>
-                <Image x:Name="CompleteCheck" HorizontalAlignment="Left" Height="20" Margin="820,681,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>
-                <Image x:Name="StartTrainingCheck" HorizontalAlignment="Left" Height="20" Margin="166,637,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png" RenderTransformOrigin="-1.08,0.146"/>
-                <Image x:Name="StartTrainingWarning" HorizontalAlignment="Left" Height="29" Margin="234,612,0,0" VerticalAlignment="Top" Width="31" Source="Img/exclamation.png"/>
-                <Image x:Name="RandomMetricCheck" HorizontalAlignment="Left" Height="20" Margin="507,92,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>
-                <Image x:Name="ConstraintsCheck" HorizontalAlignment="Left" Height="20" Margin="807,92,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>
-            </Grid>
-            <Grid Margin="0,0,0,0" HorizontalAlignment="Left" Height="Auto" Width="Auto">
-                <ComboBox x:Name="cmbPlanogramSize" SelectionChanged="CbPlanogramSize_SelectionChanged" HorizontalAlignment="Left" Margin="23,10,0,0" VerticalAlignment="Top" Width="528"/>
+        <DockPanel Height="Auto" Margin="0,0,0,0" Width="Auto">
+            <Grid DockPanel.Dock="Left" Width="818" Height="Auto" HorizontalAlignment="Left">
+                <Grid x:Name="flowchartGrid">
+                    <Image x:Name="FlowchartImgContainer" Height="698" VerticalAlignment="Bottom" Width="803" Source="Img/Flowchart.png" Margin="15,0,0,51" HorizontalAlignment="Left"/>
+                    <!--<Rectangle x:Name="GenerateRandomProducts" Fill="Transparent" HorizontalAlignment="Left" Height="90" Margin="40,10,0,0" VerticalAlignment="Top" Width="152" Cursor="Hand" MouseDown="GenerateRandomProducts_MouseDown"/>-->
+                    <Rectangle x:Name="CreateRetailConstraints" Fill="Transparent" HorizontalAlignment="Left" Height="90" Margin="656,10,0,0" VerticalAlignment="Top" Width="153" Cursor="Hand" MouseDown="CreateRetailConstraints_MouseDown"/>
+                    <Rectangle x:Name="CreateShelfSpace" Fill="Transparent" HorizontalAlignment="Left" Height="92" Margin="197,329,0,0" VerticalAlignment="Top" Width="151" Cursor="Hand" PreviewMouseLeftButtonDown="CreateShelfSpace_PreviewMouseLeftButtonDown"/>
+                    <Rectangle x:Name="StartFlowChart" Fill="Transparent" HorizontalAlignment="Left" Height="68" Margin="17,573,0,0" VerticalAlignment="Top" Width="163" Cursor="Hand" MouseDown="StartFlowChart_MouseDown"/>
+                    <Rectangle x:Name="DownloadData" Fill="Transparent" HorizontalAlignment="Left" Height="129" Margin="62,165,0,0" VerticalAlignment="Top" Width="103" Cursor="Hand" MouseDown="DownloadData_MouseDown"/>
+                    <Grid x:Name="DownloadDataTooltip" VerticalAlignment="Top" HorizontalAlignment="Left" Width="117" Height="85" Margin="104,131,0,0" Visibility="Hidden">
+                        <Image Source="Img/callout.png" Height="Auto" Width="Auto"/>
+                        <Image Name="CloseButton" Source="Img/xCircle.png" Height="12" Margin="0,8,2,0" Width="12" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="Hand" MouseDown="CloseButton_MouseDown" ></Image>
+                        <TextBlock FontFamily="Fonts/#Oswald Light" Text="Click Here to Download Retail Data." VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" Margin="10,20,10,0" Height="64" Foreground="White"/>
+                    </Grid>
+                    <Grid x:Name="StartTrainingToolTip" VerticalAlignment="Top" HorizontalAlignment="Left" Width="117" Height="85" Margin="104,498,0,0" Visibility="Visible">
+                        <Image Source="Img/callout.png" Height="Auto" Width="Auto"></Image>
+                        <Image Name="CloseButtonStart" Source="Img/xCircle.png" Height="12" Margin="0,9,3,0" Width="12" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="Hand" MouseDown="CloseButtonStart_MouseDown" ></Image>
+                        <TextBlock FontFamily="Fonts/#Oswald Light" Text="Click Here to Start Training." VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" Margin="10,20,10,0" Height="64" Foreground="White"/>
+                    </Grid>
+                    <Grid x:Name="PlanogramSizeTooltip" VerticalAlignment="Top" HorizontalAlignment="Left" Width="117" Height="85" Margin="1254,34,-553,0" Visibility="Visible">
+                        <Image Source="Img/calloutreverse.png" Height="Auto" Width="Auto"/>
+                        <Image Name="CloseButtonSize" Source="Img/xCircle.png" Height="12" Margin="0,18,3,0" Width="12" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="Hand" MouseDown="CloseButtonSize_MouseDown" ></Image>
+                        <TextBlock FontFamily="Fonts/#Oswald Light" Text="Change the Difficulty Here." VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" Margin="10,30,10,0" Height="55" Foreground="White"/>
+                    </Grid>
+                    <Image x:Name="ProductCheck" HorizontalAlignment="Left" Height="20" Margin="104,78,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png" RenderTransformOrigin="0.772,0.737"/>
+                    <Image x:Name="CompleteCheck" HorizontalAlignment="Left" Height="20" Margin="733,655,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>
+                    <Image x:Name="StartTrainingCheck" HorizontalAlignment="Left" Height="20" Margin="86,615,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png" RenderTransformOrigin="-1.08,0.146"/>
+                    <Image x:Name="StartTrainingWarning" HorizontalAlignment="Left" Height="29" Margin="149,588,0,0" VerticalAlignment="Top" Width="31" Source="Img/exclamation.png"/>
+                    <Image x:Name="RandomMetricCheck" HorizontalAlignment="Left" Height="20" Margin="425,78,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>
+                    <Image x:Name="ConstraintsCheck" HorizontalAlignment="Left" Height="20" Margin="720,78,0,0" VerticalAlignment="Top" Width="23" Source="Img/check.png"/>                   
+                </Grid>
+                <Grid x:Name="progressGrid">
+                    <ProgressBar x:Name="progressBar" Height="36" Margin="10,713,0,0" VerticalAlignment="Top" />
+                    <Label x:Name="progressText" Foreground="White" Content="Ready" Margin="10,713,0,0" VerticalAlignment="Top" Height="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="/RetailPoC;component/Fonts/#Oswald Light" FontSize="14" MouseUp="progressText_MouseUp" Cursor="Hand"/>
+                </Grid>
+            </Grid>            
+            <Grid x:Name="detailSettingsGrid" Margin="0,0,0,0" HorizontalAlignment="Left" Height="Auto" Width="Auto">
+                <ComboBox x:Name="cmbPlanogramSize" SelectionChanged="CbPlanogramSize_SelectionChanged" HorizontalAlignment="Left" Margin="23,10,0,0" VerticalAlignment="Top" Width="528" ContextMenuOpening="cmbPlanogramSize_ContextMenuOpening"/>
                 <Label x:Name="engineLbl_Copy" Content="Select Engine:" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light" Margin="20,48,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="20" Background="White" Width="120"/>
                 <RadioButton x:Name="rdbRLM" IsChecked="True" Content="RLM" HorizontalAlignment="Left" Margin="67,92,0,0" VerticalAlignment="Top"/>
-                <RadioButton x:Name="rdbEncog" Content="Encog" HorizontalAlignment="Left" Margin="157,92,0,0" VerticalAlignment="Top"/>
-                <RadioButton x:Name="rdbTensorflow" Content="Tensorflow" HorizontalAlignment="Left" Margin="237,92,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="rdbEncog" Content="Encog" HorizontalAlignment="Left" Margin="124,92,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="rdbTensorflow" Content="Tensorflow" HorizontalAlignment="Left" Margin="191,92,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.466,3.041"/>
 
-                <Grid Margin="24,205,0,0" x:Name="GrdRLMsetting" HorizontalAlignment="Left" Width="151" Height="290" VerticalAlignment="Top" >
+                <Grid Margin="24,205,0,0" x:Name="GrdRLMsetting" HorizontalAlignment="Left" Width="517" Height="290" VerticalAlignment="Top" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20" />
                         <RowDefinition Height="*" />
@@ -101,23 +123,23 @@
                     <Label x:Name="sessionLbl" Content="Sessions Run:" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="auto" Width="105" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="14" Margin="0,45,0,0" Grid.RowSpan="3"/>
                     <Label x:Name="timeElapsedLbl" Content="Time Elapsed:" HorizontalAlignment="Left" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="auto" Width="105" FontWeight="Bold" Grid.Row="3" Grid.Column="0" FontSize="14" Margin="0,43,0,0" Grid.RowSpan="2"/>
                     <Label x:Name="itemScorLbl" Content="Item Score:" HorizontalAlignment="Left"  FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="auto" Width="93" FontWeight="Bold" Grid.Row="5" Grid.Column="0" FontSize="14" Margin="0,44,0,0" Grid.RowSpan="2"/>
-                    <TextBlock x:Name="statusTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="47" Width="130" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,5,0,0" Padding="0" Grid.Row="1"/>
-                    <TextBlock x:Name="sessionRunTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="130" Grid.Row="3" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,3,0,0" Padding="0"/>
-                    <TextBlock x:Name="timElapseTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="130" RenderTransformOrigin="0.376,0.421" Grid.Row="4" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,19,0,0" Grid.RowSpan="2" Padding="0"/>
-                    <TextBlock x:Name="itemScoreTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="130" Grid.Row="7" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,3,0,0" Padding="0"/>
+                    <TextBlock x:Name="statusTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Not Started" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="47" Width="390" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,5,0,0" Padding="0" Grid.Row="1"/>
+                    <TextBlock x:Name="sessionRunTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="0" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="390" Grid.Row="3" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,3,0,0" Padding="0"/>
+                    <TextBlock x:Name="timElapseTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="00:00:00.000" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="390" RenderTransformOrigin="0.376,0.421" Grid.Row="4" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,19,0,0" Grid.RowSpan="2" Padding="0"/>
+                    <TextBlock x:Name="itemScoreTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="00.00" FontFamily="Fonts/#Oswald Light"  VerticalAlignment="Top" Height="40" Width="390" Grid.Row="7" Grid.Column="0" FontWeight="Bold" FontSize="25" Foreground="#FF29ABE2" Margin="11,3,0,0" Padding="0"/>
                 </Grid>
 
                 <TextBlock x:Name="engineTxt" HorizontalAlignment="Left" Margin="226,507,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="16" Width="94" Visibility="Hidden" Grid.Column="1"/>
                 <Label x:Name="EngineLbl_Copy" Content="Engine:" HorizontalAlignment="Left" Margin="265,502,0,0" VerticalAlignment="Top" Height="26" Width="48" Visibility="Hidden" Grid.Column="1" />
                 <TextBlock x:Name="engineTxtTensor" HorizontalAlignment="Left" Margin="328,596,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="16" Width="94"/>
-                <TextBlock x:Name="targetScoreTxt" TextAlignment="Left" HorizontalAlignment="Left" Margin="34,154,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="121" FontSize="25" FontWeight="Bold" FontFamily="Fonts/#Oswald Light"  />
+                <TextBlock x:Name="targetScoreTxt" TextAlignment="Left" HorizontalAlignment="Left" Margin="34,159,0,0" TextWrapping="Wrap" Text="00.00" VerticalAlignment="Top" Width="121" FontSize="25" FontWeight="Bold" FontFamily="Fonts/#Oswald Light"  />
                 <Label x:Name="targetScoreLbl" Content="Target Score:" HorizontalAlignment="Left" Margin="26,123,0,0" VerticalAlignment="Top" Height="31" Width="129" FontWeight="Bold" FontFamily="Fonts/#Oswald Light" FontSize="14" Visibility="Visible" />
                 <Button x:Name="btnComparisonClose" Visibility="Hidden" Foreground="#FFFFFF" Background="#FFFE8F41" Content="Close Comparison" HorizontalAlignment="Left" Margin="423,14,0,0" VerticalAlignment="Top" Width="127" Height="36" Click="btnComparisonClose_Click" IsEnabled="False" FontFamily="Fonts/#Oswald Light" FontSize="14"/>
-                <Rectangle x:Name="rectHeadToHeadDivider" Fill="WhiteSmoke" HorizontalAlignment="Left" Height="713" Margin="565,84,0,-38" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="1"/>
-                <Rectangle Fill="WhiteSmoke" HorizontalAlignment="Left" Height="2" Margin="24,495,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="526"/>
+                <!--<Rectangle x:Name="rectHeadToHeadDivider" Fill="WhiteSmoke" HorizontalAlignment="Left" Height="713" Margin="565,84,0,-38" VerticalAlignment="Top" Width="1"/>-->
+                <!--<Rectangle Fill="WhiteSmoke" HorizontalAlignment="Left" Height="2" Margin="24,495,0,0" Stroke="#FFC9C9C9" VerticalAlignment="Top" Width="526"/>-->
 
-                <Grid>
-                    <GroupBox x:Name="grpBox_RLM" Header="Planogram Scores"  FontFamily="Fonts/#Oswald Light" HorizontalAlignment="Left" Margin="23,506,0,0" Width="259" FontSize="14" FontWeight="Bold" BorderBrush="#FFC3C3C3" Height="231" VerticalAlignment="Top">
+                <Grid Margin="0,0,0,10">
+                    <GroupBox x:Name="grpBox_RLM" Header="Planogram Scores"  FontFamily="Fonts/#Oswald Light" HorizontalAlignment="Left" Margin="23,506,0,0" Width="245" FontSize="14" FontWeight="Bold" Height="243" VerticalAlignment="Top">
                         <Grid Margin="0,10,0,0"  >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -144,7 +166,7 @@
                             <TextBlock x:Name="maxScoreTxt" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="20" Width="113" FontSize="14" FontWeight="Bold" Grid.Row="4" Grid.Column="1" Margin="0,8,0,11" Foreground="#FF29ABE2"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox x:Name="RLMsettingGroup" Header="Settings" FontFamily="Fonts/#Oswald Light" Margin="307,506,16,0" BorderBrush="#FFC3C3C3" FontSize="14" FontWeight="Bold" Height="231" VerticalAlignment="Top" Visibility="Visible">
+                    <GroupBox x:Name="RLMsettingGroup" Header="Settings" FontFamily="Fonts/#Oswald Light" Margin="291,506,15,0" FontSize="14" FontWeight="Bold" Height="243" VerticalAlignment="Top" Visibility="Visible">
                         <Grid Margin="0,10,-2,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="118*" />

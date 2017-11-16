@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     /// <summary>
     /// Interaction logic for ItemAttributes.xaml

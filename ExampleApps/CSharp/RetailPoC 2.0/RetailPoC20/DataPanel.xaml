@@ -1,9 +1,9 @@
-﻿<Controls:MetroWindow x:Class="RetailPoC.DataPanel"
+﻿<Controls:MetroWindow x:Class="RetailPoC20.DataPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RetailPoC"
+        xmlns:local="clr-namespace:RetailPoC20"
         
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"              
         mc:Ignorable="d"
@@ -20,7 +20,7 @@
     <Grid>
         <DataGrid x:Name="dataGrid" Margin="10,58" ColumnWidth="Auto" SelectionMode="Single" ScrollViewer.CanContentScroll="True" MouseDoubleClick="dataGrid_MouseDoubleClick" BorderBrush="LightGray" BorderThickness="1" />
         <Grid Height="38" Margin="10,10,10,0" VerticalAlignment="Top">
-            <Button x:Name="generateDataBtn" Content="Generate Data" HorizontalAlignment="Left" VerticalAlignment="Top" Width="114" Click="generateDataBtn_Click" Foreground="#FFFFFF" FontFamily="Fonts/#Oswald Light" FontSize="14" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Height="35"/>
+            <Button x:Name="generateDataBtn" Content="Generate Data" HorizontalAlignment="Left" VerticalAlignment="Top" Width="114" Click="GenerateDataBtn_Click" Foreground="#FFFFFF" FontFamily="Fonts/#Oswald Light" FontSize="14" BorderBrush="#FFFE8F41" Background="#FFFE8F41" Height="35"/>
             <Grid Height="38" Margin="0,0,-9,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="263">
                 <TextBox x:Name="searchItemBox" Height="23" Margin="60,5,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyUp="textBox_KeyUp"/>
                 <Label x:Name="label" Content="Search:&#xD;&#xA;" HorizontalAlignment="Left" Margin="7,5,0,0" VerticalAlignment="Top" Width="48" Height="23"/>

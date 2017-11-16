@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RetailPoC.Models;
+using RetailPoC20.Models;
 using System.IO;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public class SimulationCsvLogger
     {

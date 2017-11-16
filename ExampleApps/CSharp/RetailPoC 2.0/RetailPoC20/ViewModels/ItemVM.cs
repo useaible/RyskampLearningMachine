@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RetailPoC.ViewModels
+namespace RetailPoC20.ViewModels
 {
     public class ItemVM : INotifyPropertyChanged
     {

@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using WPFVisualizer;
 using System.ComponentModel;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     /// <summary>
     /// Interaction logic for TempRLVContainerPanel.xaml

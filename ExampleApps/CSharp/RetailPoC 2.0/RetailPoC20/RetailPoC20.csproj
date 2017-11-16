@@ -7,8 +7,8 @@
     <ProjectGuid>{C176C182-E402-4102-89E1-40C1B1A71014}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RetailPoC</RootNamespace>
-    <AssemblyName>RetailPoC</AssemblyName>
+    <RootNamespace>RetailPoC20</RootNamespace>
+    <AssemblyName>RetailPoC20</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -132,9 +132,7 @@
     </Compile>
     <Compile Include="RLVOutputVisualizer.cs" />
     <Compile Include="SimulationCsvLogger.cs" />
-    <Compile Include="SimulationPanel.xaml.cs">
-      <DependentUpon>SimulationPanel.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="SimulationSetter.cs" />
     <Compile Include="StartupWindow.xaml.cs">
       <DependentUpon>StartupWindow.xaml</DependentUpon>
     </Compile>
@@ -178,10 +176,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NoDataNotificationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SimulationPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -245,9 +239,13 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Resource Include="Img\Flowchart.png" />
     <Resource Include="Img\check.png" />
     <Resource Include="Img\exclamation.png" />
+    <Resource Include="Img\xCircle.png" />
+    <Resource Include="Img\Flowchart.png" />
+    <Resource Include="Img\Flowchart2.png" />
+    <Resource Include="Img\calloutreverse.png" />
+    <Resource Include="Img\callout.png" />
     <Content Include="Retail POC How to.docx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

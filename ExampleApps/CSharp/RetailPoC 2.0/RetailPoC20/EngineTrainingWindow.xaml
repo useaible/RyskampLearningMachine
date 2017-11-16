@@ -1,12 +1,12 @@
-﻿<Controls:MetroWindow x:Class="RetailPoC.EngineTrainingWindow"
+﻿<Controls:MetroWindow x:Class="RetailPoC20.EngineTrainingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RetailPoC"
+        xmlns:local="clr-namespace:RetailPoC20"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="Shelve Space Layout" Closing="Window_Closing" LocationChanged="MetroWindow_LocationChanged" Width="728.034" Height="419.385" BorderBrush="LightGray" BorderThickness="0.6">
+        Title="Shelf Space Layout" Closing="Window_Closing" LocationChanged="MetroWindow_LocationChanged" Width="728.034" Height="419.385" BorderBrush="LightGray" BorderThickness="0.6">
     <Controls:MetroWindow.Resources>
         <SolidColorBrush x:Key="comparisonBlack" Color="Black" Opacity="0.8"></SolidColorBrush>
     </Controls:MetroWindow.Resources>

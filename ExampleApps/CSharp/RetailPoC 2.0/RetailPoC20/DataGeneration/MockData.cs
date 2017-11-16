@@ -1,4 +1,4 @@
-﻿using RetailPoC.Models;
+﻿using RetailPoC20.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -10,7 +10,7 @@ using System.IO;
 using CsvHelper;
 using Microsoft.Win32;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public class MockData : IDisposable
     {
@@ -21,7 +21,7 @@ namespace RetailPoC
 
         public delegate void dataPanelProgress(double value);
         public delegate void dataPanelGrid(bool refresh);
-        public event dataPanelProgress Progress;
+        public event GeneratingData GeneratingDataEvent;
         public event dataPanelGrid Refreshdata;
 
         public MockData()
@@ -42,7 +42,7 @@ namespace RetailPoC
 
             rnd = new Random();
         }
-
+        
         public double GetItemMinimumScore(RPOCSimulationSettings simSettings)
         {
             double retVal = double.MinValue;
@@ -196,10 +196,12 @@ namespace RetailPoC
 
                 //update progress
                 var currentProgress = ((currentRows / _attributes.Count()) * 100);
-                Progress(currentProgress);
+                GeneratingDataEvent?.Invoke(currentProgress, "Generating historical metric data...", false);
 
                 await _context.SaveChangesAsync();
             }
+
+            GeneratingDataEvent?.Invoke(100, "Generating historical metric data...", false);
 
             //_context.ItemAttributes.AddRange(_attributes);
             //_context.SaveChangesAsync();
@@ -229,7 +231,7 @@ namespace RetailPoC
                     SKU = String.Format("{0:0000}", i),
                     Attributes = _attributes.Where(x => numbers.Any(a => a == x.ID)).ToList(),
                     Color = color.ToArgb() //converts the color to integer to be save in the database
-            };
+                };
 
                 _items.Add(item);
 
@@ -237,7 +239,7 @@ namespace RetailPoC
             }
 
             currentRows = 0;
-            Progress(0);
+            GeneratingDataEvent?.Invoke(0, "Generating random products...", false);
             while (currentRows < _items.Count())
             {
                 currentRows = _context.Items.Count();
@@ -246,15 +248,17 @@ namespace RetailPoC
 
                 //update progress   
                 var currentProgress = ((currentRows / _items.Count()) * 100);
-                Progress(currentProgress);
+                GeneratingDataEvent?.Invoke(currentProgress, "Generating random products...", false);
 
                 await _context.SaveChangesAsync();
 
             }
 
+            GeneratingDataEvent?.Invoke(100, "Generating random products...", true);
+
             //_context.Items.AddRange(_items);
             //_context.SaveChangesAsync();
-            Refreshdata(true);
+            //Refreshdata(true);
         }
 
         public int GetItemsCount()

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public class ItemClickedCommand : ICommand
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PoCTools.Settings;
 
-namespace RetailPoC.Models
+namespace RetailPoC20.Models
 {
     public class RPOCSimulationSettings : SimulationSettings
     {

@@ -1,4 +1,4 @@
-﻿using RetailPoC.Models;
+﻿using RetailPoC20.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.Entity;
-using RetailPoC.ViewModels;
+using RetailPoC20.ViewModels;
 using System.Windows.Controls.Primitives;
 using Microsoft.Win32;
 using System.Diagnostics;
@@ -27,7 +27,7 @@ using RLM.Models;
 using System.Threading;
 using PoCTools.Settings;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public delegate void SimulationStart(Item[] items, RPOCSimulationSettings simSettings, CancellationToken token);
 
@@ -115,14 +115,16 @@ namespace RetailPoC
         private EngineTrainingWindow trainingWindow;
         private bool enableTensorflowTraining = false;
 
+        private DataPanel dataPanel;
+
+        private Exception runException = null;
+
         public MainWindow(bool enableTensorflow = false, bool htoh = false)
         {
-            startupWin = new StartupWindow();
-            ShowStartupWindow(true, "Connecting to SQL Server...");
-
             InitializeComponent();
             headToHead = htoh;
             enableTensorflowTraining = enableTensorflow;
+            DownloadData.IsEnabled = false;
 
             // set planogram sizes
             planogramSizes = new PlanogramSize[10];
@@ -130,7 +132,7 @@ namespace RetailPoC
             for (int shelf = 10 - 1; shelf >= 0; shelf--)
             {
                 simSettings.DefaultScorePercentage = defaultScorePercentage;
-                var curr = planogramSizes[9 - shelf] = new PlanogramSize() { Name = $"Planogram {shelf + 1}", Shelves = shelf + 3, SlotsPerShelf = SLOTS_PER_SHELF, ItemsCount = 500 * (shelf + 1), Metrics = shelf + 1, BaseScoringPercentage =  simSettings.DefaultScorePercentage};
+                var curr = planogramSizes[9 - shelf] = new PlanogramSize() { Name = $"Difficulty Level {shelf + 1}", Shelves = shelf + 3, SlotsPerShelf = SLOTS_PER_SHELF, ItemsCount = 500 * (shelf + 1), Metrics = shelf + 1, BaseScoringPercentage =  simSettings.DefaultScorePercentage};
                 cmbPlanogramSize.Items.Add(curr.ToString());
 
                 if (shelf == SHELVES - 1)
@@ -157,23 +159,7 @@ namespace RetailPoC
                 rdbTensorflow.IsEnabled = false;                
             }
 
-            if (CheckProducts() == false)
-            {
-                ProductCheck.Visibility = Visibility.Hidden;
-                RandomMetricCheck.Visibility = Visibility.Hidden;
-                ConstraintsCheck.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                ProductCheck.Visibility = Visibility.Visible;
-                RandomMetricCheck.Visibility = Visibility.Visible;
-                ConstraintsCheck.Visibility = Visibility.Visible;
-            }
-
-            CompleteCheck.Visibility = Visibility.Hidden;
-            StartTrainingWarning.Visibility = Visibility.Visible;
-            StartTrainingCheck.Visibility = Visibility.Hidden;
-
+         
             this.Closing += MainWindow_Closing;
         }
 
@@ -181,62 +167,7 @@ namespace RetailPoC
         {
             tokenSource.Cancel();
         }
-
-        private void dataGenerationBtn_Click(object sender, RoutedEventArgs e)
-        {
-            showDataPanelDlg();
-        }
-
-        private void showDataPanelDlg()
-        {
-            var dataPanel = new DataPanel();
-
-            dataPanel.GenerateDataEvent += DataPanel_GenerateDataEvent;
-            
-            dataPanel.NumItems = currPlanogramSize.ItemsCount;
-            dataPanel.NumShelves = currPlanogramSize.Shelves;
-            dataPanel.NumSlots = currPlanogramSize.SlotsPerShelf;
-
-            dataPanel.Closed += (s, ee) => {
-                dataPanel = new DataPanel();
-                setSelectedPlanogramSize();
-            };
-
-            dataPanel.NumItems = simSettings.NumItems;
-            dataPanel.NumShelves = simSettings.NumShelves;
-            dataPanel.NumSlots = simSettings.NumSlots;
-
-            dataPanel.dataGrid.Loaded += (ss, evv) => {
-
-                bool exist = CheckProducts();
-
-                if (exist)
-                {
-                    dataPanel.dataGrid.ItemsSource = dataFactory.Items; // Setting data source for the DataPanel's datagrid
-                    dataPanel.Items = dataFactory.Items; // Store the items to a new List for searching purposes
-                    dataPanel.dataGrid.AutoGenerateColumns = false;
-
-                    // Binding and settings of datagrid columns
-                    dataPanel.dataGrid.Columns.Add(new DataGridTextColumn() { Header = "ID", Binding = new Binding("ID"), Width = new DataGridLength(1, DataGridLengthUnitType.Star), IsReadOnly = true });
-                    dataPanel.dataGrid.Columns.Add(new DataGridTextColumn() { Header = "SKU", Binding = new Binding("SKU"), Width = new DataGridLength(1, DataGridLengthUnitType.Star), IsReadOnly = true });
-                    dataPanel.dataGrid.Columns.Add(new DataGridTextColumn() { Header = "Name", Binding = new Binding("Name"), Width = new DataGridLength(1, DataGridLengthUnitType.Star), IsReadOnly = true });
-
-                    ProductCheck.Visibility = Visibility.Visible;
-                    RandomMetricCheck.Visibility = Visibility.Visible;
-                    ConstraintsCheck.Visibility = Visibility.Visible;
-                }
-            };
-
-           dataPanel.ShowDialog();
-
-        }
-
-        private void DataPanel_GenerateDataEvent(string msg)
-        {
-            startupWin.startupWindowMsg.Document.Blocks.Clear();
-            startupWin.startupWindowMsg.AppendText(msg);
-        }
-
+        
         private bool CheckProducts()
         {
             var retVal = false;
@@ -287,33 +218,77 @@ namespace RetailPoC
 
         private void runSlmBtnFunction()
         {
-            selectedSlotIndex = -1;            
+            runException = null;
 
-            SimulationPanel simPanel = new SimulationPanel();
-            simPanel.SetSimSettings(simSettings);
-            bool? result = simPanel.ShowDialog();
+            // disable control buttons
+            EnableControlButtons(false);
 
-            CompleteCheck.Visibility = Visibility.Hidden;
+            FlowchartImgContainer.Source = new BitmapImage(new Uri(@"/RetailPoC20;component/Img/Flowchart.png", UriKind.Relative));
+            DownloadDataTooltip.Visibility = Visibility.Hidden;
+            StartTrainingToolTip.Visibility = Visibility.Hidden;
 
-            if (result.HasValue && result.Value == true)
+            selectedSlotIndex = -1;
+            var resetEvent = new ManualResetEvent(false);
+            dataPanel = new DataPanel();
+            dataPanel.NumItems = currPlanogramSize.ItemsCount;
+            dataPanel.NumShelves = currPlanogramSize.Shelves;
+            dataPanel.NumSlots = currPlanogramSize.SlotsPerShelf;
+            dataPanel.GenerateDataEvent += (percent, text, done, ex) =>
             {
+                Dispatcher.Invoke(() =>
+                {
+                    progressBar.Value = percent;
+                    progressText.Content = text;
+                    if (done)
+                    {
+                        resetEvent.Set();
+                    }
+                    if (ex != null)
+                    {
+                        runException = ex;
+                    }
+                });
+            };
+
+            Task runSimTask = Task.Run(() =>
+            {
+                dataPanel.GenerateDataBtn_Click(null, null);
+                resetEvent.WaitOne();                
+            }).ContinueWith((t) =>
+            {
+                if (runException != null)
+                {
+                    return;
+                }
+
+                StartSimulation();
+            });
+        }
+
+        private void StartSimulation()
+        {
+            SimulationSetter simSetter = new SimulationSetter(simSettings);
+            bool doRlm = false;
+            bool doEncog = false;
+            string dbIdentifier = "RLM_planogram_" + Guid.NewGuid().ToString("N");
+
+            // set simulation settings
+            simSettings.SimType = SimulationType.Score;
+            double maxScore = simSetter.CalculateMaxScore() * (currPlanogramSize.BaseScoringPercentage/100D);
+            simSettings.Score = maxScore;
+            simSettings.EnableSimDisplay = true;
+            simSettings.DefaultScorePercentage = currPlanogramSize.BaseScoringPercentage;
+            simSettings.HiddenLayers = ENCOG_HIDDEN_LAYERS;
+            simSettings.HiddenLayerNeurons = ENCOG_HIDDEN_LAYER_NEURONS;
+
+
+            Dispatcher.Invoke(() => 
+            {
+                progressBar.IsIndeterminate = true;
+                progressText.Content = "Initializing data for training...";
+
                 // disable control buttons
                 EnableControlButtons(false);
-
-                // set simulation settings
-                simSettings.SimType = simPanel.SimType;
-                simSettings.Sessions = simPanel.Sessions;
-                simSettings.Hours = simPanel.Hours;
-                simSettings.Score = simPanel.Score;
-                simSettings.EnableSimDisplay = simPanel.EnableSimDisplay;
-                simSettings.DefaultScorePercentage = simPanel.simScoreSlider.Value;
-
-                simSettings.HiddenLayers = ENCOG_HIDDEN_LAYERS;
-                //simSettings.HiddenLayers = simPanel.HiddenLayers;
-
-                simSettings.HiddenLayerNeurons = ENCOG_HIDDEN_LAYER_NEURONS;
-                //simSettings.HiddenLayerNeurons = simPanel.HiddenLayerNeurons;
-
                 targetScoreTxt.Text = "";
                 if (simSettings.SimType == SimulationType.Score)
                 {
@@ -340,8 +315,10 @@ namespace RetailPoC
 
                 Logger.Clear();
 
+                CompleteCheck.Visibility = Visibility.Hidden;
+                StartTrainingCheck.Visibility = Visibility.Visible;
+                StartTrainingWarning.Visibility = Visibility.Hidden;
 
-                string dbIdentifier = "RLM_planogram_" + Guid.NewGuid().ToString("N");
                 // instantiate visualizer with this window as its parent reference
                 visualizer = new RLVOutputVisualizer(this);
                 core = new RLVCore(dbIdentifier);
@@ -354,58 +331,101 @@ namespace RetailPoC
                 rlvPanel = new TempRLVContainerPanel(core, visualizer);
                 OpenTrainingWindow();
 
-                bool doRlm = rdbRLM.IsChecked.HasValue && rdbRLM.IsChecked.Value;
-                bool doEncog = rdbEncog.IsChecked.HasValue && rdbEncog.IsChecked.Value;
+                doRlm = rdbRLM.IsChecked.HasValue && rdbRLM.IsChecked.Value;
+                doEncog = rdbEncog.IsChecked.HasValue && rdbEncog.IsChecked.Value;
+            });
 
-                Task.Run(() =>
+            try
+            {
+                // get items from db as well as the min and max metric scores as we need that for the calculation later on
+                Item[] items;
+                using (PlanogramContext ctx = new PlanogramContext())
                 {
-                    try
-                    {
-                        // get items from db as well as the min and max metric scores as we need that for the calculation later on
-                        Item[] items;
-                        using (PlanogramContext ctx = new PlanogramContext())
-                        {
-                            MockData mock = new MockData(ctx);
-                            items = itemsCache = mock.GetItemsWithAttr();
-                            simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
-                            simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
-                        }
-
-                        if (doRlm)
-                        {
-                            // initialize and start RLM training
-                            optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier);
-                            optimizer.StartOptimization(tokenSource.Token);
-                        }
-                        else if (doEncog)
-                        {
-                            var encogOpt = new PlanogramOptimizerEncog(itemsCache, simSettings, UpdateTensorflowResults, UpdateTensorflowStatus, Logger, false);
-                            encogOpt.StartOptimization(tokenSource.Token);
-                        }
-                        else // do tensorflow
-                        {
-                            // let's tensorflow (or other listeners) know that it should start training
-                            OnSimulationStart?.Invoke(items, simSettings, tokenSource.Token);
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        ShowStartupWindow(true, $"ERROR: {ex.Message}");
-                    }
+                    MockData mock = new MockData(ctx);
+                    items = itemsCache = mock.GetItemsWithAttr();
+                    simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
+                    simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
+                }
+                
+                if (doRlm)
+                {
+                    // initialize RLM training
+                    optimizer = new PlanogramOptimizer(items, simSettings, this.UpdateRLMResults, this.UpdateRLMStatus, Logger, dbIdentifier);
+                }
+                
+                Dispatcher.Invoke(() =>
+                {
+                    progressText.Content = "Training...";
                 });
 
-                StartTrainingCheck.Visibility = Visibility.Visible;
-                StartTrainingWarning.Visibility = Visibility.Hidden;
+                if (doRlm)
+                {
+                    optimizer.DataPersistenceCompleteEvent += () =>
+                    {
+                        DoneSimulation("Data visualization ready");
+                    };
+                    optimizer.StartOptimization(tokenSource.Token);
+                }
+                else if (doEncog)
+                {
+                    var encogOpt = new PlanogramOptimizerEncog(itemsCache, simSettings, UpdateTensorflowResults, UpdateTensorflowStatus, Logger, false);
+                    encogOpt.StartOptimization(tokenSource.Token);
+                }
+                else // do tensorflow
+                {
+                    // let's tensorflow (or other listeners) know that it should start training
+                    OnSimulationStart?.Invoke(items, simSettings, tokenSource.Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(()=> {
+                    progressBar.IsIndeterminate = false;
+                    progressText.Content = "An error occured. Please click here to view the full details.";
+                    runException = ex;
+                });
+                return;
+            }
+            
+            if (doEncog)
+            {
+                DoneSimulation("Training Done");
+
+                Dispatcher.Invoke(() =>
+                {
+                    FlowchartImgContainer.Source = new BitmapImage(new Uri(@"/RetailPoC20;component/Img/Flowchart2.png", UriKind.Relative));
+                    DownloadDataTooltip.Visibility = Visibility.Visible;
+                });
+                
+            }
+            
+            if (doRlm)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    progressText.Content = "Training done. Finalizing data for visualization...";
+                });
             }
         }
 
+        private void DoneSimulation(string msg)
+        {
+            Dispatcher.Invoke(() => {
+                progressBar.IsIndeterminate = false;
+                progressBar.Value = 100;
+                progressText.Content = msg;
+            });
+        }
+        
         private void EnableControlButtons(bool value)
         {
+            cmbPlanogramSize.IsEnabled = value;
             rdbEncog.IsEnabled = value;
             rdbRLM.IsEnabled = value;
             StartFlowChart.IsEnabled = value;
             CreateRetailConstraints.IsEnabled = value;
-            GenerateRandomProducts.IsEnabled = value;
+            DownloadData.IsEnabled = value;
+            // GenerateRandomProducts.IsEnabled = value;
 
             if (enableTensorflowTraining)
             {
@@ -471,6 +491,9 @@ namespace RetailPoC
                 {
                     CompleteCheck.Visibility = Visibility.Visible;
                     EnableControlButtons(true);
+                    FlowchartImgContainer.Source = new BitmapImage(new Uri(@"/RetailPoC20;component/Img/Flowchart2.png", UriKind.Relative));
+                    DownloadDataTooltip.Visibility = Visibility.Visible;
+
                 }
             });
         }
@@ -606,15 +629,9 @@ namespace RetailPoC
             simSettings.Metric10 = 0;
         }
 
-        public void setSelectedPlanogramSize()
+        private void setSelectedPlanogramSize(int itemCnt)
         {
-            int count;
-            using (PlanogramContext ctx = new PlanogramContext())
-            {
-                MockData data = new MockData(ctx);
-                count = data.GetItemsCount();
-            }
-
+            int count = itemCnt;
             if (currPlanogramSize == null)
             {
                 int index = -1;
@@ -644,7 +661,7 @@ namespace RetailPoC
             {
                 if (count != currPlanogramSize.ItemsCount && currPlanogramSize == prevPlanogramSize)
                 {
-                    showDataPanelUntil();
+                    //showDataPanelUntil();
                 }
                 else
                 {
@@ -666,28 +683,7 @@ namespace RetailPoC
                 simSettings.DefaultScorePercentage = currPlanogramSize.BaseScoringPercentage;
             }
         }
-
-        private void showDataPanelUntil()
-        {
-            var confirmation = MessageBox.Show("Warning! Please generate new data.", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
-            if (confirmation == MessageBoxResult.OK)
-            {
-                showDataPanelDlg();
-            }
-            else
-            {
-                if (prevPlanogramSize != null)
-                {
-                    currPlanogramSize = prevPlanogramSize;
-                    cmbPlanogramSize.SelectedIndex = planogramSizes.ToList().IndexOf(currPlanogramSize);
-                }
-                else
-                {
-                    Application.Current.Shutdown();
-                }
-            }
-        }
-                
+        
         private void OnSelectedItem(Border sender)
         {
             try
@@ -727,56 +723,24 @@ namespace RetailPoC
 
                     var itemDisplay = new[]
                     {
-                    new RLVItemDisplay() { Name = "Item", Value = "Item #" + (selectedSlotIndex + 1), Visibility = RLVVisibility.Visible } // todo pass in actual item name (see: Value)
-                };
+                        new RLVItemDisplay() { Name = "Item", Value = "Item #" + (selectedSlotIndex + 1), Visibility = RLVVisibility.Visible } // todo pass in actual item name (see: Value)
+                    };
 
-                    if (!NoData)
+                    if (rlvPanel != null)
                     {
-                        if (noData != null)
-                        {
-                            noData.Close();
-                        }
-
-                        if (rlvPanel != null)
-                        {
-                            rlvPanel.Visibility = Visibility.Visible;
-                        }
-
-                        previousSelectedSlotIndex = selectedSlotIndex;
-                        previousSelectedRect = txtBorder;
-                        AlignPanels();
+                        rlvPanel.Visibility = Visibility.Visible;
                     }
-                    else
-                    {
-                        if (noData != null)
-                        {
-                            noData.Close();
-                        }
-                        noData = new NoDataNotificationWindow();
-                        noData.Show();
-                        noData.Top = rlvPanel.Top;
-                        noData.Left = rlvPanel.Left + rlvPanel.Width;
 
-                        selectedSlotIndex = previousSelectedSlotIndex;
-
-                        // Highlight the previous item with data
-                        if (txtBorder != null)
-                        {
-                            //txtBorder.BorderBrush = GetBrushFromColor(Colors.Black);
-                        }
-
-                        if (previousSelectedRect != null)
-                        {
-                            HighlightItem(previousSelectedRect);
-                        }
-                    }
+                    previousSelectedSlotIndex = selectedSlotIndex;
+                    previousSelectedRect = txtBorder;
+                    AlignPanels();
 
                     visualizer?.SelectNewItem(inputValues, outputValues, itemDisplay);
                 }
             }
             catch (Exception ex)
             {
-                ShowStartupWindow(true, $"ERROR: {ex.Message}");
+                ShowStartupWindow(true, ex.Message, ex.GetType().Name);
             }
         }
 
@@ -979,7 +943,7 @@ namespace RetailPoC
 
         private void ItemAttributes_Compare_MouseLeave(object sender, MouseEventArgs e)
         {
-            itemScoreTxt.Text = " ";
+            itemScoreTxt.Text = "Hover an item on the Shelf Layout to check.";
             trainingWindow.comparisonGrid.Visibility = Visibility.Hidden;
         }
 
@@ -989,7 +953,7 @@ namespace RetailPoC
         }
         private void ItemAttributes_MouseLeave(object sender, MouseEventArgs e)
         {
-            itemScoreTxt.Text = " ";
+            itemScoreTxt.Text = "Hover an item on the Shelf Layout to check.";
         }
 
         public void UpdateTensorflowResults(PlanogramOptResults results, bool enableSimDisplay = false)
@@ -1056,7 +1020,17 @@ namespace RetailPoC
                 statusTxt.Text = statusMsg;
 
                 if (isDone)
+                {
                     EnableControlButtons(true);
+                    
+                    Dispatcher.Invoke(() => {
+                        progressBar.IsIndeterminate = false;
+                        progressBar.Value = 100;
+                        progressText.Content = "Training Done.";
+                        FlowchartImgContainer.Source = new BitmapImage(new Uri(@"/RetailPoC20;component/Img/Flowchart2.png", UriKind.Relative));
+                        DownloadDataTooltip.Visibility = Visibility.Visible;
+                    });
+                }
             });
         }
 
@@ -1089,10 +1063,13 @@ namespace RetailPoC
 
         private void CbPlanogramSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            
+
             var a = sender as ComboBox;
 
             var selectedIndex = cmbPlanogramSize.SelectedIndex;
             currPlanogramSize = planogramSizes[selectedIndex];
+            
 
             this.simSettings.NumItems = currPlanogramSize.ItemsCount;
             this.simSettings.NumShelves = currPlanogramSize.Shelves;
@@ -1103,16 +1080,16 @@ namespace RetailPoC
                 InitializeGrid(trainingWindow.planogram, Colors.Gray);
             }
 
-            int count;
-            using (PlanogramContext ctx = new PlanogramContext())
-            {
-                MockData data = new MockData(ctx);
-                count = data.GetItemsCount();
-            }
+            int count = currPlanogramSize.ItemsCount;
+            //using (PlanogramContext ctx = new PlanogramContext())
+            //{
+            //    MockData data = new MockData(ctx);
+            //    count = data.GetItemsCount();
+            //}
 
             if (count != simSettings.NumItems)
             {
-                showDataPanelUntil();
+                //showDataPanelUntil();
             }
         }
 
@@ -1143,45 +1120,89 @@ namespace RetailPoC
             }
         }
 
-        private StartupWindow startupWin = null;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //startupWin = new StartupWindow();
-            //ShowStartupWindow(true, "Connecting to SQL Server...");
+            metricPanel = new MetricPanel(null);
+            flowchartGrid.IsEnabled = false;
+            detailSettingsGrid.IsEnabled = false;
+            progressBar.IsIndeterminate = true;
+            progressText.Content = "Startup initialization...";
 
-            try
+            Task startupTask = Task.Run(() =>
             {
-                metricPanel = new MetricPanel(null);
-                setSelectedPlanogramSize();
-
-                using (PlanogramContext ctx = new PlanogramContext())
+                try
                 {
-                    MockData mock = new MockData(ctx);
-                    itemsCache = mock.GetItemsWithAttr();
-                    simSettings.ItemMetricMin = mock.GetItemMinimumScore(simSettings);
-                    simSettings.ItemMetricMax = mock.GetItemMaximumScore(simSettings);
-                }
+                    int count = 0;
+                    bool hasProducts = false;
+                    using (PlanogramContext ctx = new PlanogramContext())
+                    {
+                        hasProducts = ctx.Database.Exists();
+                        if (hasProducts)
+                        {
+                            count = ctx.Items.Count();
+                        }
+                    }
 
-                ShowStartupWindow(false);
-            }
-            catch (Exception ex)
-            {
-                ShowStartupWindow(true, $"ERROR: {ex.Message}");
-            }
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (hasProducts == false)
+                        {
+                            ProductCheck.Visibility = Visibility.Hidden;
+                            RandomMetricCheck.Visibility = Visibility.Hidden;
+                            ConstraintsCheck.Visibility = Visibility.Hidden;
+                        }
+                        else
+                        {
+                            ProductCheck.Visibility = Visibility.Visible;
+                            RandomMetricCheck.Visibility = Visibility.Visible;
+                            ConstraintsCheck.Visibility = Visibility.Visible;
+                        }
+
+                        CompleteCheck.Visibility = Visibility.Hidden;
+                        StartTrainingWarning.Visibility = Visibility.Visible;
+                        StartTrainingCheck.Visibility = Visibility.Hidden;
+                        setSelectedPlanogramSize(count);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        runException = ex;
+                        progressText.Content = "An error occurred. Please click here to view the details.";
+                    });
+                }
+                finally
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        progressBar.IsIndeterminate = false;
+                        progressBar.Value = 100;
+                        flowchartGrid.IsEnabled = true;
+                        detailSettingsGrid.IsEnabled = true;
+                        if (runException == null)
+                        {
+                            progressText.Content = "Ready";
+                        }
+                    });
+                }
+            });
         }
 
-        private void ShowStartupWindow(bool show, string msg = "")
+        private void ShowStartupWindow(bool show, string msg = "", string errorType = "")
         {
             Dispatcher.Invoke(()=> {
+                StartupWindow startupwin = new StartupWindow();
                 if (show)
                 {
-                    startupWin.startupWindowMsg.Document.Blocks.Clear();
-                    startupWin.startupWindowMsg.AppendText(msg);
-                    startupWin.Show();
+                    startupwin.errorType.Content = errorType;
+                    startupwin.startupWindowMsg.Document.Blocks.Clear();
+                    startupwin.startupWindowMsg.AppendText(msg);
+                    startupwin.Show();
                 }
                 else
                 {
-                    startupWin.Hide();
+                    startupwin.Hide();
                 }
             });
         }
@@ -1218,7 +1239,7 @@ namespace RetailPoC
             }
             catch (Exception ex)
             {
-                ShowStartupWindow(true, $"ERROR: {ex.Message}");
+                ShowStartupWindow(true, ex.Message, ex.GetType().Name);
             }
         }
 
@@ -1330,12 +1351,7 @@ namespace RetailPoC
 
             return retVal;
         }
-
-        private void GenerateRandomProducts_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            showDataPanelDlg();
-        }
-
+        
         private void CreateRetailConstraints_MouseDown(object sender, MouseButtonEventArgs e)
         {
             metricsBtnFunction();
@@ -1359,6 +1375,41 @@ namespace RetailPoC
             }
 
             trainingWindow.Show();
+        }
+
+        private void DownloadData_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MockData mock = new MockData();
+            mock.DownloadRetailData();
+            DownloadDataTooltip.Visibility = Visibility.Hidden;
+        }
+
+        private void CloseButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DownloadDataTooltip.Visibility = Visibility.Hidden;
+        }
+
+        private void CloseButtonStart_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            StartTrainingToolTip.Visibility = Visibility.Hidden;
+        }
+
+        private void progressText_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (runException != null)
+            {
+                ShowStartupWindow(true, runException.Message, runException.GetType().Name);
+            }
+        }
+
+        private void CloseButtonSize_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            PlanogramSizeTooltip.Visibility = Visibility.Hidden;
+        }
+
+        private void cmbPlanogramSize_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            PlanogramSizeTooltip.Visibility = Visibility.Hidden;
         }
     }
 }

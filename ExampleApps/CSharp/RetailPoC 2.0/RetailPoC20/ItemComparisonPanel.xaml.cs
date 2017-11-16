@@ -1,4 +1,4 @@
-﻿using RetailPoC.Models;
+﻿using RetailPoC20.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     /// <summary>
     /// Interaction logic for ItemComparisonPanel.xaml

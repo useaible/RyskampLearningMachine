@@ -6,7 +6,7 @@
     <ProjectHome>
     </ProjectHome>
     <StartupFile>Headtohead.py</StartupFile>
-    <SearchPath>..\..\..\CSharp\RetailPoCIBM\RetailPoCIBM\bin\Debug;..\..\..\CSharp\RetailPoCIBM\RetailPoCIBM\bin\Debug\Fonts</SearchPath>
+    <SearchPath>..\..\..\CSharp\RetailPoC 2.0\RetailPoC20\bin\Debug;..\..\..\CSharp\RetailPoC 2.0\RetailPoC20\bin\Debug\Fonts</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>RetailPoC20</Name>

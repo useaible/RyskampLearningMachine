@@ -9,7 +9,7 @@ using Encog.Neural.Networks.Training;
 using Encog.Neural.Networks.Training.Anneal;
 using Encog.Neural.Pattern;
 using Encog.Util.Arrayutil;
-using RetailPoC.Models;
+using RetailPoC20.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using PoCTools.Settings;
 using System.Collections.Concurrent;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
     public class PlanogramOptimizerEncog
     {
@@ -33,6 +33,7 @@ namespace RetailPoC
 
         private UpdateUINonRLMCallback updateUI;
         private UpdateStatusCallback updateStatus;
+        private AutoResetEvent signal;
 
 
         const int POPULATION_SIZE = 200;
@@ -47,6 +48,7 @@ namespace RetailPoC
             this.logger = logger;
             this.updateUI = updateUI;
             this.updateStatus = updateStatus;
+            this.signal = new AutoResetEvent(false);
 
             network = CreateNetwork();
             planogramScore = new PlanogramScore()
@@ -69,6 +71,11 @@ namespace RetailPoC
                     return network;
                 }, planogramScore, POPULATION_SIZE);
             }
+           
+            planogramScore.StopEncogTraningEvent += () =>
+            {
+                signal.Set();
+            };
         }
 
         public void StartOptimization(CancellationToken? cancelToken = null)
@@ -81,7 +88,13 @@ namespace RetailPoC
             
             do
             {
-                train.Iteration();
+                Task.Run(() =>
+                {
+                    train.Iteration();
+                    signal.Set();
+                });
+
+                signal.WaitOne();
 
                 if (cancelToken.HasValue && cancelToken.Value.IsCancellationRequested)
                     break;
@@ -91,10 +104,7 @@ namespace RetailPoC
                 (simSettings.SimType == SimulationType.Score && RPOCSimulationSettings.NUM_SCORE_HITS > planogramScore.NumScoreHits));
 
             // display for final results only
-            if (!simSettings.EnableSimDisplay)
-            {
-                updateUI?.Invoke(planogramScore.LastResult, true);
-            }
+            updateUI?.Invoke(planogramScore.LastResult, true);
 
             updateStatus?.Invoke("Done", true);
         }
@@ -117,10 +127,13 @@ namespace RetailPoC
         }
     }
 
+    public delegate void StopEncogTraining();
     public class PlanogramScore : ICalculateScore
     {
         private ConcurrentBag<double> metricScoreHistory = new ConcurrentBag<double>();
         private ConcurrentQueue<double> metricAvgLastTen = new ConcurrentQueue<double>();
+
+        public event StopEncogTraining StopEncogTraningEvent;
 
         public int SessionNumber { get; set; } = 0;
         public int NumScoreHits { get; set; } = 0;
@@ -129,9 +142,12 @@ namespace RetailPoC
         public UpdateUINonRLMCallback UpdateUI { get; set; }
         public SimulationCsvLogger Logger { get; set; }
         public PlanogramOptResults LastResult { get; set; }
+        public bool IsStopped { get; set; }
 
         public double CalculateScore(IMLMethod network)
         {
+            if (IsStopped) return 0;
+
             SessionNumber++;
 
             DateTime startSession = DateTime.Now;
@@ -162,6 +178,12 @@ namespace RetailPoC
                 {
                     NumScoreHits = 0;
                 }
+            }
+
+            if (NumScoreHits >= RPOCSimulationSettings.NUM_SCORE_HITS)
+            {
+                StopEncogTraningEvent?.Invoke();
+                IsStopped = true;
             }
 
             result.NumScoreHits = NumScoreHits;

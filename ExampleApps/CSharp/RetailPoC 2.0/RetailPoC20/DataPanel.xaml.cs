@@ -1,5 +1,5 @@
-﻿using RetailPoC.Models;
-using RetailPoC.ViewModels;
+﻿using RetailPoC20.Models;
+using RetailPoC20.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +15,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 
-namespace RetailPoC
+namespace RetailPoC20
 {
-    public delegate void GeneratingData(string value);
+    public delegate void GeneratingData(double percent, string text, bool isDone, Exception ex = null);
+
     /// <summary>
     /// Interaction logic for DataPanel.xaml
     /// </summary>
@@ -49,48 +50,43 @@ namespace RetailPoC
             }
         }
 
-        private async void generateDataBtn_Click(object sender, RoutedEventArgs e)
+        public async void GenerateDataBtn_Click(object sender, RoutedEventArgs e)
         {
-            using (PlanogramContext context = new PlanogramContext())
+            GenerateDataEvent?.Invoke(0, "Preparing data generation...", false);
+
+            try
             {
-                MockData data = new MockData(context);
-
-                data.NumItems = this.NumItems;
-
-                generateDataBtn.IsEnabled = false;
-                DataProgressBar.Visibility = Visibility.Visible;
-                //todo: ask for confirmation
-                if (context.Items.Count() > 0)
+                using (PlanogramContext context = new PlanogramContext())
                 {
-                    var confirmation = MessageBox.Show("Warning! You currently have an existing database. Generating a new set of data will overwrite the current one. Proceed?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-                    //var confirmation = MessageBox.Show("Warning! You currently have an existing database. Generating a new set of data will overwrite the current one. Proceed?", "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-                    if (confirmation == MessageBoxResult.OK)
+                    int dataCount = context.Items.Count();
+                    if (dataCount == this.NumItems)
                     {
-                        //todo: dropDb and generate a new data set
-                        context.Database.Delete();
-                        context.Database.CreateIfNotExists();
-
-                        this.dataGrid.ItemsSource = dataFactory.Items;
-                        this.Items = dataFactory.Items;
-
-                        data.Progress += dataPanelProgress;
-                        data.Refreshdata += refreshDataGrid;
-                        GenerateDataEvent?.Invoke("Generating sample retail data...");
-                        await data.Generate();
+                        GenerateDataEvent?.Invoke(100, "", true);
                     }
                     else
                     {
-                        generateDataBtn.IsEnabled = true;
-                        DataProgressBar.Visibility = Visibility.Hidden;
+                        context.Database.Delete();
+                        context.Database.CreateIfNotExists();
+
+                        MockData data = new MockData(context);
+                        data.NumItems = this.NumItems;
+
+                        //generateDataBtn.IsEnabled = false;
+                        //DataProgressBar.Visibility = Visibility.Visible;
+
+                        data.GeneratingDataEvent += (p, t, d, ex) =>
+                        {
+                            GenerateDataEvent?.Invoke(p, t, d, ex);
+                        };
+
+                        //data.Refreshdata += refreshDataGrid;
+                        await data.Generate();
                     }
                 }
-                else
-                {
-                    data.Progress += dataPanelProgress;
-                    data.Refreshdata += refreshDataGrid;
-                    GenerateDataEvent?.Invoke("Generating sample retail data...");
-                    await data.Generate();
-                }
+            }
+            catch (Exception ex)
+            {
+                GenerateDataEvent?.Invoke(0, "An error occured. Please click here to view the full details.", true, ex);
             }
         }
         
@@ -99,11 +95,7 @@ namespace RetailPoC
             // Re-query from the database the list of items and store it to local variables
             refreshDataGrid(true);
         }
-
-        void dataPanelProgress(double value)
-        {
-            DataProgressBar.Value = value;
-        }
+        
 
         void refreshDataGrid(bool refresh)
         {
@@ -114,7 +106,7 @@ namespace RetailPoC
                 generateDataBtn.IsEnabled = true;
                 DataProgressBar.Value = 0;
                 DataProgressBar.Visibility = Visibility.Hidden;
-                GenerateDataEvent?.Invoke("Done.");
+                //GenerateDataEvent?.Invoke("Done.");
             }
         }
 

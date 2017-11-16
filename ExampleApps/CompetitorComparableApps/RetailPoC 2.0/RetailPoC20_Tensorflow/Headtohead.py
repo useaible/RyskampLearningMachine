@@ -14,7 +14,7 @@ clr.AddReference("PresentationFramework, Version=4.0.0.0, Culture=neutral, Publi
 clr.AddReference("PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35")
 
 #comment this gino
-binPath = 'CSharp\\RetailPoCIBM\\RetailPoCIBM\\bin\\Debug\\'
+binPath = 'CSharp\\RetailPoC 2.0\\RetailPoC20\\bin\\Debug\\'
 mahApps = os.path.abspath(os.path.join('..', '..', '..', binPath + 'MahApps.Metro.dll'))
 clr.AddReference(mahApps)
 
@@ -34,8 +34,8 @@ currDir = os.path.realpath(__file__).replace('Headtohead.py', '')
 
 from System.Windows import Application
 from System.Threading import CancellationToken
-from RetailPoC import *
-from RetailPoC.Models import *
+from RetailPoC20 import *
+from RetailPoC20.Models import *
 import random
 from threading import Thread
 

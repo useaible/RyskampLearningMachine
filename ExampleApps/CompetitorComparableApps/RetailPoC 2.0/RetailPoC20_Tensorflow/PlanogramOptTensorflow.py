@@ -2,8 +2,8 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import numpy as np
 
-from RetailPoC import *
-from RetailPoC.Models import *
+from RetailPoC20 import *
+from RetailPoC20.Models import *
 from System import TimeSpan
 from System.Threading import CancellationToken
 from PoCTools.Settings import SimulationSettings

@@ -1,18 +1,21 @@
-﻿<Window x:Class="RetailPoC.StartupWindow"
+﻿<Window x:Class="RetailPoC20.StartupWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:local="clr-namespace:RetailPoC"
+        xmlns:local="clr-namespace:RetailPoC20"
         mc:Ignorable="d"
         Title="" Height="285.381" Width="311.441"  ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Topmost="True" WindowStyle="ToolWindow">
     <Grid>
-        <RichTextBox x:Name="startupWindowMsg" Margin="10" BorderThickness="0">
+        <RichTextBox x:Name="startupWindowMsg" Margin="10,72,10,10" BorderThickness="1">
             <FlowDocument>
                 <Paragraph TextAlignment="Center">
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
+        <Label Content="Error Type:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Error Message:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="errorType" Content="" HorizontalAlignment="Left" Margin="81,10,0,0" VerticalAlignment="Top" Width="214"/>
     </Grid>
 </Window>
