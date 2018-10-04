@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RLM;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -51,7 +53,8 @@ namespace TotalRecallConsoleApp
                 goto getDbName;
             }
 
-            var sessionCaseApi = new RlmSessionCaseHistory(dbName);
+            IRlmDbData sqlDbData = new RlmDbDataSQLServer(dbName);
+            var sessionCaseApi = new RlmSessionCaseHistory(sqlDbData);
             bool dbOk = false;
 
             if (userInput == 1)
@@ -114,7 +117,7 @@ namespace TotalRecallConsoleApp
             }
 
             if (histStr.Length > 1) {
-                System.Windows.Forms.Clipboard.SetText(histStr.ToString());
+                //System.Windows.Forms.Clipboard.SetText(histStr.ToString()); //todo: netcore
                 Console.WriteLine("\n*** Results copied to clipboard! ***");
             }
 
@@ -153,7 +156,7 @@ namespace TotalRecallConsoleApp
 
                 if (eventsStr.Length > 1)
                 {
-                    System.Windows.Forms.Clipboard.SetText(eventsStr.ToString());
+                    //System.Windows.Forms.Clipboard.SetText(eventsStr.ToString()); //todo: netcore
                     Console.WriteLine("\n*** Results copied to clipboard! ***");
                 }
 
@@ -203,7 +206,7 @@ namespace TotalRecallConsoleApp
                     eventsStr.AppendLine(ioDetailsStr.ToString());
                     if (eventsStr.Length > 1)
                     {
-                        System.Windows.Forms.Clipboard.SetText(eventsStr.ToString());
+                        //System.Windows.Forms.Clipboard.SetText(eventsStr.ToString()); //todo: netcore
                         Console.WriteLine("\n*** Results copied to clipboard! ***");
                     }
                 }

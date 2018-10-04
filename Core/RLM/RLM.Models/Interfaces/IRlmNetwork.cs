@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace RLM.Models.Interfaces
 {
-    public interface IRlmNetwork
+    public interface IRlmNetwork : IDisposable
     {
         event DataPersistenceCompleteDelegate DataPersistenceComplete;
         event DataPersistenceProgressDelegate DataPersistenceProgress;
+        event LoadNetworkProgressDelegate LoadNetworkProgress;
         bool PersistData { get; }
         long CurrentNetworkID { get; }
         string CurrentNetworkName { get; }
@@ -20,7 +21,9 @@ namespace RLM.Models.Interfaces
         IDictionary<long, RlmInputMomentum> InputMomentums { get; }
         int SessionCount { get; }
         long CaseOrder { get; }
-
+        bool Predict { get; set; }
+        IRlmRneuronProcessor GPURneuronProcessor { get; }
+        IRlmDbData RlmDBData { get; }
 
         void NewNetwork(string name, IEnumerable<RlmIO> inputs, IEnumerable<RlmIO> outputs);
         bool LoadNetwork();
@@ -30,5 +33,7 @@ namespace RLM.Models.Interfaces
         void SessionEnd(double finalSessionScore);
         void ScoreCycle(long cycleId, double cycleScore);
         void SetDataPersistenceProgressInterval(int milliseconds);
+
+        void UpdateLoadNetworkProgress(long processing, long total);
     }
 }

@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class Idea_Implementation
+    public class _Idea_Implementation
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Int64 ID { get; set; }
-        public Int64 IdeaRatingEndOfCycleCase { get; set;}
+        public Int64 IdeaRatingEndOfCycleCase { get; set; }
+        [ForeignKey("_Case")]
         public Int64? Case_ID { get; set; }
+        [ForeignKey("_Session")]
         public Int64? Session_ID { get; set; }
+        [ForeignKey("_Idea_Module")]
         public Int64? Idea_Module_ID { get; set; }
+    }
 
+    public class Idea_Implementation : _Idea_Implementation
+    {
         // Navigation Properties
-        [ForeignKey("Case_ID")]
         public virtual Case Case { get; set; }
-        [ForeignKey("Session_ID")]
         public virtual Session Session { get; set; }
-        [ForeignKey("Idea_Module_ID")]
         public virtual Idea_Module Idea_Module { get; set; }
 
         //Constructors

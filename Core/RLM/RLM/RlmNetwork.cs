@@ -7,9 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +39,9 @@ namespace RLM
         public event CycleCompleteDelegate CycleComplete;
         public event DataPersistenceCompleteDelegate DataPersistenceComplete;
         public event DataPersistenceProgressDelegate DataPersistenceProgress;
-        
+        public event LoadNetworkProgressDelegate LoadNetworkProgress;
+
+        public bool Predict { get; set; }
         public bool PersistData { get; private set; }
         public IManager MemoryManager { get; private set; }
 
@@ -215,80 +214,89 @@ namespace RLM
         public IDictionary<long, RlmInputMomentum> InputMomentums { get; private set; } = new Dictionary<long, RlmInputMomentum>();
         public RlmSessionCaseHistory SessionCaseHistory { get; set; }
 
+        public IRlmRneuronProcessor GPURneuronProcessor { get; private set; }
+
+        public IRlmDbData RlmDBData { get; private set; }
+
         #region Static
 
         public static void RestoreDB(string databaseName, bool simpleRecovery = false)
         {
-            using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
-            {
-                bool dbExists = ctx.DBExists(databaseName);
-                bool fileBackupExists = ctx.FileBackupExists(databaseName);
+            //using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
+            //{
+            //    bool dbExists = ctx.DBExists(databaseName);
+            //    bool fileBackupExists = ctx.FileBackupExists(databaseName);
 
-                if (!dbExists && !fileBackupExists)
-                {
-                    ctx.RestoreDBFromTemplate(databaseName);
-                    System.Diagnostics.Debug.WriteLine("Db restored from template...");
-                }
-                else if (!dbExists && fileBackupExists)
-                {
-                    ctx.RestoreDB(databaseName);
-                    System.Diagnostics.Debug.WriteLine("Db restored...");
-                }
+            //    if (!dbExists && !fileBackupExists)
+            //    {
+            //        ctx.RestoreDBFromTemplate(databaseName);
+            //        System.Diagnostics.Debug.WriteLine("Db restored from template...");
+            //    }
+            //    else if (!dbExists && fileBackupExists)
+            //    {
+            //        ctx.RestoreDB(databaseName);
+            //        System.Diagnostics.Debug.WriteLine("Db restored...");
+            //    }
 
-                if (simpleRecovery)
-                {
-                    ctx.SetDBRecoveryMode(databaseName, DBRecoveryMode.Simple);
-                }
-            }
+            //    if (simpleRecovery)
+            //    {
+            //        ctx.SetDBRecoveryMode(databaseName, DBRecoveryMode.Simple);
+            //    }
+            //}
+            // todo migrate to ef core
         }
 
         public static void BackupDB(string databaseName)
         {
-            using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
-            {
-                if (ctx.FileBackupExists(databaseName))
-                {
-                    ctx.DeleteFileBackup(databaseName);
-                    System.Diagnostics.Debug.WriteLine("Deleted file backup...");
-                }
+            //using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
+            //{
+            //    if (ctx.FileBackupExists(databaseName))
+            //    {
+            //        ctx.DeleteFileBackup(databaseName);
+            //        System.Diagnostics.Debug.WriteLine("Deleted file backup...");
+            //    }
 
-                if (ctx.DBExists(databaseName))
-                {
-                    ctx.BackupDB(databaseName);
-                    System.Diagnostics.Debug.WriteLine("Db backed up...");
+            //    if (ctx.DBExists(databaseName))
+            //    {
+            //        ctx.BackupDB(databaseName);
+            //        System.Diagnostics.Debug.WriteLine("Db backed up...");
 
-                    DropDB(ctx, databaseName);
-                }
-            }
+            //        DropDB(ctx, databaseName);
+            //    }
+            //}
+            // todo migrate to ef core
         }
 
         public static void DropDB(string databaseName)
         {
-            using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
-            {
-                if (ctx.DBExists(databaseName))
-                {
-                    DropDB(ctx, databaseName);
-                }
-            }
+            //using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
+            //{
+            //    if (ctx.DBExists(databaseName))
+            //    {
+            //        DropDB(ctx, databaseName);
+            //    }
+            //}
+            // todo migrate to ef core
         }
 
         private static void DropDB(RlmDbEntities ctx, string databaseName)
         {
-            if (ctx != null && !string.IsNullOrEmpty(databaseName))
-            {
-                ctx.DropDB(databaseName);
-                System.Diagnostics.Debug.WriteLine("Db dropped...");
-            }
+            //if (ctx != null && !string.IsNullOrEmpty(databaseName))
+            //{
+            //    ctx.DropDB(databaseName);
+            //    System.Diagnostics.Debug.WriteLine("Db dropped...");
+            //}
+            // todo migrate to ef core
         }
 
         public static bool Exists(string databaseName)
         {
             bool retVal = false;
-            using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
-            {
-                retVal = ctx.DBExists(databaseName);
-            }
+            //using (RlmDbEntities ctx = new RlmDbEntities(RlmDbEntities.MASTER_DB))
+            //{
+            //    retVal = ctx.DBExists(databaseName);
+            //}
+            // todo migrate to ef core
             return retVal;
         }
 
@@ -299,29 +307,27 @@ namespace RLM
         /// default contstructor, creates "RyskampLearningMachine" database
         /// </summary>
         /// <param name="persistData">Allows you to turn on/off the data persistence feature of the RLM. Turned on by default.</param>
-        public RlmNetwork(bool persistData = true)
+        public RlmNetwork(IRlmRneuronProcessor gpu = null)
         {
-            PersistData = persistData;
+            PersistData = false;
             if (PersistData)
-                DatabaseName = RlmDbEntities.DetermineDbName();
-            Initialize();
+                DatabaseName = "RLM_" + Guid.NewGuid().ToString("n");//RlmDbEntities.DetermineDbName(); // todo migrate to ef core
+            Initialize(gpu);
         }
+
         /// <summary>
         /// sets your preferred database name
         /// </summary>
         /// <param name="databaseName">Uses a custom database name instead of the default generated name</param>
         /// <param name="persistData">Allows you to turn on/off the data persistence feature of the RLM. Turned on by default.</param>
-        public RlmNetwork(string databaseName, bool persistData = true)
+        public RlmNetwork(IRlmDbData rlmDbData, bool persistData = true, IRlmRneuronProcessor gpu = null)
         {
             PersistData = persistData;
-            DatabaseName = databaseName;
-            Initialize();
-            //MemoryManager.StartRnnDbWorkers();
-
-            //using (RnnDbEntities db = new RnnDbEntities(DatabaseName))
-            //{
-            //    db.SaveChanges(); //On the constructor we save changes no matter what to create DB if not exists
-            //}
+            this.RlmDBData = rlmDbData;
+            DatabaseName = rlmDbData.DatabaseName;
+            rlmDbData.Initialize();
+            SessionCaseHistory = new RlmSessionCaseHistory(rlmDbData);
+            Initialize(gpu);
         }
 
         #endregion Constructor
@@ -397,6 +403,8 @@ namespace RLM
             {
                 MemoryManager.NewNetwork(newnet, ioTypesForDb, inputsForDb, outputsForDb, this);
             }
+
+            MemoryManager.SetArrays(Inputs.Count());
         }
 
         /// <summary>
@@ -406,22 +414,28 @@ namespace RLM
         public bool LoadNetwork()
         {
             bool retVal = false;
-
-            if (PersistData)
+           
+            string networkName = null;
+            if (RlmDBData != null)
             {
-                string networkName = null;
-                using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-                {
-                    networkName = db.Rnetworks.Select(a => a.Name).FirstOrDefault();
-                }
+                //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+                //{
+                //    networkName = db.Rnetworks.Select(a => a.Name).FirstOrDefault();
+                //}
 
-                if (networkName == null)
+                var rnetworks = RlmDBData.FindAll<_Rnetwork>();
+                if (rnetworks.Count() > 0)
                 {
-                    retVal = false;
-                }
-                else
-                {
-                    retVal = LoadNetwork(networkName);
+                    networkName = rnetworks.FirstOrDefault().Name;
+                    
+                    if (networkName == null)
+                    {
+                        retVal = false;
+                    }
+                    else
+                    {
+                        retVal = LoadNetwork(networkName);
+                    }
                 }
             }
 
@@ -440,7 +454,7 @@ namespace RLM
         {
             bool retVal = false;
 
-            if (PersistData)
+            if (RlmDBData != null)
             {
                 var result = MemoryManager.LoadNetwork(name);
 
@@ -457,6 +471,7 @@ namespace RLM
 
                 retVal = result.Loaded;
             }
+
 
             return retVal;
         }
@@ -497,10 +512,11 @@ namespace RLM
                 throw new Exception("Cannot reset a non existing network. You must create or load a network first.");
             }
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                RlmUtils.ResetTrainingData(db, CurrentNetworkID);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    RlmUtils.ResetTrainingData(db, CurrentNetworkID);
+            //}
+            // todo migrate to ef core
 
             // recreates network from scratch
             // TODO don't know if we need this later on when resetting the network. Just creating new one since we are dropping entire DB
@@ -541,7 +557,7 @@ namespace RLM
                     //save session to db
                     if (PersistData)
                     {
-                        MemoryManager.AddSessionToQueue(CurrentSessionID, session);
+                        MemoryManager.AddSessionToCreateToQueue(CurrentSessionID, session);
                     }
 
                     // reset input momentums
@@ -585,10 +601,12 @@ namespace RLM
                         BestSolution bSol;
                         if (bsDict.TryGetValue(stageBsol.SolutionId, out bSol))
                         {
-                            if (stageBsol.SessionScore >= bSol.SessionScore && stageBsol.CycleScore >= bSol.CycleScore && stageBsol.CycleOrder >= bSol.CycleOrder)
+                            if ((stageBsol.SessionScore > bSol.SessionScore) ||
+                                (stageBsol.SessionScore == bSol.SessionScore && stageBsol.CycleScore > bSol.CycleScore) ||
+                                (stageBsol.SessionScore == bSol.SessionScore && stageBsol.CycleScore == bSol.CycleScore && stageBsol.CycleOrder > bSol.CycleOrder))
                             {
                                 bsDict[stageBsol.SolutionId] = stageBsol;
-                            }
+                            }                            
                         }
                         else
                         {
@@ -614,7 +632,7 @@ namespace RLM
                 //update session to db
                 if (PersistData)
                 {
-                    MemoryManager.AddSessionUpdateToQueue(session);
+                    MemoryManager.AddSessionToUpdateToQueue(session);
                 }
 
                 //Throw the endsession event
@@ -667,8 +685,18 @@ namespace RLM
             }
 
             CurrentCase = null;
+            bsol = null;
         }
 
+        public void RemoveSolutionsCascade(IDictionary<long, IEnumerable<string>> outputs)
+        {
+            IEnumerable<long> solutionIds = MemoryManager.GetSolutionIdsForOutputs(outputs);
+            
+            foreach (var item in solutionIds)
+            {
+                MemoryManager.RemoveSolutionCascade(item);
+            }
+        }
 
         #endregion External Methods
 
@@ -741,11 +769,17 @@ namespace RLM
             return retVal;
         }
 
-        private void Initialize()
+        private void Initialize(IRlmRneuronProcessor gpu = null)
         {
             MemoryManager = new Manager(this);
             MemoryManager.DataPersistenceComplete += MemoryManager_DataPersistenceComplete;
             MemoryManager.DataPersistenceProgress += MemoryManager_DataPersistenceProgress;
+
+            if (gpu != null)
+            {
+                GPURneuronProcessor = gpu;
+                GPURneuronProcessor.SetManagerReference(MemoryManager);
+            }
 
             // default 
             MemoryManager.UseMomentumAvgValue = USE_MOM_AVG;
@@ -761,6 +795,17 @@ namespace RLM
         {
             DataPersistenceProgress?.Invoke(processing, total);
         }
+
+        public void UpdateLoadNetworkProgress(long processing, long total)
+        {
+            LoadNetworkProgress?.Invoke(processing, total);
+        }
+
+        public void Dispose()
+        {
+            (MemoryManager as IDisposable).Dispose();
+        }
+
         #endregion Supporting Functions
     }
 }

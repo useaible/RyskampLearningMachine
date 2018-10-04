@@ -11,7 +11,7 @@ namespace RequirementsTool
     {
         const string REGISTRY_BASE_VS = @"SOFTWARE\Microsoft\VisualStudio";
         const string REGISTRY_VS_SETUP = @"{{versionNumber}}\Setup";
-        const int VS_VERSION_IDENTIFIER = 14; // 2015        
+        const int VS_VERSION_IDENTIFIER = 15; // 2017
         readonly Regex REGEX = new Regex("Microsoft Visual Studio (Professional|Premium|Enterprise|Community|Express).*", RegexOptions.IgnoreCase);
 
         public VisualStudioChecker()
@@ -19,7 +19,7 @@ namespace RequirementsTool
             Name = "Visual Studio";
             Url = "https://www.visualstudio.com/downloads/";
 
-            Versions.Add("2015 or later");
+            Versions.Add("2017 or later");
 
             CheckPythonTools = false;
             VSPythonTools = new VSPythonToolsChecker();
@@ -67,46 +67,62 @@ namespace RequirementsTool
                 {
                     bool hasMatchingVersion = false;
 
+                    double highestVersion = 0.0;
                     var subkeyNames = rootKey.GetSubKeyNames();
                     foreach(var keyName in subkeyNames)
                     {
-                        double versionNumber;
-                        if (double.TryParse(keyName, out versionNumber))
+                        double version = 0.0;
+                        if (double.TryParse(keyName, out version))
                         {
-                            if (versionNumber >= VS_VERSION_IDENTIFIER)
+                            if (highestVersion < version)
                             {
-                                using (var setupVsKey = rootKey.OpenSubKey(REGISTRY_VS_SETUP.Replace("{{versionNumber}}", keyName)))
-                                {
-                                    if (setupVsKey != null)
-                                    {
-                                        var setupSubkeys = setupVsKey.GetSubKeyNames();
-                                        var filteredSubkeys = setupSubkeys.Where(a => REGEX.IsMatch(a)).ToList();
-
-                                        foreach(var item in filteredSubkeys)
-                                        {
-                                            using (var setupItemKey = setupVsKey.OpenSubKey(item))
-                                            {
-                                                if (setupItemKey != null)
-                                                {
-                                                    hasMatchingVersion = true;
-                                                    var installInfo = setupItemKey.GetValue("InstallSuccess");
-
-                                                    if (installInfo != null && Convert.ToInt32(installInfo) == 1)
-                                                    {
-                                                        HasCorrectVersion = true;
-                                                        Message = $"{Name}...OK";
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                highestVersion = version;
                             }
                         }
+                        //double versionNumber;
+                        //if (double.TryParse(keyName, out versionNumber))
+                        //{
+                        //    if (versionNumber >= VS_VERSION_IDENTIFIER)
+                        //    {
+                        //        using (var setupVsKey = rootKey.OpenSubKey(REGISTRY_VS_SETUP.Replace("{{versionNumber}}", keyName)))
+                        //        {
+                        //            if (setupVsKey != null)
+                        //            {
+                        //                var setupSubkeys = setupVsKey.GetSubKeyNames();
+                        //                var filteredSubkeys = setupSubkeys.Where(a => REGEX.IsMatch(a)).ToList();
 
-                        if (HasCorrectVersion)
-                            break;
+                        //                foreach(var item in filteredSubkeys)
+                        //                {
+                        //                    using (var setupItemKey = setupVsKey.OpenSubKey(item))
+                        //                    {
+                        //                        if (setupItemKey != null)
+                        //                        {
+                        //                            hasMatchingVersion = true;
+                        //                            var installInfo = setupItemKey.GetValue("InstallSuccess");
+
+                        //                            if (installInfo != null && Convert.ToInt32(installInfo) == 1)
+                        //                            {
+                        //                                HasCorrectVersion = true;
+                        //                                Message = $"{Name}...OK";
+                        //                                break;
+                        //                            }
+                        //                        }
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        //}
+
+                        //if (HasCorrectVersion)
+                        //    break;
+                    }
+
+
+                    if (highestVersion == VS_VERSION_IDENTIFIER)
+                    {
+                        HasCorrectVersion = true;
+                        Message = $"{Name}...OK";
                     }
 
                     if (!HasCorrectVersion && hasMatchingVersion)

@@ -4,6 +4,7 @@
 
 using RLM.Database;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,16 @@ namespace RLM
     public class RlmNetworkLegacy : RlmNetwork
     {
         public RlmNetworkLegacy() : base() { }
-        public RlmNetworkLegacy(string dbName, bool persistData = true) : base(dbName, persistData) { }
+        public RlmNetworkLegacy(IRlmDbData rlmDbData, bool persistData = true) : base(rlmDbData, persistData)
+        {
+            rlmDbDataLegacy = rlmDbData;
+        }
+
+        private IRlmDbDataLegacy rlmDbDataLegacy;
 
         public override long SessionStart()
         {
-            long retVal =  base.SessionStart();
+            long retVal = base.SessionStart();
 
             // TEMPORARY for benchmark only
             MemoryManager.GetRneuronTimes?.Clear();
@@ -30,7 +36,7 @@ namespace RLM
 
             return retVal;
         }
-        
+
 
         public int CurrentCycleCount { get; set; }
         public IEnumerable<Session> GetSessions()
@@ -72,11 +78,14 @@ namespace RLM
 
             if (SessionCount > 0)
             {
-                using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-                {
-                    RlmUtils.GetVariance(db, CurrentNetworkID, top);
-                }
+                //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+                //{
+                //    RlmUtils.GetVariance(db, CurrentNetworkID, top);
+                //}
+
+                retVal = rlmDbDataLegacy.GetVariance(CurrentNetworkID, top);
             }
+
 
             return retVal;
         }
@@ -85,10 +94,12 @@ namespace RLM
         {
             int retVal = 0;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = RlmUtils.GetTotalSimulationInSeconds(db, CurrentNetworkID);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = RlmUtils.GetTotalSimulationInSeconds(db, CurrentNetworkID);
+            //}
+
+            retVal = rlmDbDataLegacy.GetTotalSimulationInSeconds(CurrentNetworkID);
 
             return retVal;
         }
@@ -97,10 +108,12 @@ namespace RLM
         {
             IEnumerable<Session> retVal = null;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = RlmUtils.GetSessions(db, CurrentNetworkID, skip, take, descending);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = RlmUtils.GetSessions(db, CurrentNetworkID, skip, take, descending);
+            //}
+
+            retVal = rlmDbDataLegacy.GetSessions(CurrentNetworkID, skip, take, descending);
 
             return retVal;
         }
@@ -109,10 +122,12 @@ namespace RLM
         {
             IEnumerable<RlmSessionSummary> retVal = null;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = RlmUtils.GetSessionSummary(db, CurrentNetworkID, groupBy, descending);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = RlmUtils.GetSessionSummary(db, CurrentNetworkID, groupBy, descending);
+            //}
+
+            retVal = rlmDbDataLegacy.GetSessionSummary(CurrentNetworkID, groupBy, descending);
 
             return retVal;
         }
@@ -121,10 +136,12 @@ namespace RLM
         {
             int retVal = 0;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = db.Sessions.Where(a => a.Rnetwork.ID == CurrentNetworkID).Count();
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = db.Sessions.Where(a => a.Rnetwork.ID == CurrentNetworkID).Count();
+            //}
+
+            retVal = rlmDbDataLegacy.GetSessionCount(CurrentNetworkID);
 
             return retVal;
         }
@@ -133,10 +150,12 @@ namespace RLM
         {
             IEnumerable<Case> retVal = null;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = RlmUtils.GetCases(db, sessionId, skip, take);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = RlmUtils.GetCases(db, sessionId, skip, take);
+            //}
+
+            retVal = rlmDbDataLegacy.GetCases(sessionId, skip, take);
 
             return retVal;
         }
@@ -145,10 +164,12 @@ namespace RLM
         {
             int retVal = 0;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = db.Cases.Where(a => a.Session.ID == sessionId).Count();
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = db.Cases.Where(a => a.Session.ID == sessionId).Count();
+            //}
+
+            retVal = rlmDbDataLegacy.GetCaseCount(sessionId);
 
             return retVal;
         }
@@ -157,12 +178,15 @@ namespace RLM
         {
             RlmStats retVal = null;
 
-            using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
-            {
-                retVal = RlmUtils.GetRNetworkStatistics(db, CurrentNetworkID);
-            }
+            //using (RlmDbEntities db = new RlmDbEntities(DatabaseName))
+            //{
+            //    retVal = RlmUtils.GetRNetworkStatistics(db, CurrentNetworkID);
+            //}
+
+            retVal = rlmDbDataLegacy.GetStatistics(CurrentNetworkID);
 
             return retVal;
         }
     }
+    // todo migrate to ef core
 }

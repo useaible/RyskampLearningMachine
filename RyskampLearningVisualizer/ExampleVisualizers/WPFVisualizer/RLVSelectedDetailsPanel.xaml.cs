@@ -376,5 +376,15 @@ namespace WPFVisualizer
                 throw (e);
             }
         }
+
+        public void IRLVSelectedDetailsNavigatePrevNext(long caseId, bool isNext)
+        {
+            NextPrevCaseChangedEvent?.Invoke(caseId, isNext);
+        }
+
+        public void IRLVSelectedDetailsShowLearningComparison(long currentSessionId, long previousSessionId)
+        {
+            LearningComparisonEvent?.Invoke(currentSessionId, previousSessionId);
+        }
     }
 }

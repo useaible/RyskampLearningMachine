@@ -60,7 +60,7 @@ namespace RLM.Database
                     rneuronValues.Append($"{(rneuronValues.Length == 0 ? "" : ",")} ({r_id.ParameterName}, {g_bint.ParameterName}, {g_double.ParameterName}, {r_rnet.ParameterName})");
 
                     int ivrCnt = 0;
-                    foreach(var ivr in c.Rneuron.Input_Values_Reneurons)
+                    foreach(var ivr in c.Rneuron.Input_Values_Rneurons)
                     {
                         //var ivr_id = new SqlParameter($"@ivr_id_{cnt}_{ivrCnt}", ivr.ID);
                         var ivr_val = new SqlParameter($"@ivr_val_{cnt}_{ivrCnt}", ivr.Value);

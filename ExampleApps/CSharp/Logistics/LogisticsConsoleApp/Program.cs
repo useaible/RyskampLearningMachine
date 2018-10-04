@@ -16,6 +16,8 @@ namespace LogisticsConsoleApp
             Console.WriteLine("Logistics Simulator");
             var logist = new RlmLogistics();
             logist.LogisticTrain();
+
+            Console.ReadLine();
         }        
     }
 }

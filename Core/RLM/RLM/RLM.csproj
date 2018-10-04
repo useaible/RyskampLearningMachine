@@ -1,96 +1,47 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01EEC6CE-A2CA-4637-8133-6288B6E246C3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RLM</RootNamespace>
-    <AssemblyName>RLM</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>%24/useAIble/RLM/RLM-dev-crossplatform/Core/RLM/RLM</SccProjectName>
+    <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
+    <SccAuxPath>https://rixryskamp.visualstudio.com</SccAuxPath>
+    <SccLocalPath>.</SccLocalPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-    <DocumentationFile>bin\Debug\RLM.XML</DocumentationFile>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+
+    <PackageId>useAIble.RyskampLearningMachine</PackageId>
+    <Version>1.0.7</Version>
+    <Title>RyskampLearningMachine</Title>
+    <Authors>useAIble</Authors>
+    <Owners>Rix Ryskamp</Owners>
+    <PackageLicenseUrl>https://github.com/useaible/RyskampLearningMachine/blob/master/License.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/useaible/RyskampLearningMachine</PackageProjectUrl>
+    <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+    <Description>The Ryskamp Learning Machine represents a quantum leap in the world of machine learning. It breaks from the traditions of the past and uses a completely new paradigm for the core machine learning algorithm. This algorithm focuses on logic over pure mathematical solutions and specific information processing (currently associated with traditional programming) combined with categorization and pattern recognition (currently associated with machine learning) into a single algorithm and engine. Additionally, the RLM saves every decision it ever makes, making debugging simple. Neural network “black box” problems are now a thing of the past.</Description>
+    <PackageReleaseNotes>Please visit https://github.com/useaible/RyskampLearningMachine/releases/tag/v1.0.7 to view the release notes</PackageReleaseNotes>
+    <Copyright>Copyright 2017</Copyright>
+    <PackageTags>AI MachineLearning NeuralNetwork</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="NCalc2" Version="2.1.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RlmCerebralCortex.cs" />
-    <Compile Include="RlmNetwork.cs" />
-    <Compile Include="RlmCycle.cs" />
-    <Compile Include="RlmNetworkLegacy.cs" />
-    <Compile Include="RlmSessionCaseHistory.cs" />
-    <Compile Include="RlmUtils.cs" />
+    <ProjectReference Include="..\RLM.Models\RLM.Models.csproj" />
+	  <ProjectReference Include="..\RLM.Memory\RLM.Memory.csproj" />
+	  <ProjectReference Include="..\RLM.Database\RLM.Database.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RLM.Database\RLM.Database.csproj">
-      <Project>{70ce8fe8-19d9-4472-89e1-2b61e7402b03}</Project>
-      <Name>RLM.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RLM.Memory\RLM.Memory.csproj">
-      <Project>{2e4b0ad0-dac9-44ef-b3b3-a339b397d34e}</Project>
-      <Name>RLM.Memory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RLM.Models\RLM.Models.csproj">
-      <Project>{f603454e-2199-4366-9a2a-08ec30818a0c}</Project>
-      <Name>RLM.Models</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

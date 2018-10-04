@@ -23,6 +23,7 @@ namespace RLV.Core.Interfaces
     
     public delegate void SelectedCaseScaleChangedDelegate(long selectedCaseId, double scale);
     public delegate void SelectedCaseScaleChangedResultsDelegate(IEnumerable<RlmLearnedCase> data, long selectedCaseId);
+    public delegate void SelectChartDataPointDelegate(long selectedCaseId);
 
     public delegate void NextPrevCaseChangedDelegate(long caseId, bool next);
     public delegate void NextPrevCaseChangedResultsDelegate(long caseId);

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class Session
+    public class _Session
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Int64 ID { get; set; }
@@ -16,12 +13,32 @@ namespace RLM.Models
         public DateTime DateTimeStop { get; set; }
         public double SessionScore { get; set; }
         public bool Hidden { get; set; }
+        [ForeignKey("_Rnetwork")]
         public Int64 Rnetwork_ID { get; set; }
+    }
 
+    public class Session : _Session
+    {
+        private ICollection<Case> cases;
+               
         //Navigation Properties
-        [ForeignKey("Rnetwork_ID")]
         public virtual Rnetwork Rnetwork { get; set; }
-        public virtual ICollection<Case> Cases { get; set; }
+        public virtual ICollection<Case> Cases
+        {
+            get
+            {
+                if (cases == null)
+                {
+                    cases = new HashSet<Case>();
+                }
+
+                return cases;
+            }
+            set
+            {
+                cases = value;
+            }
+        }
 
         // TEMPORARY for benchmarks only
         [NotMapped]
@@ -52,7 +69,7 @@ namespace RLM.Models
         //One parameterless constructor is required by EF for auto creation
         public Session()
         {
-            Cases = new HashSet<Case>();
+            //Cases = new HashSet<Case>();
             Hidden = false;
         }
 

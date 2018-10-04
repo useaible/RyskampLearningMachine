@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using RLM.Enums;
 using RLM.Models;
 using System.Linq.Expressions;
-using System.Data.Entity;
 using RLM.Memory;
 
 namespace RLM
@@ -19,7 +18,7 @@ namespace RLM
     {
         private const double IDEAL_SCORE = 100; 
 
-        internal static RlmCycleOutput CoreCycleProcess(RlmNetwork rnn_net, RlmCycle rnn_cyc, List<Models.RlmIOWithValue> rnn_ins, RlmNetworkType rnnType, List<Models.RlmIOWithValue> rnn_outs, double cyclescore, IEnumerable<RlmIdea> ideas = null)
+        internal static RlmCycleOutput CoreCycleProcess(RlmNetwork rnn_net, RlmCycle rnn_cyc, IEnumerable<Models.RlmIOWithValue> rnn_ins, RlmNetworkType rnnType, IEnumerable<Models.RlmIOWithValue> rnn_outs, double cyclescore, IEnumerable<RlmIdea> ideas = null, IEnumerable<long> excludeSolutions = null)
         {
             var memoryMgr = rnn_net.MemoryManager;
 
@@ -52,25 +51,7 @@ namespace RLM
             GetSolutionResult solutionFound = new GetSolutionResult();
             Solution solution = null;
             
-            // sets ideas, if any are passed in as parameters
             IEnumerable<Models.RlmIO> outputs = rnn_net.Outputs;
-            if (ideas != null)
-            {
-                foreach (var output in outputs)
-                {
-                    foreach (var idea in ideas)
-                    {
-                        if (idea is RlmOutputLimiter)
-                        {
-                            var outputIdea = idea as RlmOutputLimiter;
-                            if (outputIdea.RlmIOId == output.ID)
-                            {
-                                output.Idea = outputIdea;
-                            }
-                        }
-                    }
-                }
-            }
 
             bool completelyRandom = false;
             double randomnessValue = rnn_net.RandomnessCurrentValue;
@@ -99,12 +80,12 @@ namespace RLM
                 if (!random)
                 {
                     // get best solution
-                    solution = memoryMgr.GetBestSolution(rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0); //db.GetBestSolution(rnn_net.CurrentNetworkID, rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0);
+                    solution = memoryMgr.GetBestSolution(rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0, excludeSolutions: excludeSolutions); //db.GetBestSolution(rnn_net.CurrentNetworkID, rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0);
                     bestSolutionId = solution?.ID;
                     if (solution == null)
                     {
                         completelyRandom = true;
-                        solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, bestSolutionId);
+                        solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, bestSolutionId, ideas);
                     }
                     else
                     {
@@ -114,27 +95,27 @@ namespace RLM
                 }
                 else if (random && outputs.Count() > 1)
                 {
-                    solution = memoryMgr.GetBestSolution(rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0); //db.GetBestSolution(rnn_net.CurrentNetworkID, rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0);
+                    solution = memoryMgr.GetBestSolution(rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0, excludeSolutions: excludeSolutions); //db.GetBestSolution(rnn_net.CurrentNetworkID, rnn_ins, (hasLinearInputs) ? rnn_net.LinearToleranceCurrentValue : 0);
                     bestSolutionId = solution?.ID;
                     completelyRandom = true;
-                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, bestSolutionId);
+                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, bestSolutionId, ideas);
                 }
                 else
                 {
                     completelyRandom = true;
-                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs);
+                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, ideas: ideas);
                 }
 
                 solution = solutionFound.Solution;
             }
             else // Predict
             {
-                solution = memoryMgr.GetBestSolution(rnn_ins, predict: true, predictLinearTolerance: rnn_net.PredictLinear); //db.GetBestSolution(rnn_net.CurrentNetworkID, new List<long>() { neuron.ID }, true);
+                solution = memoryMgr.GetBestSolution(rnn_ins, predict: true, predictLinearTolerance: rnn_net.PredictLinear, excludeSolutions: excludeSolutions); //db.GetBestSolution(rnn_net.CurrentNetworkID, new List<long>() { neuron.ID }, true);
                 
                 if (solution == null)
                 {
                     completelyRandom = true;
-                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs);
+                    solutionFound = memoryMgr.GetRandomSolutionFromOutput(randomnessValue, outputs, ideas: ideas);
                     solution = solutionFound.Solution;
                     #region TODO cousin node search
                     //// no solution found AND all inputs are Distinct
@@ -206,12 +187,13 @@ namespace RLM
             // set Current case reference
             rnn_net.CurrentCase = newCase;
                 
-            var cycleOutput = new RlmCycleOutput(newCase.ID, newCase.Solution_ID, rnn_net.Outputs, solution.Output_Values_Solutions);
+            var cycleOutput = new RlmCycleOutput(newCase.ID, newCase.Rneuron_ID, newCase.Solution_ID, rnn_net.Outputs, solution.Output_Values_Solutions);
+            cycleOutput.CompletelyRandom = completelyRandom;
             return cycleOutput;
         }
    
         //Record Case
-        private static Case RecordCase(RlmCycle cycle, GetRneuronResult rneuronFound, List<RlmIOWithValue> rnn_ins, List<RlmIOWithValue> runn_outs,
+        private static Case RecordCase(RlmCycle cycle, GetRneuronResult rneuronFound, IEnumerable<RlmIOWithValue> rnn_ins, IEnumerable<RlmIOWithValue> runn_outs,
             double cyclescore, GetSolutionResult solutionFound, Int16 currentmfactor, bool resultcompletelyrandom, short sequentialmfactorsuccessescount)
         {
             Case casefromdb = cycle.CaseReference; //db.Cases.Find(cycle.CycleCaseID);

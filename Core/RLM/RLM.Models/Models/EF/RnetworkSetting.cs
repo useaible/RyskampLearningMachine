@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class RnetworkSetting
+    public class _RnetworkSetting
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Int64 ID { get; set; }
         public String Name { get; set; }
         public String Value { get; set; }
+        [ForeignKey("_Rnetwork")]
         public Int64 Rnetwork_ID { get; set; }
+    }
 
+    public class RnetworkSetting : _RnetworkSetting
+    {
         // Navigation Properties
-        [ForeignKey("Rnetwork_ID")]
         public virtual Rnetwork Rnetwork { get; set; }
 
         //Constructors

@@ -1,23 +1,23 @@
 ﻿using RLM.Enums;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class Input_Values_Rneuron
+    public class _Input_Values_Rneuron
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Int64 ID { get; set; }
         public String Value { get; set; }
+        [ForeignKey("_Input")]
         public Int64 Input_ID { get; set; }
+        [ForeignKey("_Rneuron")]
         public Int64 Rneuron_ID { get; set; }
+    }
 
-        [ForeignKey("Input_ID")]
+    public class Input_Values_Rneuron : _Input_Values_Rneuron
+    {
         public virtual Input Input { get; set; }
-        [ForeignKey("Rneuron_ID")]
         public virtual Rneuron Rneuron { get; set; }
 
         [NotMapped]

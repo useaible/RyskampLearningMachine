@@ -1,11 +1,16 @@
-﻿using RLM;
+﻿using CsvHelper;
+using RLM;
+using RLM.SQLServer;
 using RLM.Enums;
 using RLM.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RLM.PostgreSQLServer;
 
 namespace LanderGameLib
 {
@@ -13,18 +18,26 @@ namespace LanderGameLib
     {
         private const string NETWORK_NAME = "lunar lander";
         private RlmNetwork network;
+        private double lastScore = 0;
 
         public bool DataPersistenceDone { get; private set; } = false;
-        public bool ShowDataPersistenceProgress { get; set; } = false;
+        public bool ShowDataPersistenceProgress { get; set; } = true;
+        public bool SimulationDone { get; set; } = false;
+
+        private Stopwatch watcher = new Stopwatch();
+        private List<long> TotalCycleTime { get; set; } = new List<long>();
 
         public RLMPilot(bool learn = false, int numSessions = 50, int startRandomness = 30, int endRandomness = 0, int maxLinearBracket = 15, int minLinearBracket = 3)
         {
             string dbName = "RLM_lander_" + Guid.NewGuid().ToString("N");
-            network = new RlmNetwork(dbName);
+            //var sqlDbData = new RlmDbDataPostgreSqlServer(dbName);
+            var sqlDbData = new RlmDbDataSQLServer(dbName);
+            network = new RlmNetwork(sqlDbData);
+            //network = new RlmNetwork();
             network.DataPersistenceComplete += Network_DataPersistenceComplete;
             network.DataPersistenceProgress += Network_DataPersistenceProgress;
 
-            if (!network.LoadNetwork(NETWORK_NAME))
+            if (!network.LoadNetwork())
             {
                 var inputs = new List<RlmIO>();
                 inputs.Add(new RlmIO("fuel", typeof(System.Int32).ToString(), 0, 200, RlmInputType.Linear));
@@ -43,22 +56,23 @@ namespace LanderGameLib
             network.EndRandomness = endRandomness;
             network.MaxLinearBracket = maxLinearBracket;
             network.MinLinearBracket = minLinearBracket;
+
         }
 
         private void Network_DataPersistenceProgress(long processed, long total)
         {
-            if (ShowDataPersistenceProgress)
+            if (ShowDataPersistenceProgress && SimulationDone)
             {
-                Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+                Console.Write($"Data Persistence progress: {processed}/{total}\r");
             }
         }
 
         private void Network_DataPersistenceComplete()
         {
             DataPersistenceDone = true;
-            Console.WriteLine("RLM Data Persistence done.");
+            Console.WriteLine("\n\nRLM Data Persistence done.");
         }
-                
+
         public bool Learn { get; set; }
 
         public void ResetRLMRandomization()
@@ -79,7 +93,10 @@ namespace LanderGameLib
                 inputs.Add(new RlmIOWithValue(network.Inputs.First(a => a.Name == "velocity"), Math.Round(sim.Velocity, 2).ToString()));
 
                 var cycle = new RlmCycle();
+                watcher.Restart();
                 var cycleOutcome = cycle.RunCycle(network, network.CurrentSessionID, inputs, Learn);
+                watcher.Stop();
+                TotalCycleTime.Add(watcher.ElapsedMilliseconds);
 
                 bool thrust = Convert.ToBoolean(cycleOutcome.CycleOutput.Outputs.First(a => a.Name == "thrust").Value);
                 if (thrust && showOutput && !Learn)
@@ -100,13 +117,13 @@ namespace LanderGameLib
                 if (sim.Fuel == 0 && sim.Altitude > 0 && sim.Velocity == -LanderSimulator.TerminalVelocity)
                     break;
             }
-            
+
             if (showOutput)
             {
                 Console.WriteLine($"Session #{ sessionNumber } \t Score: {sim.Score}");
             }
-            
-            network.SessionEnd(sim.Score);
+
+            network.SessionEnd(lastScore = sim.Score);
         }
 
         public double scoreTurn(LanderSimulator sim, bool thrust)
@@ -131,10 +148,21 @@ namespace LanderGameLib
 
             return retVal;
         }
-        
-        public void TrainingDone()
+
+        public void TrainingDone(TimeSpan time, int sessions)
         {
             network.TrainingDone();
-        }        
+
+
+            Console.WriteLine("End of Simulation");
+            SimulationDone = true;
+        }
+    }
+
+    public class SessionElapse
+    {
+        public TimeSpan Elapsed { get; set; }
+        public int Session { get; set; }
+        public int Inputs { get; set; }
     }
 }

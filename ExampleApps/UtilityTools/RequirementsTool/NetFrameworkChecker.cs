@@ -8,14 +8,14 @@ namespace RequirementsTool
     public class NetFrameworkChecker : RegistryChecker
     {
         const string REGISTRY_BASE = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-        const int RELEASEKEY_VALUE_FOR_462 = 394802;
+        const int RELEASEKEY_VALUE_FOR_472 = 461808;
         
         public NetFrameworkChecker()
         {
             Name = ".NET Framework";
             Url = "https://www.microsoft.com/net/download/framework";
 
-            Versions.Add("4.6.2 or later");
+            Versions.Add("4.7.2 or later");
         }
 
         public override bool Check()
@@ -40,7 +40,7 @@ namespace RequirementsTool
                     if (releaseKey != null)
                     {
                         int releaseKeyVal = Convert.ToInt32(releaseKey);
-                        if (releaseKeyVal >= RELEASEKEY_VALUE_FOR_462)
+                        if (releaseKeyVal >= RELEASEKEY_VALUE_FOR_472)
                         {
                             HasCorrectVersion = true;
                             Message = $"{Name}...OK";

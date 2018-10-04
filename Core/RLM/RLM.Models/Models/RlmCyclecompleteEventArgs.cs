@@ -27,10 +27,11 @@ namespace RLM.Models
         /// <param name="outputs"></param>
         /// <param name="outputsWithVal"></param>
         /// <param name="cycleGUID"></param>
-        public RlmCycleOutput(long cycleID, long solutionID, IEnumerable<RlmIO> outputs, IEnumerable<Output_Values_Solution> outputsWithVal)
+        public RlmCycleOutput(long cycleID, long rneuronID, long solutionID, IEnumerable<RlmIO> outputs, IEnumerable<Output_Values_Solution> outputsWithVal)
         {
             CycleID = cycleID;
             SolutionID = solutionID;
+            RneuronID = rneuronID;
 
             var outputList = new List<RlmIOWithValue>();
             foreach(var o in outputsWithVal)
@@ -53,7 +54,9 @@ namespace RLM.Models
 
         public long CycleID { get; set; }
         public long SolutionID { get; set; }
+        public long RneuronID { get; set; }
         public IEnumerable<RlmIOWithValue> Outputs { get; set; }
+        public bool CompletelyRandom { get; set; } = false;
     }
 
     public class RlmCyclecompleteArgs

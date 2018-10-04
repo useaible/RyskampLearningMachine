@@ -1,8 +1,10 @@
 ﻿using LogisticsGameLib;
 using RLM;
+using RLM.SQLServer;
 using RLM.Enums;
 using RLM.Models;
 using RLM.Models.Exceptions;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools;
+using RLM.PostgreSQLServer;
 
 namespace LogisticsConsoleApp
 {
@@ -34,7 +37,9 @@ namespace LogisticsConsoleApp
             
             try
             {
-                RlmNetwork network = new RlmNetwork(dbName); //Make an instance of rlm_network passing the database name as parameter
+                //IRlmDbData rlmDbData = new RlmDbDataPostgreSqlServer(dbName);
+                IRlmDbData rlmDbData = new RlmDbDataSQLServer(dbName);
+                RlmNetwork network = new RlmNetwork(rlmDbData); //Make an instance of rlm_network passing the database name as parameter
                 network.DataPersistenceComplete += Network_DataPersistenceComplete;
                 network.DataPersistenceProgress += Network_DataPersistenceProgress;
 

@@ -1,4 +1,6 @@
-﻿using RLM.Models;
+﻿using RLM.SQLServer;
+using RLM.Models;
+using RLM.Models.Interfaces;
 using RLM.WebAPI.Models;
 using System;
 using System.Collections.Concurrent;
@@ -35,7 +37,8 @@ namespace RLM.WebAPI.Manager
 
         public void CreateOrLoadNetwork(CreateLoadNetworkParams data)
         {
-            RlmNetworkWebAPI network = new RlmNetworkWebAPI(data.RlmName);
+            IRlmDbData rlmDbData = new RlmDbDataSQLServer(data.RlmName);
+            RlmNetworkWebAPI network = new RlmNetworkWebAPI(rlmDbData);
             
             if (network.LoadNetwork(data.NetworkName))
             {
@@ -154,71 +157,82 @@ namespace RLM.WebAPI.Manager
 
         private IEnumerable<RlmSessionHistory> getSessionHistory(RlmFilterResultParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetSessionHistory(data.Skip, data.Take);
         }
 
         private IEnumerable<RlmSessionHistory> getSessionsWithSignificantLearning(RlmFilterResultParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetSignificantLearningEvents(data.Skip, data.Take);
         }
 
         public IEnumerable<RlmCaseHistory> GetSessionCases(RlmGetSessionCaseParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetSessionCaseHistory(data.SessionId, data.Skip, data.Take);
         }
 
         public RlmCaseIOHistory GetCaseInputOutputDetails(RlmGetCaseIOParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetCaseIOHistory(data.CaseId, data.RneuronId, data.SolutionId);
         }
 
         public long? GetNextPrevLearnedCaseId(RlmGetNextPrevLearnedCaseIdParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetNextPreviousLearnedCaseId(data.CaseId.Value, data.IsNext);
         }
 
         public IEnumerable<RlmLearnedSessionDetails> GetSessionIODetails(RlmGetSessionDetailsParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetSessionIODetails(data.SessionIds);
         }
 
         public long? GetRneuronIdFromInputs(RlmGetRneuronIdFromInputs data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetRneuronIdFromInputs(data.InputValuesPair);
         }
 
         public long? GetSolutionIdFromOutputs(RlmGetSolutionIdFromOutputs data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetSolutionIdFromOutputs(data.OutputValuesPair);
         }
 
         public IEnumerable<RlmLearnedCase> GetLearnedCases(RlmGetLearnedCasesParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetLearnedCases(data.RneuronId, data.SolutionId, data.Scale);
         }
 
         public IEnumerable<RlmLearnedCaseDetails> GetCaseDetails(RlmGetCaseDetailsParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetCaseDetails(data.CaseId);
         }
 
         public IEnumerable<RlmIODetails>[] GetCaseIODetails(RlmGetCaseIODetailsParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmNetworkWebAPI network = LoadNetworkFromCache(data);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
             return hist.GetCaseIODetails(data.CaseId);
         }
 

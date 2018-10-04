@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
-using System.Data.Entity;
 using System.Data.SqlClient;
 using RLM.Models;
 using RLM.Database;
@@ -63,198 +62,201 @@ namespace RLM
                 DELETE FROM [Cases] WHERE [Session_ID] IN (SELECT [ID] FROM [Sessions] WHERE [Rnetwork_ID] = @p0);
                 DELETE FROM [Sessions] WHERE [Rnetwork_ID] = @p0;";
 
-            db.Database.ExecuteSqlCommand(sql, rnetworkId);
+            //db.Database.ExecuteSqlCommand(sql, rnetworkId);
         }
 
         #region used by Legacy RlmNetwork functions
-        public static double GetVariance(RlmDbEntities db, long rnetworkId, int top)
-        {
-            double retVal = 0;
+        // todo migrate to ef core
+        //public static double GetVariance(RlmDbEntities db, long rnetworkId, int top)
+        //{
+        //    double retVal = 0;
 
-            var sessions = db.Sessions
-                .Where(a => a.Rnetwork.ID == rnetworkId)
-                .OrderByDescending(a => a.DateTimeStop)
-                .Select(a => a.SessionScore)
-                .Take(top);
+        //    var sessions = db.Sessions
+        //        .Where(a => a.Rnetwork.ID == rnetworkId)
+        //        .OrderByDescending(a => a.DateTimeStop)
+        //        .Select(a => a.SessionScore)
+        //        .Take(top);
 
-            double max = sessions.Max();
-            double min = sessions.Min();
-            double diff = sessions.Max() - sessions.Min();
+        //    double max = sessions.Max();
+        //    double min = sessions.Min();
+        //    double diff = sessions.Max() - sessions.Min();
 
-            retVal = (diff <= 0) ? 0 : (diff / max);
+        //    retVal = (diff <= 0) ? 0 : (diff / max);
 
-            return retVal;
-        }
+        //    return retVal;
+        //}
 
-        public static int GetTotalSimulationInSeconds(RlmDbEntities db, long rnetworkId)
-        {
-            int retVal = 0;
+        //public static int GetTotalSimulationInSeconds(RlmDbEntities db, long rnetworkId)
+        //{
+        //    int retVal = 0;
 
-            //var total = db.Sessions
-            //    .Where(a => a.Rnetwork.ID == rnetworkId && (!a.Hidden || a.SessionScore != Int32.MinValue))
-            //    .Select(a => (a.DateTimeStop - a.DateTimeStart))
-            //    .Sum(a => a.TotalSeconds);
+        //    //var total = db.Sessions
+        //    //    .Where(a => a.Rnetwork.ID == rnetworkId && (!a.Hidden || a.SessionScore != Int32.MinValue))
+        //    //    .Select(a => (a.DateTimeStop - a.DateTimeStart))
+        //    //    .Sum(a => a.TotalSeconds);
 
-            string sql = "select datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,sum(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))) from [Sessions] where Rnetwork_ID = @p0 and hidden = 0";
-            var result = db.Database.SqlQuery<int?>(sql, rnetworkId);
-            var resultVal = result.FirstOrDefault();
-            if (resultVal.HasValue)
-            {
-                retVal = resultVal.Value;
-            }
+        //    string sql = "select datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,sum(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))) from [Sessions] where Rnetwork_ID = @p0 and hidden = 0";
+        //    var result = db.Database.SqlQuery<int?>(sql, rnetworkId);
+        //    var resultVal = result.FirstOrDefault();
+        //    if (resultVal.HasValue)
+        //    {
+        //        retVal = resultVal.Value;
+        //    }
 
-            return retVal;
-        }
+        //    return retVal;
+        //}
 
-        public static RlmStats GetRNetworkStatistics(RlmDbEntities db, long rnetworkId)
-        {
-            RlmStats retVal = null;
+        //public static RlmStats GetRNetworkStatistics(RlmDbEntities db, long rnetworkId)
+        //{
+        //    RlmStats retVal = null;
 
-            string sql = $@"
-                 declare @lastSessionId bigint,
-                 @lastSessionScore float,
-                 @lastSessionTime int;
+        //    string sql = $@"
+        //         declare @lastSessionId bigint,
+        //         @lastSessionScore float,
+        //         @lastSessionTime int;
 
-                select top 1 
-	                @lastSessionId = [ID],
-	                @lastSessionScore = [SessionScore],
-	                @lastSessionTime = coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,convert(float,DateTimeStop)-Convert(float,DateTimeStart))),0)
-                from [Sessions] 
-                where [Rnetwork_ID] = @p0 and [Hidden] = 0 and [SessionScore] <> @p1
-                order by [ID] desc;
+        //        select top 1 
+	       //         @lastSessionId = [ID],
+	       //         @lastSessionScore = [SessionScore],
+	       //         @lastSessionTime = coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,convert(float,DateTimeStop)-Convert(float,DateTimeStart))),0)
+        //        from [Sessions] 
+        //        where [Rnetwork_ID] = @p0 and [Hidden] = 0 and [SessionScore] <> @p1
+        //        order by [ID] desc;
 
-                select 
-                    coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,avg(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))),0) as [AvgTimePerSessionInSeconds],
-                    coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,sum(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))),0) as [TotalSessionTimeInSeconds],
-                    count([ID]) as [TotalSessions],
-                    coalesce(max([SessionScore]),0) as [MaxSessionScore],
-                    coalesce(avg([SessionScore]),0) as [AvgSessionScore],
-                    coalesce(@lastSessionId,0) as [LastSessionId],
-                    coalesce(@lastSessionScore,0) as [LastSessionScore],
-                    coalesce(@lastSessionTime,0) as [LastSessionTimeInSeconds]
-                from [Sessions]                 
-                where [Rnetwork_ID] = @p0 and [Hidden] = 0 and [SessionScore] <> @p1";
+        //        select 
+        //            coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,avg(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))),0) as [AvgTimePerSessionInSeconds],
+        //            coalesce(datediff(second,'1900-01-01 00:00:00.0000000', convert(datetime,sum(convert(float,DateTimeStop)-Convert(float,DateTimeStart)))),0) as [TotalSessionTimeInSeconds],
+        //            count([ID]) as [TotalSessions],
+        //            coalesce(max([SessionScore]),0) as [MaxSessionScore],
+        //            coalesce(avg([SessionScore]),0) as [AvgSessionScore],
+        //            coalesce(@lastSessionId,0) as [LastSessionId],
+        //            coalesce(@lastSessionScore,0) as [LastSessionScore],
+        //            coalesce(@lastSessionTime,0) as [LastSessionTimeInSeconds]
+        //        from [Sessions]                 
+        //        where [Rnetwork_ID] = @p0 and [Hidden] = 0 and [SessionScore] <> @p1";
 
-            retVal = db.Database.SqlQuery<RlmStats>(sql, rnetworkId, int.MinValue).FirstOrDefault();
+        //    retVal = db.Database.SqlQuery<RlmStats>(sql, rnetworkId, int.MinValue).FirstOrDefault();
 
-            if (retVal != null)
-            {
-                retVal.NumSessionsSinceLastBestScore = GetNumSessionSinceBestScore(db, rnetworkId);
-            }
+        //    if (retVal != null)
+        //    {
+        //        retVal.NumSessionsSinceLastBestScore = GetNumSessionSinceBestScore(db, rnetworkId);
+        //    }
 
-            return retVal;
-        }
+        //    return retVal;
+        //}
 
-        public static int GetNumSessionSinceBestScore(RlmDbEntities db, long rnetworkId)
-        {
-            int retVal = 0;
+        //public static int GetNumSessionSinceBestScore(RlmDbEntities db, long rnetworkId)
+        //{
+        //    int retVal = 0;
 
-            string sql = @"
-                select count(*) as [NumSessionSinceBestScore]
-                from
-                (
-	                select
-		                [ID],
-		                [SessionScore],
-		                ROW_NUMBER() OVER( ORDER BY [ID] DESC) as [Num]
-	                from [Sessions]
-	                where ID > (select top 1 [ID] from [Sessions] order by [SessionScore] desc, [ID] desc) and [Rnetwork_ID] = @p0
-                ) a";
+        //    string sql = @"
+        //        select count(*) as [NumSessionSinceBestScore]
+        //        from
+        //        (
+	       //         select
+		      //          [ID],
+		      //          [SessionScore],
+		      //          ROW_NUMBER() OVER( ORDER BY [ID] DESC) as [Num]
+	       //         from [Sessions]
+	       //         where ID > (select top 1 [ID] from [Sessions] order by [SessionScore] desc, [ID] desc) and [Rnetwork_ID] = @p0
+        //        ) a";
 
-            int? result = db.Database.SqlQuery<int?>(sql, rnetworkId).FirstOrDefault();
-            if (result.HasValue)
-            {
-                retVal = result.Value;
-            }
+        //    int? result = db.Database.SqlQuery<int?>(sql, rnetworkId).FirstOrDefault();
+        //    if (result.HasValue)
+        //    {
+        //        retVal = result.Value;
+        //    }
 
-            return retVal;
-        }
+        //    return retVal;
+        //}
 
-        
-        public static IEnumerable<Session> GetSessions(RlmDbEntities db, long rnetworkId, int? skip = null, int? take = null, bool descending = false)
-        {
-            IEnumerable<Session> retVal = db.Sessions
-                .Where(a => a.Rnetwork.ID == rnetworkId);
 
-            if (descending)
-            {
-                retVal = retVal.OrderByDescending(a => a.DateTimeStart);
-            }
-            else
-            {
-                retVal = retVal.OrderBy(a => a.DateTimeStart);
-            }
+        //public static IEnumerable<Session> GetSessions(RlmDbEntities db, long rnetworkId, int? skip = null, int? take = null, bool descending = false)
+        //{
+        //    IEnumerable<Session> retVal = db.Sessions
+        //        .Where(a => a.Rnetwork.ID == rnetworkId);
 
-            if (skip.HasValue && take.HasValue)
-            {
-                retVal = retVal.Skip(skip.Value)
-                    .Take(take.Value);
-            }
+        //    if (descending)
+        //    {
+        //        retVal = retVal.OrderByDescending(a => a.DateTimeStart);
+        //    }
+        //    else
+        //    {
+        //        retVal = retVal.OrderBy(a => a.DateTimeStart);
+        //    }
 
-            return retVal.ToList();
-        }
+        //    if (skip.HasValue && take.HasValue)
+        //    {
+        //        retVal = retVal.Skip(skip.Value)
+        //            .Take(take.Value);
+        //    }
 
-        public static IEnumerable<RlmSessionSummary> GetSessionSummary(RlmDbEntities db, long rnetworkId, int groupBy, bool descending = false)
-        {
-            IEnumerable<RlmSessionSummary> retVal = null;
+        //    return retVal.ToList();
+        //}
 
-            string sql = $@"
-                WITH T AS(
-                  SELECT
-                    *, RANK() OVER(ORDER BY[ID]) as [Row]
-                  FROM [Sessions]
-                  WHERE [Rnetwork_ID] = @p1 AND [Hidden] = 0 AND [SessionScore] <> @p2
-                )
-                SELECT
-                    ([Row] - 1) / @p0 as [GroupId], 
-	                coalesce(avg([SessionScore]), 0) as [Score],
-	                coalesce(datediff(second, '1900-01-01 00:00:00.0000000', convert(datetime, avg(convert(float,[DateTimeStop]) - Convert(float,[DateTimeStart])))), 0) as [TimeInSeconds]
-                FROM T
-                GROUP BY (([Row] - 1) / @p0)
-                ORDER BY [GroupId] {(descending ? "DESC" : "ASC")}";
+        //public static IEnumerable<RlmSessionSummary> GetSessionSummary(RlmDbEntities db, long rnetworkId, int groupBy, bool descending = false)
+        //{
+        //    IEnumerable<RlmSessionSummary> retVal = null;
 
-            retVal = db.Database.SqlQuery<RlmSessionSummary>(sql, groupBy, rnetworkId, int.MinValue).ToList();
+        //    string sql = $@"
+        //        WITH T AS(
+        //          SELECT
+        //            *, RANK() OVER(ORDER BY[ID]) as [Row]
+        //          FROM [Sessions]
+        //          WHERE [Rnetwork_ID] = @p1 AND [Hidden] = 0 AND [SessionScore] <> @p2
+        //        )
+        //        SELECT
+        //            ([Row] - 1) / @p0 as [GroupId], 
+	       //         coalesce(avg([SessionScore]), 0) as [Score],
+	       //         coalesce(datediff(second, '1900-01-01 00:00:00.0000000', convert(datetime, avg(convert(float,[DateTimeStop]) - Convert(float,[DateTimeStart])))), 0) as [TimeInSeconds]
+        //        FROM T
+        //        GROUP BY (([Row] - 1) / @p0)
+        //        ORDER BY [GroupId] {(descending ? "DESC" : "ASC")}";
 
-            return retVal;
-        }
+        //    retVal = db.Database.SqlQuery<RlmSessionSummary>(sql, groupBy, rnetworkId, int.MinValue).ToList();
 
-        public static IEnumerable<Case> GetCases(RlmDbEntities db, long sessionId, int? skip = null, int? take = null)
-        {
-            IEnumerable<Case> retVal = db.Cases
-                .Include(a => a.Rneuron.Input_Values_Reneurons.Select(b => b.Input))
-                .Include(a => a.Solution.Output_Values_Solutions.Select(b => b.Output))
-                .Where(a => a.Session.ID == sessionId)
-                .OrderBy(a => a.ID);
+        //    return retVal;
+        //}
 
-            if (skip.HasValue && take.HasValue)
-            {
-                retVal = retVal.Skip(skip.Value)
-                    .Take(take.Value);
-            }
+        //public static IEnumerable<Case> GetCases(RlmDbEntities db, long sessionId, int? skip = null, int? take = null)
+        //{
+        //    IEnumerable<Case> retVal = db.Cases
+        //        .Include(a => a.Rneuron.Input_Values_Rneurons.Select(b => b.Input))
+        //        .Include(a => a.Solution.Output_Values_Solutions.Select(b => b.Output))
+        //        .Where(a => a.Session.ID == sessionId)
+        //        .OrderBy(a => a.ID);
 
-            return retVal.ToList();
-        }
+        //    if (skip.HasValue && take.HasValue)
+        //    {
+        //        retVal = retVal.Skip(skip.Value)
+        //            .Take(take.Value);
+        //    }
+
+        //    return retVal.ToList();
+        //}
+        // todo migrate to ef core
 
         public static bool RLMHasTrainingData(string dbName)
         {
             bool retVal = false;
 
-            using (RlmDbEntities master = new RlmDbEntities("master"))
-            {
-                if (master.DBExists(dbName))
-                {
-                    using (RlmDbEntities db = new RlmDbEntities(dbName))
-                    {
-                        if (db.Sessions.Count() > 0)
-                        {
-                            if (db.Cases.Count() > 0)
-                            {
-                                retVal = true;
-                            }
-                        }
-                    }
-                }
-            }
+            //using (RlmDbEntities master = new RlmDbEntities("master"))
+            //{
+            //    if (master.DBExists(dbName))
+            //    {
+            //        using (RlmDbEntities db = new RlmDbEntities(dbName))
+            //        {
+            //            if (db.Sessions.Count() > 0)
+            //            {
+            //                if (db.Cases.Count() > 0)
+            //                {
+            //                    retVal = true;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            // todo migrate to ef core
 
             return retVal;
         }

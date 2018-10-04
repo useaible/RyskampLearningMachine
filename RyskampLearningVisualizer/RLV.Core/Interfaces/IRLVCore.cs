@@ -16,6 +16,7 @@ namespace RLV.Core.Interfaces
         event RealTimeUpdateDelegate RealTimeUpdateEvent;
         event SelectedCaseScaleChangedResultsDelegate SelectedCaseScaleChangedResultsEvent;
         event SessionBreakdownClickResultsDelegate SessionBreakdownClickResultsEvent;
+        event SelectChartDataPointDelegate SelectChartDataPointEvent;
 
         bool IsComparisonModeOn { get; set; }
 

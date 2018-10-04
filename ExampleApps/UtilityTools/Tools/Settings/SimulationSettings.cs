@@ -26,5 +26,6 @@ namespace PoCTools.Settings
         public bool EncogSelected { get; set; } = false;
         public int HiddenLayers { get; set; } = 1;
         public int HiddenLayerNeurons { get; set; } = 0;
+        public int PopulationSize { get; set; } = 500;
     }
 }

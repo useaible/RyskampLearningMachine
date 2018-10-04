@@ -22,6 +22,7 @@ namespace RLM.Models
         public long SessionId { get; set; }
         public long RneuronId { get; set; }
         public long SolutionId { get; set; }
+        public long CycleOrder { get; set; }
         public TimeSpan Elapse
         {
             get

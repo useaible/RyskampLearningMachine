@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,11 @@ namespace RLM.Models
 
         public Dictionary<long, InputRangeInfo> Ranges { get; set; } = new Dictionary<long, InputRangeInfo>();
         //public IEnumerable<long> RneuronIds { get; set; }
-        public SortedList<RlmInputKey, RlmInputValue> CachedInputs{ get; set; }
+        //public SortedList<RlmInputKey, RlmInputValue> CachedInputs{ get; set; }
+
+
+        public long[] CachedRneurons { get; set; }
+        public double[][] CachedInputs { get; set; }
 
         public void Clear()
         {
@@ -91,7 +96,19 @@ namespace RLM.Models
     {
         public int Compare(RlmInputKey x, RlmInputKey y)
         {
-            return x.Value.CompareTo(y.Value);
+            int retVal = 0;
+
+            try
+            {
+                if (x != null && y != null)
+                    retVal = x.Value.CompareTo(y.Value);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
+            return retVal;
         }
     }
 
@@ -99,14 +116,168 @@ namespace RLM.Models
     {
         public int Compare(RlmInputKey x, RlmInputKey y)
         {
-            return x.DoubleValue.CompareTo(y.DoubleValue);
+            int retVal = 0;
+
+            try
+            {
+                if (x != null && y != null)
+                    retVal = x.DoubleValue.CompareTo(y.DoubleValue);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
+            return retVal;
         }
+    }
+
+    public static class ParallelUtil
+    {
+        public static ConcurrentBag<KeyValuePair<RlmInputKey, RlmInputValue>> ParallelWhere(this SortedList<RlmInputKey, RlmInputValue> list,
+            double from, double to, Enums.RlmInputType type, string val)
+        {
+            ConcurrentBag<KeyValuePair<RlmInputKey, RlmInputValue>> retVal = new ConcurrentBag<KeyValuePair<RlmInputKey, RlmInputValue>>();
+            Parallel.For(0, list.Count, a => {
+                if (type == Enums.RlmInputType.Linear ?
+                list.ElementAt(a).Key.DoubleValue >= from &&
+                list.ElementAt(a).Key.DoubleValue <= to :
+                list.ElementAt(a).Key.Value == val)
+                {
+                    retVal.Add(list.ElementAt(a));
+                }
+            });
+
+            return retVal;
+        }
+
+        //public static void ParallelWhere(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, ConcurrentBag<long> rneuronsFound)
+        //{
+        //    var key = inputs.First().Key;
+        //    var range = rangeInfos[key.InputNum];
+
+        //    Parallel.For(0, inputs.Count, () => new ConcurrentBag<long>(), (int a, ParallelLoopState loop, ConcurrentBag<long> bag) =>
+        //    {
+        //        var item = inputs.ElementAt(a);
+
+        //        //var filtered = (key.Type == Enums.RlmInputType.Linear) ?
+        //        //    inputs.Where(a => a.Key.DoubleValue >= range.FromValue && a.Key.DoubleValue <= range.ToValue) :
+        //        //    inputs.Where(a => a.Key.Value == range.Value);
+
+        //        //var filtered = itemRef.ParallelWhere(range.FromValue, range.ToValue, key.Type, range.Value);
+        //        bool isMatch = false;
+        //        if (key.Type == Enums.RlmInputType.Linear)
+        //        {
+        //            if (item.Key.DoubleValue >= range.FromValue && item.Key.DoubleValue <= range.ToValue)
+        //            {
+        //                isMatch = true;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (item.Key.Value == range.Value)
+        //            {
+        //                isMatch = true;
+        //            }
+        //        }
+
+        //        if (isMatch)
+        //        {
+        //            if (!item.Value.RneuronId.HasValue)
+        //            {
+        //                RlmInputValue.RecurseInputForMatchingRneurons(item.Value.RelatedInputs, rangeInfos, rneuronsFound);
+        //            }
+        //            else
+        //            {
+        //                rneuronsFound.Add(item.Value.RneuronId.Value);
+        //            }
+        //        }
+
+        //        return bag;
+        //    }, (finalBag) =>
+        //    {
+        //        foreach (var item in finalBag)
+        //        {
+        //            rneuronsFound.Add(item);
+        //        }
+        //    });
+
+        //}
+
+        //public static SortedList<RlmInputKey, RlmInputValue> ParallelWhere(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, IDictionary<int, InputRangeInfo> rneuronRangeInfos, ConcurrentBag<long> rneuronsFound, bool prevItemMatch = true)
+        //{
+        //    var key = inputs.First().Key;
+        //    var range = rangeInfos[key.InputNum];
+
+        //    // for cache
+        //    IComparer<RlmInputKey> comparer = (key.Type == Enums.RlmInputType.Linear) ? (IComparer<RlmInputKey>)new RlmInputKeyLinearComparer() : (IComparer<RlmInputKey>)new RlmInputKeyDistinctComparer();
+        //    SortedList<RlmInputKey, RlmInputValue> cacheInput = null;
+        //    ConcurrentDictionary<RlmInputKey, RlmInputValue> dict = new ConcurrentDictionary<RlmInputKey, RlmInputValue>();
+            
+        //    Parallel.For(0, inputs.Count, () => new ConcurrentBag<long>(), (int a, ParallelLoopState loop, ConcurrentBag<long> bag) =>
+        //    {
+        //        var item = inputs.ElementAt(a);
+        //        bool isMatch = false;
+        //        if (key.Type == Enums.RlmInputType.Linear)
+        //        {
+        //            if (item.Key.DoubleValue >= range.FromValue && item.Key.DoubleValue <= range.ToValue)
+        //            {
+        //                isMatch = true;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (item.Key.Value == range.Value)
+        //            {
+        //                isMatch = true;
+        //            }
+        //        }
+
+        //        if (isMatch)
+        //        {
+        //            var cacheItemVal = new RlmInputValue() { RneuronId = item.Value.RneuronId };
+        //            bool currentItemMatch = false;
+
+        //            var rneuronRange = rneuronRangeInfos[item.Key.InputNum];
+        //            if (prevItemMatch)
+        //                currentItemMatch = item.Key.Type == Enums.RlmInputType.Linear ? item.Key.DoubleValue >= rneuronRange.FromValue && item.Key.DoubleValue <= rneuronRange.ToValue : item.Key.Value == rneuronRange.Value;
+
+        //            if (!item.Value.RneuronId.HasValue)
+        //            {
+        //                cacheItemVal.RelatedInputs = RlmInputValue.RecurseInputForMatchingRneuronsForCaching(item.Value.RelatedInputs, rangeInfos, rneuronRangeInfos, rneuronsFound, currentItemMatch);
+
+        //                if (cacheItemVal.RelatedInputs.Count > 0)
+        //                    dict.TryAdd(item.Key, cacheItemVal); //cacheInput.Add(item.Key, cacheItemVal);
+        //            }
+        //            else
+        //            {
+        //                if (prevItemMatch && currentItemMatch)
+        //                    rneuronsFound.Add(cacheItemVal.RneuronId.Value);
+
+        //                dict.TryAdd(item.Key, cacheItemVal); //cacheInput.Add(item.Key, cacheItemVal);
+        //            }
+        //        }
+
+        //        return bag;
+        //    }, (finalBag) =>
+        //    {
+        //        foreach(var item in finalBag)
+        //        {
+        //            rneuronsFound.Add(item);
+        //        }
+        //    });
+
+        //    cacheInput = new SortedList<RlmInputKey, RlmInputValue>(dict, comparer);
+
+        //    return cacheInput;
+        //}
     }
 
     public class RlmInputValue
     {
         public long? RneuronId { get; set; }
         public SortedList<RlmInputKey, RlmInputValue> RelatedInputs { get; set; }
+
 
         //public static void TraverseInputForMatchingRneurons(KeyValuePair<RnnInputKey, RnnInputValue> inputPair, IDictionary<int, InputRangeInfo> rangeInfos, List<long> rneuronsFound)
         //{
@@ -130,17 +301,18 @@ namespace RLM.Models
         //    }
         //}
 
-        public static void RecurseInputForMatchingRneurons(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, List<long> rneuronsFound)
+        public static void RecurseInputForMatchingRneurons(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, ConcurrentBag<long> rneuronsFound)
         {
             //if (inputs.Count == 0) return;
 
             var key = inputs.First().Key;
             var range = rangeInfos[key.InputNum];
+
             var filtered = (key.Type == Enums.RlmInputType.Linear) ?
                 inputs.Where(a => a.Key.DoubleValue >= range.FromValue && a.Key.DoubleValue <= range.ToValue) :
                 inputs.Where(a => a.Key.Value == range.Value);
-            
-            foreach(var item in filtered)
+
+            foreach (var item in filtered)
             {                
                 if (!item.Value.RneuronId.HasValue)
                 {
@@ -153,7 +325,7 @@ namespace RLM.Models
             }
         }
 
-        public static SortedList<RlmInputKey, RlmInputValue> RecurseInputForMatchingRneuronsForCaching(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, IDictionary<int, InputRangeInfo> rneuronRangeInfos, List<long> rneuronsFound, bool prevItemMatch = true)
+        public static SortedList<RlmInputKey, RlmInputValue> RecurseInputForMatchingRneuronsForCaching(SortedList<RlmInputKey, RlmInputValue> inputs, IDictionary<int, InputRangeInfo> rangeInfos, IDictionary<int, InputRangeInfo> rneuronRangeInfos, ConcurrentBag<long> rneuronsFound, bool prevItemMatch = true)
         {
             var key = inputs.First().Key;
             var range = rangeInfos[key.InputNum];

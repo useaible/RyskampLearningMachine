@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RLM.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,7 +13,7 @@ namespace RLM.WebAPI.Models
         private DateTime expiresOn = DateTime.Now.AddMinutes(EXPIRES_AFTER);
 
         public RlmNetworkWebAPI() { }
-        public RlmNetworkWebAPI(string dbName) : base(dbName) { }
+        public RlmNetworkWebAPI(IRlmDbData rlmDbData) : base(rlmDbData) { }
 
         
         public bool IsExpired

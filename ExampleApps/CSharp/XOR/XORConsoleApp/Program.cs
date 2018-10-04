@@ -1,12 +1,15 @@
 ﻿using RLM;
+using RLM.SQLServer;
 using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools;
+using RLM.PostgreSQLServer;
 
 namespace XORConsoleApp
 {
@@ -32,9 +35,13 @@ namespace XORConsoleApp
             int startRandomness = Util.GetInput("Start randomness [default 50]: ", 50);
             int endRandomness = Util.GetInput("End randomness [default 0]: ", 0);
 
+            // use Sql Server as Rlm Db
+            IRlmDbData rlmDBData = new RlmDbDataSQLServer($"RLM_XOR_SAMPLE_{Guid.NewGuid().ToString("N")}");
+            //IRlmDbData rlmDBData = new RlmDbDataPostgreSqlServer($"RLM_XOR_SAMPLE_{Guid.NewGuid().ToString("N")}");
+
             // the appended Guid is just to have a unique RLM network every time we run this example.
             // you can remove this or simply change the name to something static to use the same network all the time
-            var rlmNet = new RlmNetwork($"RLM_XOR_SAMPLE_{Guid.NewGuid().ToString("N")}");
+            var rlmNet = new RlmNetwork(rlmDBData);
 
             // subscribe to events to know the status of the Data Persistence that works in the background
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;

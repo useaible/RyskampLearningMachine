@@ -26,6 +26,9 @@ using RLV.Core.Enums;
 using RLM.Models;
 using System.Threading;
 using PoCTools.Settings;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
+using RLM.PostgreSQLServer;
 
 namespace RetailPoC
 {
@@ -76,8 +79,9 @@ namespace RetailPoC
         private int selectedSlotIndex = -1;
 
         private ItemComparisonPanel itemCompPanel = new ItemComparisonPanel();
-        
-        private IRLVCore core = new RLVCore("RLV_small");
+
+        private IRlmDbData rlmDbData;
+        private IRLVCore core = null;//new RLVCore("RLV_small");
         //private IRLVSelectedDetailsPanel detailsPanel = new RLVSelectedDetailsPanel();
         //private IRLVProgressionChartPanel chartPanel = new RLVProgressionChartPanel();
         private IRLVPlangoramOutputVisualizer visualizer = null;
@@ -295,7 +299,9 @@ namespace RetailPoC
                 string dbIdentifier = "RLM_planogram_" + Guid.NewGuid().ToString("N");
                 // instantiate visualizer with this window as its parent reference
                 visualizer = new RLVOutputVisualizer(this);
-                core = new RLVCore(dbIdentifier);
+                rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+                //rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+                core = new RLVCore(rlmDbData);
 
                 // subscribe mainwindow to the comparison event
                 //visualizer.LearningComparisonDisplayResultsEvent += DisplayLearningComparisonResults;

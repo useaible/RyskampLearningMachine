@@ -26,6 +26,9 @@ using RLV.Core.Enums;
 using RLM.Models;
 using System.Threading;
 using PoCTools.Settings;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
+using RLM.PostgreSQLServer;
 
 namespace RetailPoC20
 {
@@ -85,8 +88,8 @@ namespace RetailPoC20
         private int preCompareSelectedSlotIndex = -1;
 
         private ItemComparisonPanel itemCompPanel = new ItemComparisonPanel();
-        
-        private IRLVCore core = new RLVCore("RLV_small");
+        private IRlmDbData rlmDbData;
+        private IRLVCore core = null;// new RLVCore("RLV_small");
         private IRLVPlangoramOutputVisualizer visualizer = null;
 
         private IDictionary<Color, SolidColorBrush> coloredBrushesDict = new Dictionary<Color, SolidColorBrush>();
@@ -321,7 +324,9 @@ namespace RetailPoC20
 
                 // instantiate visualizer with this window as its parent reference
                 visualizer = new RLVOutputVisualizer(this);
-                core = new RLVCore(dbIdentifier);
+                //rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+                rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+                core = new RLVCore(rlmDbData);
 
                 if (rlvPanel != null)
                 {

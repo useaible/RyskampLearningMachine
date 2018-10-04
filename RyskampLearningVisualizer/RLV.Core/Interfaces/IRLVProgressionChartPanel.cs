@@ -14,11 +14,14 @@ namespace RLV.Core.Interfaces
 
         event SelectedCaseChangedDelegate SelectedCaseChangedEvent;
         event SelectedCaseScaleChangedDelegate SelectedCaseScaleChangedEvent;
+        event SelectChartDataPointDelegate SelectChartDataPointEvent;
 
         void IRLVCore_NextPrevCaseChangedResultsHandler(long caseId);
         void IRLVCore_SelectedUniqueInputSetChangedResultsHandler(IEnumerable<RlmLearnedCase> data, IEnumerable<IRLVItemDisplay> itemDisplay, bool showComparison = false);
         void IRLVCore_ScaleChangedResultsHandler(IEnumerable<RlmLearnedCase> data);
         void IRLVCore_RealTimeUpdateHandler(IEnumerable<RlmLearnedCase> data);
         void IRLVCore_SelectedCaseScaleChangedResultsHandler(IEnumerable<RlmLearnedCase> data, long selectedCaseId);
+        void IRLVProgressionChartChangeScale(long caseId, double scale);
+        void IRLVProgressionChartSelectCase(long caseId);
     }
 }

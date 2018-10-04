@@ -1,12 +1,12 @@
-﻿using RLM.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using RLM.Enums;
 using RLM.Models;
 using RLM.Models.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Data.Entity.SqlServer;
+using System.Data;
 using System.Data.SqlClient;
 using System.Dynamic;
 using System.IO;
@@ -42,19 +42,20 @@ namespace RLM.Database
         #region Static
         static RlmDbEntities()
         {
-            if (string.IsNullOrEmpty(ConnStr))
-            {
-                connStr = DetermineSQLConnectionString();
-            }
+            //if (string.IsNullOrEmpty(ConnStr))
+            //{
+            //    connStr = DetermineSQLConnectionString();
+            //}
 
-            CreateRLMFoldersIfNotExists();
-            CreateRLMTemplateDB();
-            
+            //CreateRLMFoldersIfNotExists();
+            //CreateRLMTemplateDB();
+            //TODO: Migrate to EF Core
+
             // So that front end apps no longer need to reference EF
             // via http://stackoverflow.com/a/29743758/6223318
-            var type = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
-            if (type == null)
-                throw new Exception("Do not remove, ensures static reference to System.Data.Entity.SqlServer");
+            //var type = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
+            //if (type == null)
+            //    throw new Exception("Do not remove, ensures static reference to System.Data.Entity.SqlServer");
         }
 
         public static string DefaultRLMTemplateDb
@@ -123,20 +124,31 @@ namespace RLM.Database
             }
         }
 
-
-
+        public static string BCPLocation
+        {
+            get
+            {
+                var retVal = string.Empty;
+                retVal = ConfigurationManager.AppSettings["RLMBcpLocation"];
+                if (string.IsNullOrEmpty(retVal))
+                {
+                    retVal = @"C:\RLM\BCP_temporary_files";
+                }
+                return retVal;
+            }
+        }
+        
         public static void CreateRLMFoldersIfNotExists()
         {
             Directory.CreateDirectory(BackupLocation);
             Directory.CreateDirectory(DataLocation);
+            Directory.CreateDirectory(BCPLocation);
         }
 
         public static void CreateRLMTemplateDB()
         {
             using (RlmDbEntities db = new RlmDbEntities(DefaultRLMTemplateDb))
             {
-                db.Database.CreateIfNotExists();
-
                 // delete if backup already exists
                 if (db.FileBackupExists(DefaultRLMTemplateDb))
                 {
@@ -162,37 +174,39 @@ namespace RLM.Database
                 GROUP BY
                     dbid ";
 
-            using (RlmDbEntities db = new RlmDbEntities(MASTER_DB))
-            {
-                var existDbs = db.Database.SqlQuery<string>(sqlExistDb, DEFAULT_RLM_DBNAME).ToList();
+            //using (RlmDbEntities db = new RlmDbEntities(MASTER_DB))
+            //{
+            //    var existDbs = db.Database.SqlQuery<string>(sqlExistDb, DEFAULT_RLM_DBNAME).ToList();
 
-                if (existDbs.Count > 0)
-                {
-                    var dbConnections = db.Database.SqlQuery<RlmDBInfo>(sqlConnCount, DEFAULT_RLM_DBNAME).ToList();
-                    
-                    if (dbConnections.Count > 0)
-                    {
-                        // check for none existing connections
-                        List<string> dbWithConnections = dbConnections.Select(a => a.Name).ToList();
-                        List<string> dbWithoutConnections = existDbs.Except(dbWithConnections).ToList();
+            //    if (existDbs.Count > 0)
+            //    {
+            //        var dbConnections = db.Database.SqlQuery<RlmDBInfo>(sqlConnCount, DEFAULT_RLM_DBNAME).ToList();
 
-                        if (dbWithoutConnections.Count > 0)
-                        {
-                            retVal = dbWithoutConnections.First();
-                            DropDb(db.Database, retVal);
-                        }
-                        else
-                        {
-                            retVal = GetPostfixedDbName(DEFAULT_RLM_DBNAME);
-                        }
-                    }
-                    else if (dbConnections.Count == 0 && existDbs.Count > 0)
-                    {
-                        retVal = existDbs.First();
-                        DropDb(db.Database, retVal);
-                    }
-                }
-            }
+            //        if (dbConnections.Count > 0)
+            //        {
+            //            // check for none existing connections
+            //            List<string> dbWithConnections = dbConnections.Select(a => a.Name).ToList();
+            //            List<string> dbWithoutConnections = existDbs.Except(dbWithConnections).ToList();
+
+            //            if (dbWithoutConnections.Count > 0)
+            //            {
+            //                retVal = dbWithoutConnections.First();
+            //                DropDb(db.Database, retVal);
+            //            }
+            //            else
+            //            {
+            //                retVal = GetPostfixedDbName(DEFAULT_RLM_DBNAME);
+            //            }
+            //        }
+            //        else if (dbConnections.Count == 0 && existDbs.Count > 0)
+            //        {
+            //            retVal = existDbs.First();
+            //            DropDb(db.Database, retVal);
+            //        }
+            //    }
+            //}
+
+            throw new Exception("TODO migrate to ef core");
 
             return retVal;
         }
@@ -240,18 +254,19 @@ namespace RLM.Database
             return true;
         }
 
-        private static void DropDb(System.Data.Entity.Database databaseContext, string databaseName)
+        private static void DropDb(DatabaseFacade databaseContext, string databaseName)
         {
             string sql = $@"
                 ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
                 DROP DATABASE [{databaseName}];";
-            databaseContext.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql);
+            databaseContext.ExecuteSqlCommand(sql);
         }
 
         #endregion
 
         public RlmDbEntities()
         {
+            Database.EnsureCreated();
             DatabaseName = DEFAULT_RLM_DBNAME;
             Initialize();
         }
@@ -262,10 +277,12 @@ namespace RLM.Database
             {
                 throw new ArgumentNullException("The database name cannot be null or empty.");
             }
-
+            
             DatabaseName = databaseName;
             bool isMasterDb = databaseName == MASTER_DB;
             Initialize(isMasterDb);
+
+            //Database.EnsureCreated();
         }
 
         private void Initialize(bool isMasterDb = false)
@@ -273,26 +290,30 @@ namespace RLM.Database
             try
             {
                 string connString = ConnStr;
+                var connection = Database.GetDbConnection();
                 if (ConnStr.Contains(DBNAME_PLACEHOLDER))
                 {
-                    Database.Connection.ConnectionString = connString.Replace(DBNAME_PLACEHOLDER, DatabaseName);
+                    connection.ConnectionString = connString.Replace(DBNAME_PLACEHOLDER, DatabaseName);
                 }
                 else
                 {
-                    Database.Connection.ConnectionString = connString;
+                    connection.ConnectionString = connString;
                 }
 
                 if (isMasterDb)
                 {
-                    System.Data.Entity.Database.SetInitializer<RlmDbEntities>(null);
+                    //System.Data.Entity.Database.SetInitializer<RlmDbEntities>(null);
                 }
                 else
                 {
-                    System.Data.Entity.Database.SetInitializer<RlmDbEntities>(new RLMCreateDBIfNotExists());
+                    //System.Data.Entity.Database.SetInitializer<RlmDbEntities>(new RLMCreateDBIfNotExists());
                 }
                 //Database.SetInitializer<RnnDbEntities>(new MigrateDatabaseToLatestVersion<RnnDbEntities, Configuration>(true));
                 //Database.SetInitializer<RnnDbEntities>(null);
-                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 0;
+                //((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 0;
+
+                //this.Configuration.AutoDetectChangesEnabled = false;
+                //this.Configuration.ProxyCreationEnabled = false;
             }
             catch (Exception Ex)
             {
@@ -301,15 +322,15 @@ namespace RLM.Database
             }
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
+        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
+        //}
 
         public virtual void SetDBRecoveryMode(string database, DBRecoveryMode mode)
         {
             string sql = $"ALTER DATABASE [{database}] SET RECOVERY {mode.ToString()}";
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql);
+            Database.ExecuteSqlCommand(sql);
         }
 
         public virtual void BackupDB(string database)
@@ -318,14 +339,14 @@ namespace RLM.Database
             string sql = $"BACKUP DATABASE [{database}] TO DISK = @p0 WITH COMPRESSION";
             try
             {
-                Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql, path);
+                Database.ExecuteSqlCommand(sql, path);
             }
             catch (SqlException e)
             {
                 if (e.Number == 1844)
                 {
                     sql = sql.Replace("WITH COMPRESSION", string.Empty);
-                    Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql, path);
+                    Database.ExecuteSqlCommand(sql, path);
                 }
                 else
                 {
@@ -338,7 +359,7 @@ namespace RLM.Database
         {
             string path = Path.Combine(BackupLocation, database + ".bak");
             string sql = $"RESTORE DATABASE [{database}] FROM DISK = @p0";
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql, path);
+            Database.ExecuteSqlCommand(sql, path);
         }
 
         public virtual void RestoreDBFromTemplate(string database)
@@ -353,11 +374,11 @@ namespace RLM.Database
                 WITH RECOVERY,
                 MOVE '{DefaultRLMTemplateDb}' TO @p1,
                 MOVE '{DefaultRLMTemplateDb}_log' TO @p2";
-                //MOVE '{DefaultRLMTemplateDb}_dir' TO @p3";
+            //MOVE '{DefaultRLMTemplateDb}_dir' TO @p3";
 
             // restore db using the RNN_TEMPLATE backup
-            Database.Connection.Open();
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql, path, dataPath, logPath); //, fileGroupPath);
+            Database.OpenConnection();
+            Database.ExecuteSqlCommand(sql, path, dataPath, logPath); //, fileGroupPath);
                         
             // Modify logical names
             // data file
@@ -378,7 +399,7 @@ namespace RLM.Database
             string sql = $@"
                 ALTER DATABASE [{database}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
                 DROP DATABASE [{database}];";
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, sql);
+            Database.ExecuteSqlCommand(sql);
         }
 
         public virtual bool DBExists(string database)
@@ -386,15 +407,27 @@ namespace RLM.Database
             bool retVal = false;
 
             string sql = $"SELECT CONVERT(BIT, 1) FROM SYS.DATABASES WHERE [Name] = @p0";
-            var result = Database.SqlQuery<bool?>(sql, database);
-            if (result != null)
+            //var result = Database.SqlQuery<bool?>(sql, database);
+
+            var connection = Database.GetDbConnection();
+
+            DataTable dt_databases = new DataTable();
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, connection.ConnectionString);
+            dataAdapter.Fill(dt_databases);
+
+            if (dt_databases.Rows.Count > 0)
             {
-                var resultItem = result.FirstOrDefault();
-                if (resultItem.HasValue)
-                {
-                    retVal = resultItem.Value;
-                }
+                retVal = true;
             }
+
+            //if (result != null)
+            //{
+            //    var resultItem = result.FirstOrDefault();
+            //    if (resultItem.HasValue)
+            //    {
+            //        retVal = resultItem.Value;
+            //    }
+            //}
 
             return retVal;
         }
@@ -409,16 +442,16 @@ namespace RLM.Database
         {
             string path = Path.Combine(BackupLocation, database + ".bak");
             File.Delete(path);
-        }        
-    }
-
-    public class RLMCreateDBIfNotExists : CreateDatabaseIfNotExists<RlmDbEntities>
-    {
-        public override void InitializeDatabase(RlmDbEntities context)
-        {
-            base.InitializeDatabase(context);
         }
     }
+
+    //public class RLMCreateDBIfNotExists : CreateDatabaseIfNotExists<RlmDbEntities>
+    //{
+    //    public override void InitializeDatabase(RlmDbEntities context)
+    //    {
+    //        base.InitializeDatabase(context);
+    //    }
+    //}
 
     //public class ContextConfiguration : DbConfiguration
     //{

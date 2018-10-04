@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleApps", "ExampleApps", "{AC49F9AD-6797-47AC-B081-9A204352AE6B}"
 EndProject
@@ -39,27 +39,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleVisualizers", "Examp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Challenger", "Challenger", "{9E976D8F-D0DC-4343-AE0E-D0616B5BF1F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM", "Core\RLM\RLM\RLM.csproj", "{01EEC6CE-A2CA-4637-8133-6288B6E246C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM", "Core\RLM\RLM\RLM.csproj", "{01EEC6CE-A2CA-4637-8133-6288B6E246C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Database", "Core\RLM\RLM.Database\RLM.Database.csproj", "{70CE8FE8-19D9-4472-89E1-2B61E7402B03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM.Database", "Core\RLM\RLM.Database\RLM.Database.csproj", "{70CE8FE8-19D9-4472-89E1-2B61E7402B03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Memory", "Core\RLM\RLM.Memory\RLM.Memory.csproj", "{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM.Memory", "Core\RLM\RLM.Memory\RLM.Memory.csproj", "{2E4B0AD0-DAC9-44EF-B3B3-A339B397D34E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.Models", "Core\RLM\RLM.Models\RLM.Models.csproj", "{F603454E-2199-4366-9A2A-08EC30818A0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM.Models", "Core\RLM\RLM.Models\RLM.Models.csproj", "{F603454E-2199-4366-9A2A-08EC30818A0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsGameLib", "ExampleApps\CSharp\Logistics\LogisticsGameLib\LogisticsGameLib.csproj", "{62A0A8AC-99F6-4809-9CD7-8B930647CADE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogisticsGameLib", "ExampleApps\CSharp\Logistics\LogisticsGameLib\LogisticsGameLib.csproj", "{62A0A8AC-99F6-4809-9CD7-8B930647CADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsConsoleApp", "ExampleApps\CSharp\Logistics\LogisticsConsoleApp\LogisticsConsoleApp.csproj", "{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogisticsConsoleApp", "ExampleApps\CSharp\Logistics\LogisticsConsoleApp\LogisticsConsoleApp.csproj", "{0FB12A71-3354-44DE-BE0E-4D3FCEBA6AF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderConsoleApp", "ExampleApps\CSharp\LunarLander\LanderConsoleApp\LanderConsoleApp.csproj", "{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanderConsoleApp", "ExampleApps\CSharp\LunarLander\LanderConsoleApp\LanderConsoleApp.csproj", "{DA6C66FF-6A7B-4F53-85F4-90BBE6A523C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanderGameLib", "ExampleApps\CSharp\LunarLander\LanderGameLib\LanderGameLib.csproj", "{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanderGameLib", "ExampleApps\CSharp\LunarLander\LanderGameLib\LanderGameLib.csproj", "{3DB5FEC4-4EF3-4C62-9812-29F818E8A55F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "ExampleApps\UtilityTools\Tools\Tools.csproj", "{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "ExampleApps\UtilityTools\Tools\Tools.csproj", "{928F7B86-F0CC-4F5C-B1B3-FCD154111E48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeConsoleApp", "ExampleApps\CSharp\Maze\MazeConsoleApp\MazeConsoleApp.csproj", "{7C75D2C8-7089-4CE3-9335-59038C0E410E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazeConsoleApp", "ExampleApps\CSharp\Maze\MazeConsoleApp\MazeConsoleApp.csproj", "{7C75D2C8-7089-4CE3-9335-59038C0E410E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGameLib", "ExampleApps\CSharp\Maze\MazeGameLib\MazeGameLib.csproj", "{E539BFF3-43F1-4957-8586-1F10168CA5D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazeGameLib", "ExampleApps\CSharp\Maze\MazeGameLib\MazeGameLib.csproj", "{E539BFF3-43F1-4957-8586-1F10168CA5D9}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "LanderConsoleAppPython", "ExampleApps\Python\LanderConsoleAppPython\LanderConsoleAppPython.pyproj", "{C4305509-DF62-4A29-9396-2B299F743AEE}"
 EndProject
@@ -75,7 +75,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequirementsTool", "Example
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMazeApp", "ExampleApps\CSharp\Maze\WPFMazeApp\WPFMazeApp.csproj", "{4DCE8890-5A0F-4C04-9D24-A7404844E17D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XORConsoleApp", "ExampleApps\CSharp\XOR\XORConsoleApp\XORConsoleApp.csproj", "{E3888EC5-8F8E-4B43-940E-DA395FB6CEC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XORConsoleApp", "ExampleApps\CSharp\XOR\XORConsoleApp\XORConsoleApp.csproj", "{E3888EC5-8F8E-4B43-940E-DA395FB6CEC5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailPoC", "ExampleApps\CSharp\RetailPoC\RetailPoC\RetailPoC.csproj", "{BF8A941B-86D4-4FD4-9A11-2A51AAC4D9D5}"
 EndProject
@@ -98,6 +98,20 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RetailPoC 2.0", "RetailPoC 2.0", "{0D08DAA8-474D-4DD1-8840-83A7F19EF15D}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RetailPoC20", "ExampleApps\CompetitorComparableApps\RetailPoC 2.0\RetailPoC20_Tensorflow\RetailPoC20.pyproj", "{4373FA1D-7060-4F22-9EBA-1D46D786CE84}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BasketballLineupOptimizer", "BasketballLineupOptimizer", "{CF36B7C3-9800-4B02-9FE6-8E177B8A2E67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RlmBasketballPrototype", "ExampleApps\CSharp\BasketballLineupOptimizer\RlmBasketballPrototype\RlmBasketballPrototype.csproj", "{18D01797-1694-4427-824D-5EF4101024B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BasketballLineupOptimizer", "BasketballLineupOptimizer", "{03B01892-1C63-47C2-812C-29C26DE7E7AD}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TFBasketballPrototype", "ExampleApps\CompetitorComparableApps\BasketballLineupOptimizer\TFBasketballPrototype\TFBasketballPrototype.pyproj", "{2DF95F00-BC14-42BE-9EC0-0EB95B241032}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLM.GPU", "Core\RLM\RLM.GPU\RLM.GPU.csproj", "{D3C259D4-7545-4B6E-9974-E89ABA724480}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM.SQLServer", "Core\RLM\RLM.SQLServer\RLM.SQLServer.csproj", "{C1A0FB80-2368-43B5-9791-60A3451B59FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RLM.PostgreSQL", "Core\RLM\RLM.PostgreSQL\RLM.PostgreSQL.csproj", "{8776A8CA-F032-41EB-A455-6950CE7581F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -207,6 +221,24 @@ Global
 		{C176C182-E402-4102-89E1-40C1B1A71014}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4373FA1D-7060-4F22-9EBA-1D46D786CE84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4373FA1D-7060-4F22-9EBA-1D46D786CE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D01797-1694-4427-824D-5EF4101024B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D01797-1694-4427-824D-5EF4101024B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D01797-1694-4427-824D-5EF4101024B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D01797-1694-4427-824D-5EF4101024B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF95F00-BC14-42BE-9EC0-0EB95B241032}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF95F00-BC14-42BE-9EC0-0EB95B241032}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C259D4-7545-4B6E-9974-E89ABA724480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C259D4-7545-4B6E-9974-E89ABA724480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C259D4-7545-4B6E-9974-E89ABA724480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C259D4-7545-4B6E-9974-E89ABA724480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1A0FB80-2368-43B5-9791-60A3451B59FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A0FB80-2368-43B5-9791-60A3451B59FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A0FB80-2368-43B5-9791-60A3451B59FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A0FB80-2368-43B5-9791-60A3451B59FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8776A8CA-F032-41EB-A455-6950CE7581F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8776A8CA-F032-41EB-A455-6950CE7581F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8776A8CA-F032-41EB-A455-6950CE7581F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8776A8CA-F032-41EB-A455-6950CE7581F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -257,9 +289,15 @@ Global
 		{C176C182-E402-4102-89E1-40C1B1A71014} = {94055AE5-322D-4D57-B6A2-9B800936BB55}
 		{0D08DAA8-474D-4DD1-8840-83A7F19EF15D} = {84A5D4E4-36A7-42A1-81EF-090F21FD72EC}
 		{4373FA1D-7060-4F22-9EBA-1D46D786CE84} = {0D08DAA8-474D-4DD1-8840-83A7F19EF15D}
+		{CF36B7C3-9800-4B02-9FE6-8E177B8A2E67} = {58F58DCE-4D43-434B-821D-67B326F13924}
+		{18D01797-1694-4427-824D-5EF4101024B7} = {CF36B7C3-9800-4B02-9FE6-8E177B8A2E67}
+		{03B01892-1C63-47C2-812C-29C26DE7E7AD} = {84A5D4E4-36A7-42A1-81EF-090F21FD72EC}
+		{2DF95F00-BC14-42BE-9EC0-0EB95B241032} = {03B01892-1C63-47C2-812C-29C26DE7E7AD}
+		{D3C259D4-7545-4B6E-9974-E89ABA724480} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{C1A0FB80-2368-43B5-9791-60A3451B59FA} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
+		{8776A8CA-F032-41EB-A455-6950CE7581F4} = {4CDF5EC0-ED7F-44EA-9DC3-B31F7BF2FE83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2551AB39-DAB9-44B5-BB16-E3DB44F6AB98}
 	EndGlobalSection
-	
 EndGlobal

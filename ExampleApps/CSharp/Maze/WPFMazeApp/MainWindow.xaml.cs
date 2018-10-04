@@ -46,6 +46,7 @@ namespace WPFMazeApp
         private PlayerType Type { get; set; }
 
         public int CurrentIteration { get; set; }
+        public int GameTimeout { get; set; } = 20000;
 
         public MainWindow(int mazeId, PlayerType type, Boolean learn = false, int temp_num_sessions = 1, int currentIteration = 1, int totalIterations = 1, int startRandomness = 1, int endRandomness = 1)
         {
@@ -70,7 +71,7 @@ namespace WPFMazeApp
                     StartRandomness = startRandomness;
                     EndRandomness = endRandomness;
 
-                    this.Title = "RNN Learning";
+                    this.Title = "RLM Learning";
                     statGrid.Visibility = Visibility.Visible;
                     lblMazeName.Content = mazeInfo.Name;
                     lblTotalSession.Content = totalIterations;
@@ -80,7 +81,7 @@ namespace WPFMazeApp
                 }
                 else
                 {
-                    this.Title = "RNN Player";
+                    this.Title = "RLM Player";
                 }
             }
             else
@@ -144,7 +145,7 @@ namespace WPFMazeApp
             StatusText.Content = "Initializing RLM engine...";
             await Task.Run(() => {
 
-                RLMMazeTraveler traveler = new RLMMazeTraveler(mazeInfo, Learn, Temp_num_sessions, StartRandomness, EndRandomness); //Instantiate RlmMazeTraveler game lib to configure the network.
+                RLMMazeTraveler traveler = new RLMMazeTraveler(mazeInfo, Learn, Temp_num_sessions, StartRandomness, EndRandomness,  persistentProgressAct:ShowPersistentProgress, persistentDoneAct:ShowPersistentDone); //Instantiate RlmMazeTraveler game lib to configure the network.
 
                 traveler.SessionComplete += Traveler_SessionComplete;
                 traveler.MazeCycleComplete += Traveler_MazeCycleComplete;
@@ -168,7 +169,7 @@ namespace WPFMazeApp
                             lblCurrentSession.Content = 1;
                         });
                         CurrentIteration = i + 1;
-                        traveler.Travel(10000);
+                        traveler.Travel(GameTimeout);
                     }
               
                     // set to predict instead of learn for the remaining sessions
@@ -181,11 +182,11 @@ namespace WPFMazeApp
                         RunUIThread(() => {
                             StatusText.Content = $"Training started... {CurrentIteration * 100 / Temp_num_sessions}%";
                         });
-                        traveler.Travel(10000);
+                        traveler.Travel(GameTimeout);
                     }
 
 
-                    //traveler.TrainingDone();
+                    traveler.TrainingDone();
                     RunUIThread(() => {
                         StatusText.Content = $"Training done... 100%";
                     });
@@ -203,7 +204,7 @@ namespace WPFMazeApp
                     });
                     traveler.Learn = false;
                     
-                    traveler.Travel(10000);
+                    traveler.Travel(GameTimeout);
 
                 }
 
@@ -335,6 +336,22 @@ namespace WPFMazeApp
             Dispatcher.BeginInvoke(act);
         }
 
+        public void ShowPersistentProgress(double finished, double total)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                this.StatusText.Content = $"Saving to database... {finished}/{total}";
+            });
+        }
+
+        public void ShowPersistentDone()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                this.StatusText.Content = "Done saving to database.";
+            });
+        }
+
         public void Dispose()
         {
             if (game != null)
@@ -345,6 +362,5 @@ namespace WPFMazeApp
                 }
             }
         }
-
     }
 }

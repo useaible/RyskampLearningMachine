@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using RLM.SQLServer;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using RLM.WebAPI.Models;
 using System;
 using System.Collections.Concurrent;
@@ -78,7 +80,8 @@ namespace RLM.WebAPI.Manager
             else if(topic == createTopic("create_load_network"))
             {
                 CreateLoadNetworkParams data = JsonConvert.DeserializeObject<CreateLoadNetworkParams>(msg);
-                network = new RlmNetwork(data.RlmName);
+                IRlmDbData rlmDbData = new RlmDbDataSQLServer(data.RlmName);
+                network = new RlmNetwork(rlmDbData);
 
                 if(!network.LoadNetwork(data.NetworkName))
                 {
@@ -124,8 +127,7 @@ namespace RLM.WebAPI.Manager
                 RlmCyclecompleteArgs cycleOutput = null;
 
                 // supervised training
-                if (data.Outputs == null ||
-                    (data.Outputs != null && data.Outputs.Count > 0))
+                if (data.Outputs != null && data.Outputs.Count > 0)
                 {
                     var outputsCycle = new List<RlmIOWithValue>();
                     foreach (var outs in data.Outputs)
@@ -207,7 +209,7 @@ namespace RLM.WebAPI.Manager
             {
                 RlmGetSessionCaseParams data = JsonConvert.DeserializeObject<RlmGetSessionCaseParams>(msg);
 
-                RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+                RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
                 var resultStr = JsonConvert.SerializeObject(hist.GetSessionCaseHistory(data.SessionId, data.Skip, data.Take));
 
@@ -217,7 +219,7 @@ namespace RLM.WebAPI.Manager
             {
                 RlmGetCaseIOParams data = JsonConvert.DeserializeObject<RlmGetCaseIOParams>(msg);
 
-                RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+                RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
                 var resultStr = JsonConvert.SerializeObject(hist.GetCaseIOHistory(data.CaseId, data.RneuronId, data.SolutionId));
 
@@ -234,14 +236,14 @@ namespace RLM.WebAPI.Manager
 
         private IEnumerable<RlmSessionHistory> getSessionHistory(RlmFilterResultParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetSessionHistory(data.Skip, data.Take);
         }
 
         private IEnumerable<RlmSessionHistory> getSessionsWithSignificantLearning(RlmFilterResultParams data)
         {
-            RlmSessionCaseHistory hist = new RlmSessionCaseHistory(data.RlmName);
+            RlmSessionCaseHistory hist = network.SessionCaseHistory;
 
             return hist.GetSignificantLearningEvents(data.Skip, data.Take);
         }

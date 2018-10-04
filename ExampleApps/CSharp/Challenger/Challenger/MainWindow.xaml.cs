@@ -32,6 +32,9 @@ using ToastNotifications;
 using ToastNotifications.Position;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
+using RLM.PostgreSQLServer;
 
 namespace Challenger
 {
@@ -65,6 +68,7 @@ namespace Challenger
         private VisualizerWindow rlvPanel;
         //private RLVOutputVisualizer visualizer;
         private RLVCore core;
+        private IRlmDbData rlmDbData;
         
         private SimulationConfig config = new SimulationConfig();
         private ChallengerSimulationSettings simSettings = new ChallengerSimulationSettings()
@@ -1183,7 +1187,9 @@ namespace Challenger
 
         private void btnVisualizer_Click(object sender, RoutedEventArgs e)
         {
-            core = new RLVCore(dbIdentifier);
+            //rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+            rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+            core = new RLVCore(rlmDbData);
 
             rlvPanel = new VisualizerWindow(core, challenger.HighestMoveCount, challenger.RecentMoves);
             rlvPanel.Show();

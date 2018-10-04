@@ -9,44 +9,49 @@ using System.Collections.Concurrent;
 using RLM.Database;
 using System.Threading;
 using RLM.Database.Utility;
+using System.Diagnostics;
+using RLM.Memory.CPU;
 
 namespace RLM.Memory
 {
     public class Manager : IManager
     {
-        private const int MAX_ALLOC = 100000; //1000000;
+        private const int MAX_ALLOC = 100000;
 
-        private BlockingCollection<Rneuron> rneuron_queue;
-        private BlockingCollection<Session> session_queue;
-        private BlockingCollection<Session> savedSession_queue;
-        private BlockingCollection<Solution> solution_queue;
-        private BlockingCollection<Case> case_queue;
-        private List<Session> sessions = new List<Session>();
-
+        private BlockingCollection<Session> bcSessionsToCreate;
+        private BlockingCollection<Session> bcSessionsToUpdate;
+        private BlockingCollection<Case> bcCasesQueue;
         private RlmDbMgr rlmDb;
         private RlmObjectEnqueuer rlmDbEnqueuer;
-
-        private CancellationTokenSource ctSourceSessions;
-        private CancellationToken tokenSessions;
-
-        private CancellationTokenSource ctSourceCases;
-        private CancellationToken tokenCases;
-
+        
         private bool trainingDone = false;
         private bool sessionsDone = false;
         private int totalSessionsCount = 0;
         private Task sessionCreateTask;
+        private CancellationTokenSource workerTokenSrc = new CancellationTokenSource();
         private Task sessionUpdateTask;
         private Task caseTask;
         private int iConcurrencyLevel = Environment.ProcessorCount;
         private int rneuronsBoundedCapacity;
-        private int sessionsBoundedCapacity;
         private int solutionsBoundedCapacity;
-        private int casesBoundedCapacity;
 
         private System.Diagnostics.Stopwatch dbSavingTime = new System.Diagnostics.Stopwatch();
         private System.Timers.Timer progressUpdater = new System.Timers.Timer();
         private double lastProgress = -1;
+
+        const int ARRAY_SIZE = 1000;
+        private RlmArray<long> rneuronIds = new RlmArray<long>(ARRAY_SIZE);
+        private RlmArray<double>[] doubleInputs;
+        private RlmArray<bool>[] results;
+        private double[][] doubleInputsArray = new double[3][];
+        private bool[][] resultsArray = new bool[3][];
+        private double[] fromArray = new double[3];
+        private double[] toArray = new double[3];
+        private bool[] rneuronsCacheArray;
+        public IRlmRneuronProcessor rneuronProcessor { get; private set; }
+
+
+        public bool GPUMode { get; private set; } = false;
 
         // temp for benchmarks
         public uint CacheBoxCount { get; set; } = 0;
@@ -56,43 +61,49 @@ namespace RLM.Memory
         public System.Diagnostics.Stopwatch SwRebuildCache { get; set; }
         // temp for benchmarks
 
+
         public event DataPersistenceCompleteDelegate DataPersistenceComplete;
         public event DataPersistenceProgressDelegate DataPersistenceProgress;
         
         public IRlmNetwork Network { get; private set; }
-        
         public SortedList<RlmInputKey, RlmInputValue> DynamicInputs { get; set; }
-
-        //public ConcurrentDictionary<long, SortedList<double, HashSet<long>>> DynamicLinearInputs { get; set; } = new ConcurrentDictionary<long, SortedList<double, HashSet<long>>>();
-        //public ConcurrentDictionary<long, Dictionary<string, HashSet<long>>> DynamicDistinctInputs { get; set; } = new ConcurrentDictionary<long, Dictionary<string, HashSet<long>>>();
-
         public ConcurrentDictionary<long, HashSet<SolutionOutputSet>> DynamicOutputs { get; set; } = new ConcurrentDictionary<long, HashSet<SolutionOutputSet>>();
         public ConcurrentDictionary<long, Rneuron> Rneurons { get; set; } = new ConcurrentDictionary<long, Rneuron>();
-        public ConcurrentQueue<Rneuron> Rneurons2 { get; set; } = new ConcurrentQueue<Rneuron>();
-
         public ConcurrentDictionary<long, Session> Sessions { get; set; } = new ConcurrentDictionary<long, Session>();
-        public ConcurrentQueue<Session> Sessions2 { get; set; } = new ConcurrentQueue<Session>();
-        public ConcurrentQueue<Session> Sessions3 { get; set; } = new ConcurrentQueue<Session>();
-
+        public ConcurrentQueue<Session> SessionsQueueToCreate { get; set; } = new ConcurrentQueue<Session>();
+        public ConcurrentQueue<Session> SessionsQueueToUpdate { get; set; } = new ConcurrentQueue<Session>();
         public ConcurrentDictionary<long, Solution> Solutions { get; set; } = new ConcurrentDictionary<long, Solution>();
-        public ConcurrentQueue<Solution> Solutions2 { get; set; } = new ConcurrentQueue<Solution>();
-
         public ConcurrentDictionary<long, Dictionary<long, BestSolution>> BestSolutions { get; set; } = new ConcurrentDictionary<long, Dictionary<long, BestSolution>>();
-
         public HashSet<BestSolution> BestSolutionStaging { get; set; } = new HashSet<BestSolution>();
-
-        public ConcurrentBag<Case> Cases { get; set; } = new ConcurrentBag<Case>();
-        public ConcurrentQueue<Case> Cases2 { get; set; } = new ConcurrentQueue<Case>();
-
         public BestSolutionCacheBox CacheBox { get; set; } = new BestSolutionCacheBox();
 
         public double MomentumAdjustment { get; set; } = 25;
         public double CacheBoxMargin { get; set; } = 0;
         public bool UseMomentumAvgValue { get; set; } = false;
 
+        // benchmark stats storage
+        //private Stopwatch globalExecutionStopWatch = new Stopwatch();
+        //private Stopwatch getBest_getRneuron_StopWatch = new Stopwatch();
+        //public List<long> GetRNeuronsFromInputsTime { get; set; } = new List<long>();
+        //public List<long> GetBestSolutionTime { get; set; } = new List<long>();
+        //public List<long> RangeInfoTime { get; set; } = new List<long>();
+        //public List<long> RneuronExecuteTime { get; set; } = new List<long>();
+        //public List<long> FindBestTime { get; set; } = new List<long>();
+        //public List<long> GetRandomSolTime { get; set; } = new List<long>();
+
         private readonly ConcurrentQueue<Queue<Case>> MASTER_CASE_QUEUE = new ConcurrentQueue<Queue<Case>>();
         private Queue<Case> caseQueue = null;
+
+        //Thread lock objects
         private object caseQueue_lock = new object();
+        private object lockDynamicInputs = new object();
+
+        // Get best solution variables
+        private BestSolution currBS = null;
+        private bool predict = false;
+        private IEnumerable<long> excludeSolutions;
+        private GetRneuronResult retValGetRneuronFromInputs = new GetRneuronResult();
+        private IDictionary<int, InputRangeInfo> rangeInfos = new Dictionary<int, InputRangeInfo>();
 
         /// <summary>
         /// Initializes memory manager
@@ -101,21 +112,15 @@ namespace RLM.Memory
         public Manager(IRlmNetwork network, bool trackStats = false)
         {
             Network = network;
-            rneuron_queue = new BlockingCollection<Rneuron>();
-            session_queue = new BlockingCollection<Session>();
-            savedSession_queue = new BlockingCollection<Session>();
-            solution_queue = new BlockingCollection<Solution>();
-            case_queue = new BlockingCollection<Case>();
 
-            rlmDb = new RlmDbMgr(network.DatabaseName, network.PersistData);
+            bcSessionsToCreate = new BlockingCollection<Session>();
+            bcSessionsToUpdate = new BlockingCollection<Session>();
+            bcCasesQueue = new BlockingCollection<Case>();
+
+
+            rlmDb = new RlmDbMgr(network.RlmDBData, network.PersistData);
             rlmDbEnqueuer = new RlmObjectEnqueuer();
-
-            ctSourceSessions = new CancellationTokenSource();
-            tokenSessions = ctSourceSessions.Token;
-
-            ctSourceCases = new CancellationTokenSource();
-            tokenCases = ctSourceCases.Token;
-
+            
             progressUpdater.Interval = 1000;
             progressUpdater.Elapsed += ProgressUpdater_Elapsed;
 
@@ -128,6 +133,42 @@ namespace RLM.Memory
             }
 
             MASTER_CASE_QUEUE.Enqueue(caseQueue = new Queue<Case>());
+
+            if (network.GPURneuronProcessor == null)
+            {
+                rneuronProcessor = new RlmRneuronGetter(this);
+            }
+            else
+            {
+                GPUMode = true;
+                rneuronProcessor = network.GPURneuronProcessor;
+            }
+        }
+
+        public void SetArrays(int length)
+        {
+            doubleInputs = new RlmArray<double>[length];
+            results = new RlmArray<bool>[length];
+            doubleInputsArray = new double[length][];
+            resultsArray = new bool[length][];
+            fromArray = new double[length];
+            toArray = new double[length];
+
+            for (var d = 0; d < length; d++)
+            {
+                doubleInputs[d] = new RlmArray<double>(ARRAY_SIZE, double.MinValue);
+            }
+
+            for (var d = 0; d < length; d++)
+            {
+                results[d] = new RlmArray<bool>(ARRAY_SIZE);
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                doubleInputsArray[i] = doubleInputs[i].DataArray;
+                resultsArray[i] = results[i].DataArray;
+            }
         }
         
         /// <summary>
@@ -157,10 +198,6 @@ namespace RLM.Memory
             }
 
             solutionsBoundedCapacity = Convert.ToInt32(s);
-
-            //Rneurons = new ConcurrentDictionary<long, Rneuron>(iConcurrencyLevel, rneuronsBoundedCapacity);
-            //Solutions = new ConcurrentDictionary<long, Solution>(iConcurrencyLevel, solutionsBoundedCapacity);
-
         }
         /// <summary>
         /// Save the new network and send it to a task. It also starts the database workers
@@ -184,54 +221,25 @@ namespace RLM.Memory
 
             t1.Wait();
             StartRlmDbWorkers();
-
-            //InitStorage(inputs, outputs);
-
-            //rlmDb.SaveNetwork(rnetwork, io_types, inputs, outputs, rnn_net);
         }
 
-        public void InitStorage(List<Input> inputs, List<Output> outputs)
-        {
-            //double r = 1.0;
-            //double s = 1.0;
-
-            //foreach (var input in inputs)
-            //{
-            //    r *= input.Max;
-            //}
-
-            //rneuronsBoundedCapacity = Convert.ToInt32(r);
-
-            //foreach (var output in outputs)
-            //{
-            //    s *= output.Max;
-            //}
-
-            //solutionsBoundedCapacity = Convert.ToInt32(s);
-
-            //Rneurons = new ConcurrentDictionary<long, Rneuron>(iConcurrencyLevel, rneuronsBoundedCapacity);
-            //Solutions = new ConcurrentDictionary<long, Solution>(iConcurrencyLevel, solutionsBoundedCapacity);
-
-            //Rneurons = new ConcurrentDictionary<long, Rneuron>();
-            //Solutions = new ConcurrentDictionary<long, Solution>();
-        }
         /// <summary>
         /// Add the session to queue
         /// </summary>
         /// <param name="key">session Id</param>
         /// <param name="session">current session</param>
         /// <returns></returns>
-        public bool AddSessionToQueue(long key, Session session)
+        public bool AddSessionToCreateToQueue(long key, Session session)
         {
             bool retVal = false;
 
-            //retVal = Sessions.TryAdd(key, session);
-            //if (retVal)
-            //{
-            //    session_queue.Add(session);
-            //}
+            sessionsDone = false;
+            if (!dbSavingTime.IsRunning)
+            {
+                dbSavingTime.Restart();
+            }
 
-            Sessions2.Enqueue(session);
+            SessionsQueueToCreate.Enqueue(session);
 
             return retVal;
         }
@@ -240,18 +248,11 @@ namespace RLM.Memory
         /// </summary>
         /// <param name="session">current session</param>
         /// <returns></returns>
-        public bool AddSessionUpdateToQueue(Session session)
+        public bool AddSessionToUpdateToQueue(Session session)
         {
             bool retVal = false;
 
-            //retVal = savedSession_queue.TryAdd(session);
-
-            //if(retVal)
-            //{
-
-            //}
-
-            Sessions3.Enqueue(session);
+            SessionsQueueToUpdate.Enqueue(session);
 
             return retVal;
         }
@@ -262,9 +263,6 @@ namespace RLM.Memory
         /// <param name="c_case">current case</param>
         public void AddCaseToQueue(long key, Case c_case)
         {
-            //Cases.Add(c_case);
-            //Cases2.Enqueue(c_case);
-
             if (caseQueue.Count() >= MAX_ALLOC)
             {
                 MASTER_CASE_QUEUE.Enqueue(caseQueue = new Queue<Case>(MAX_ALLOC));
@@ -275,6 +273,7 @@ namespace RLM.Memory
                 caseQueue.Enqueue(c_case);
             }
         }
+
         /// <summary>
         /// Gets existing Rneuron and creates a new one if not existing
         /// </summary>
@@ -283,23 +282,18 @@ namespace RLM.Memory
         /// <returns></returns>
         public GetRneuronResult GetRneuronFromInputs(IEnumerable<RlmIOWithValue> inputs, long rnetworkID)
         {
-            GetRneuronResult retVal = new GetRneuronResult();
-            Rneuron rneuron = null;
+            
 
             // generate key based on input values
             long rneuronId = Util.GenerateHashKey(inputs.Select(a => a.Value).ToArray());
 
+
             // create new rneuron if not exists
-            if (!Rneurons.TryGetValue(rneuronId, out rneuron))
+            if (!Rneurons.ContainsKey(rneuronId))
             {
-                rneuron = new Rneuron() { ID = rneuronId, Rnetwork_ID = rnetworkID };
+                var rneuron = new Rneuron() { ID = rneuronId, Rnetwork_ID = rnetworkID };
 
-                bool isFirstInput = true;
-                RlmInputValue lastInputValue = null;
                 int cnt = 0;
-
-                IComparer<RlmInputKey> distinctComparer = new RlmInputKeyDistinctComparer();
-                IComparer<RlmInputKey> linearComparer = new RlmInputKeyLinearComparer();
 
                 foreach(var i in inputs)
                 {
@@ -313,65 +307,39 @@ namespace RLM.Memory
                         DotNetType = i.DotNetType,
                         InputType = i.Type
                     };
-                    rneuron.Input_Values_Reneurons.Add(ivr);
+                    rneuron.Input_Values_Rneurons.Add(ivr);
 
-                    RlmInputKey inputKey = new RlmInputKey() { Value = ivr.Value, InputNum = cnt, Type = i.Type };
-                    inputKey.DoubleValue = (i.Type == Enums.RlmInputType.Linear) ? Convert.ToDouble(ivr.Value) : 0D;
-                    RlmInputValue inputVal = null;
-
-                    if (!isFirstInput)
+                    double value;
+                    if (i.DotNetType == typeof(bool).ToString())
                     {
-                        if (lastInputValue.RelatedInputs == null)
-                            lastInputValue.RelatedInputs = new SortedList<RlmInputKey, RlmInputValue>(i.Type == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
-
-                        if (!lastInputValue.RelatedInputs.TryGetValue(inputKey, out inputVal))
-                        {
-                            inputVal = new RlmInputValue();
-                            lastInputValue.RelatedInputs.Add(inputKey, inputVal);
-                        }
-
-                        lastInputValue = inputVal;
+                        bool boolVal = Convert.ToBoolean(i.Value);
+                        value = (boolVal) ? 1D : 0D;
                     }
                     else
                     {
-                        if (DynamicInputs == null)
-                            DynamicInputs = new SortedList<RlmInputKey, RlmInputValue>(i.Type == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
-
-                        isFirstInput = false;
-                        if (!DynamicInputs.TryGetValue(inputKey, out inputVal))
-                        {
-                            inputVal = new RlmInputValue();
-                            DynamicInputs.Add(inputKey, inputVal);
-                        }
-
-                        lastInputValue = inputVal;
+                        value = Convert.ToDouble(ivr.Value);
                     }
-                    cnt++;                   
+
+                    doubleInputs[cnt].Add(value);
+                    results[cnt].Resize(doubleInputs[cnt].DataArray.Length);
+
+                    cnt++;
                 }
 
-                lastInputValue.RneuronId = rneuronId;
-
                 Rneurons.TryAdd(rneuronId, rneuron);
-                //rneuron_queue.Add(retVal);
-                //if (Rneurons.TryAdd(rneuronId, retVal))
-                //{
-                //}
-                //Rneurons2.Enqueue(retVal);
-                //rneuron_queue.Add(retVal);
-
-                retVal.Rneuron = rneuron;
-                retVal.ExistsInCache = false;
+                rneuronIds.Add(rneuronId);
+                
+                retValGetRneuronFromInputs.Rneuron = rneuron;
+                retValGetRneuronFromInputs.ExistsInCache = false;
             }
             else
             {
-                retVal.Rneuron = rneuron;
-                retVal.ExistsInCache = true;
+                retValGetRneuronFromInputs.Rneuron = Rneurons[rneuronId]; 
+                retValGetRneuronFromInputs.ExistsInCache = true;
             }
 
-            return retVal;
+            return retValGetRneuronFromInputs;
         }
-
-        object lockDynamicInputs = new object();
         /// <summary>
         /// Sets the Rneuron
         /// </summary>
@@ -379,61 +347,36 @@ namespace RLM.Memory
         public void SetRneuronWithInputs(Rneuron rneuron)
         {
             var rneuronId = rneuron.ID;
-
-            // add rneuron to cache
-            Rneurons.TryAdd(rneuronId, rneuron);
-
-            bool isFirstInput = true;
-            RlmInputValue lastInputValue = null;
             int cnt = 0;
 
             IComparer<RlmInputKey> distinctComparer = new RlmInputKeyDistinctComparer();
             IComparer<RlmInputKey> linearComparer = new RlmInputKeyLinearComparer();
 
+            // TODO must implement repopulation of data arrays for loading network
             // build dynamic inputs
-            foreach (var i in rneuron.Input_Values_Reneurons)
+            foreach (var i in rneuron.Input_Values_Rneurons)
             {
-                RlmInputKey inputKey = new RlmInputKey() { Value = i.Value, InputNum = cnt, Type = i.InputType };
-                inputKey.DoubleValue = (i.InputType == Enums.RlmInputType.Linear) ? Convert.ToDouble(i.Value) : 0D;
-                RlmInputValue inputVal = null;
-
-                if (!isFirstInput)
+                double inputDoubleValue = 0;
+                if (i.DotNetType == typeof(bool).ToString())
                 {
-                    if (lastInputValue.RelatedInputs == null)
-                        lastInputValue.RelatedInputs = new SortedList<RlmInputKey, RlmInputValue>(i.InputType == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
-
-                    lock (lastInputValue.RelatedInputs)
-                    {
-                        if (!lastInputValue.RelatedInputs.TryGetValue(inputKey, out inputVal))
-                        {
-                            inputVal = new RlmInputValue();
-                            lastInputValue.RelatedInputs.Add(inputKey, inputVal);
-                        }
-                    }
-
-                    lastInputValue = inputVal;
+                    bool boolVal = Convert.ToBoolean(i.Value);
+                    inputDoubleValue = (boolVal) ? 1 : 0; ;
                 }
                 else
                 {
-                    if (DynamicInputs == null)
-                        DynamicInputs = new SortedList<RlmInputKey, RlmInputValue>(i.InputType == Enums.RlmInputType.Linear ? linearComparer : distinctComparer);
-
-                    isFirstInput = false;
-                    lock (lockDynamicInputs)
-                    {
-                        if (!DynamicInputs.TryGetValue(inputKey, out inputVal))
-                        {
-                            inputVal = new RlmInputValue();
-                            DynamicInputs.Add(inputKey, inputVal);
-                        }
-                    }
-                    lastInputValue = inputVal;
+                    inputDoubleValue = Convert.ToDouble(i.Value);
                 }
+
+                doubleInputs[cnt].Add(inputDoubleValue);
+                results[cnt].Resize(doubleInputs[cnt].DataArray.Length);
+
                 cnt++;
             }
 
-            lastInputValue.RneuronId = rneuronId;
+            Rneurons.TryAdd(rneuronId, rneuron);
+            rneuronIds.Add(rneuronId);
         }
+
         /// <summary>
         /// Gets best Solution
         /// </summary>
@@ -441,169 +384,76 @@ namespace RLM.Memory
         /// <param name="linearTolerance"></param>
         /// <param name="predict"></param>
         /// <returns></returns>
-        public Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double trainingLinearTolerance = 0, bool predict = false, double predictLinearTolerance = 0)
+        public Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double trainingLinearTolerance = 0, bool predict = false, double predictLinearTolerance = 0, IEnumerable<long> excludeSolutions = null)
         {
+
+            this.predict = predict;
+            this.excludeSolutions = excludeSolutions;
+
             bool useLinearTolerance = ((predict && predictLinearTolerance > 0) || !predict) ? true : false;
             double linearTolerance = (predict) ? predictLinearTolerance : trainingLinearTolerance;
 
             Solution retVal = null;
-            
-            var comparer = new DynamicInputComparer();//Util.DynamicInputComparer;
-            List<long> rneuronsFound = new List<long>();
-            
-            var rangeInfos = new Dictionary<int, InputRangeInfo>();
+
             int cnt = 0;
             foreach (var item in inputs)
             {
-                if (item.Type == Enums.RlmInputType.Linear)
-                {
-                    double val = Convert.ToDouble(item.Value);
-                    double off = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (linearTolerance / 100D));
+                InputRangeInfo rangeInfo = null;
+                double val;
 
-                    rangeInfos.Add(cnt, new InputRangeInfo() { InputId = item.ID, InputType = item.Type, FromValue = val - off, ToValue = val + off });
+                if (item.DotNetType == typeof(bool).ToString())
+                {
+                    bool boolVal = Convert.ToBoolean(item.Value);
+                    val = (boolVal) ? 1 : 0;
                 }
                 else
                 {
-                    rangeInfos.Add(cnt, new InputRangeInfo() { InputId = item.ID, InputType = item.Type, Value = item.Value });
+                    val = Convert.ToDouble(item.Value);
                 }
+
+                if (item.Type == Enums.RlmInputType.Linear)
+                {
+                    double off = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (linearTolerance / 100D));
+                    rangeInfo = new InputRangeInfo() { InputId = item.ID, InputType = item.Type, FromValue = val - off, ToValue = val + off };                    
+                }
+                else
+                {
+                    rangeInfo = new InputRangeInfo() { InputId = item.ID, InputType = item.Type, Value = item.Value, FromValue = val, ToValue = val };
+                }
+                                
+                rangeInfos[cnt] = rangeInfo;
+
+                doubleInputsArray[cnt] = doubleInputs[cnt].DataArray;
+                resultsArray[cnt] = results[cnt].DataArray;
+                fromArray[cnt] = rangeInfo.FromValue;
+                toArray[cnt] = rangeInfo.ToValue;
                 cnt++;
             }
 
-            //TODO Cache Box, current implementation is slow don't know why
-            if (useLinearTolerance)
+            currBS = null;
+
+            if (useLinearTolerance && predict == false)
             {
                 if (CacheBox.IsWithinRange(rangeInfos, linearTolerance))
                 {
-                    SwGetRneuron?.Start();
-
-                    RlmInputValue.RecurseInputForMatchingRneurons(CacheBox.CachedInputs, rangeInfos, rneuronsFound);
-
-                    SwGetRneuron?.Stop();
-                    GetRneuronTimes?.Add(SwGetRneuron.Elapsed);
-                    SwGetRneuron?.Reset();
+                    rneuronProcessor.Execute(CacheBox.CachedRneurons, CacheBox.CachedInputs, fromArray, toArray, false);
                 }
                 else
                 {
-                    SwRebuildCache?.Start();
+                    double[][] cacheBoxRangeInfos = RebuildCacheBoxRangesGPU(inputs, linearTolerance);
 
-                    CacheBoxCount++;
-                    CacheBox.Clear();
+                    rneuronsCacheArray = new bool[rneuronIds.DataArray.Length];
+                    var cachedDataArray = rneuronProcessor.Execute(rneuronIds.DataArray, doubleInputsArray, fromArray, toArray, rneuronsCacheArray, cacheBoxRangeInfos[0], cacheBoxRangeInfos[1]);
 
-                    var cacheBoxRangeInfos = new Dictionary<int, InputRangeInfo>();
-                    int cacheRangeCnt = 0;
-                    foreach (var item in inputs)
-                    {
-                        if (item.Type == Enums.RlmInputType.Linear)
-                        {
-                            double val = Convert.ToDouble(item.Value);
-                            double dataOff = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (linearTolerance / 100D));
-                            //double cacheMargin = (CacheBoxMargin == 0) ? 0 : ((item.Max - item.Min) * (CacheBoxMargin / 100));
-                            double momentum = item.InputMomentum.MomentumDirection;
-                            double toOff = 0;
-                            double fromOff = 0;
-                            double cacheOff = 0;
-
-                            if (UseMomentumAvgValue)
-                                cacheOff = item.InputMomentum.MomentumValue * MomentumAdjustment;
-                            else
-                                cacheOff = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (MomentumAdjustment / 100D));
-                            
-
-                            if (momentum > 0)
-                            {
-                                var offset = momentum * cacheOff;
-                                toOff = val + dataOff + (cacheOff + offset);
-                                fromOff = val - dataOff - (cacheOff - offset);
-                            }
-                            else if (momentum < 0)
-                            {
-                                var offset = Math.Abs(momentum) * cacheOff;
-                                toOff = val + dataOff + (cacheOff - offset);
-                                fromOff = val - dataOff - (cacheOff + offset);
-                            }
-                            else
-                            {
-                                toOff = val + dataOff + cacheOff;
-                                fromOff = val - dataOff - cacheOff;
-                            }
-
-                            double cacheMargin = (CacheBoxMargin == 0) ? 0 : (cacheOff) * (CacheBoxMargin / 100D);
-
-                            toOff += cacheMargin;
-                            fromOff -= cacheMargin;
-
-                            cacheBoxRangeInfos.Add(cacheRangeCnt, new InputRangeInfo() { InputId = item.ID, FromValue = Math.Ceiling(fromOff), ToValue = Math.Ceiling(toOff) });
-                        }
-                        else
-                        {
-                            cacheBoxRangeInfos.Add(cacheRangeCnt, new InputRangeInfo() { InputId = item.ID, Value = item.Value });
-                        }
-                        cacheRangeCnt++;
-                    }
-
-                    CacheBox.SetRanges(cacheBoxRangeInfos.Values);
-
-                    CacheBox.CachedInputs = RlmInputValue.RecurseInputForMatchingRneuronsForCaching(DynamicInputs, cacheBoxRangeInfos, rangeInfos, rneuronsFound);
-                    //RnnInputValue.RecurseInputForMatchingRneurons(CacheBox.CachedInputs, rangeInfos, rneuronsFound);
-
-                    SwRebuildCache?.Stop();
-                    RebuildCacheboxTimes?.Add(SwRebuildCache.Elapsed);
-                    SwRebuildCache?.Reset();
+                    CacheBox.CachedRneurons = cachedDataArray.Rneurons.ToArray();
+                    CacheBox.CachedInputs = cachedDataArray.Inputs.Select(a => a.ToArray()).ToArray();
                 }
             }
             else
             {
-                RlmInputValue.RecurseInputForMatchingRneurons(DynamicInputs, rangeInfos, rneuronsFound);
+                rneuronProcessor.Execute(rneuronIds.DataArray, doubleInputsArray, fromArray, toArray, true);
             }
 
-            BestSolution currBS = null;
-            foreach (var rneuronId in rneuronsFound)
-            {
-                Dictionary<long, BestSolution> bsDict;
-                if (BestSolutions.TryGetValue(rneuronId, out bsDict))
-                {
-                    foreach (var bs in bsDict.Values)
-                    {
-                        if (!predict)
-                        {
-                            if (currBS != null)
-                            {
-                                if (bs.CycleScore > currBS.CycleScore)
-                                {
-                                    currBS = bs;
-                                }
-                                else if (bs.CycleScore == currBS.CycleScore && bs.SessionScore >= currBS.SessionScore && bs.CycleOrder >= currBS.CycleOrder)
-                                {
-                                    currBS = bs;
-                                }
-                            }
-                            else
-                            {
-                                currBS = bs;
-                            }
-                        }
-                        else
-                        {
-                            if (currBS != null)
-                            {
-                                if (bs.SessionScore > currBS.SessionScore)
-                                {
-                                    currBS = bs;
-                                }
-                                else if (bs.SessionScore == currBS.SessionScore && bs.CycleScore >= currBS.CycleScore && bs.CycleOrder >= currBS.CycleOrder)
-                                {
-                                    currBS = bs;
-                                }
-                            }
-                            else
-                            {
-                                currBS = bs;
-                            }
-                        }
-                    }
-                }
-            }
-            
             if (currBS != null)
             {
                 retVal = Solutions[currBS.SolutionId];
@@ -611,6 +461,130 @@ namespace RLM.Memory
 
             return retVal;
         }
+
+        public void FindBestSolution(long rneuronId)
+        {
+            Dictionary<long, BestSolution> bsDict;
+            if (BestSolutions.TryGetValue(rneuronId, out bsDict))
+            {
+                IEnumerable<BestSolution> solutionDic;
+                if (excludeSolutions != null && excludeSolutions.Count() > 0)
+                {
+                    solutionDic = bsDict
+                        .Where(a => !excludeSolutions.Any(b => b == a.Key))
+                        .Select(a => a.Value);
+                }
+                else
+                {
+                    solutionDic = bsDict.Values;
+                }
+
+                foreach (var bs in solutionDic)
+                {
+                    if (currBS == null)
+                    {
+                        Interlocked.Exchange(ref currBS, bs);
+                        continue;
+                    }
+
+                    if (!predict)
+                    {
+                        if ((bs.CycleScore > currBS.CycleScore) ||
+                            (bs.CycleScore == currBS.CycleScore && bs.SessionScore > currBS.SessionScore) ||
+                            (bs.CycleScore == currBS.CycleScore && bs.SessionScore == currBS.SessionScore && bs.CycleOrder > currBS.CycleOrder))
+                        {
+                            Interlocked.Exchange(ref currBS, bs);
+                        }
+                    }
+                    else
+                    {
+                        if ((bs.SessionScore > currBS.SessionScore) ||
+                            (bs.SessionScore == currBS.SessionScore && bs.CycleScore > currBS.CycleScore) ||
+                            (bs.SessionScore == currBS.SessionScore && bs.CycleScore == currBS.CycleScore && bs.CycleOrder > currBS.CycleOrder))
+                        {
+                            Interlocked.Exchange(ref currBS, bs);
+                        }
+                    }
+                }
+            }
+        }
+
+        private Dictionary<int, InputRangeInfo> RebuildCacheBoxRanges(IEnumerable<RlmIOWithValue> inputs, double linearTolerance)
+        {
+            CacheBoxCount++;
+            CacheBox.Clear();
+
+            var cacheBoxRangeInfos = new Dictionary<int, InputRangeInfo>();
+            int cacheRangeCnt = 0;
+            foreach (var item in inputs)
+            {
+                if (item.Type == Enums.RlmInputType.Linear)
+                {
+                    double val = Convert.ToDouble(item.Value);
+                    double dataOff = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (linearTolerance / 100D));
+                    //double cacheMargin = (CacheBoxMargin == 0) ? 0 : ((item.Max - item.Min) * (CacheBoxMargin / 100));
+                    double momentum = item.InputMomentum.MomentumDirection;
+                    double toOff = 0;
+                    double fromOff = 0;
+                    double cacheOff = 0;
+
+                    if (UseMomentumAvgValue)
+                        cacheOff = item.InputMomentum.MomentumValue * MomentumAdjustment;
+                    else
+                        cacheOff = (item.Max - item.Min) * ((linearTolerance == 0) ? 0 : (MomentumAdjustment / 100D));
+
+
+                    if (momentum > 0)
+                    {
+                        var offset = momentum * cacheOff;
+                        toOff = val + dataOff + (cacheOff + offset);
+                        fromOff = val - dataOff - (cacheOff - offset);
+                    }
+                    else if (momentum < 0)
+                    {
+                        var offset = Math.Abs(momentum) * cacheOff;
+                        toOff = val + dataOff + (cacheOff - offset);
+                        fromOff = val - dataOff - (cacheOff + offset);
+                    }
+                    else
+                    {
+                        toOff = val + dataOff + cacheOff;
+                        fromOff = val - dataOff - cacheOff;
+                    }
+
+                    double cacheMargin = (CacheBoxMargin == 0) ? 0 : (cacheOff) * (CacheBoxMargin / 100D);
+
+                    toOff += cacheMargin;
+                    fromOff -= cacheMargin;
+
+                    cacheBoxRangeInfos.Add(cacheRangeCnt, new InputRangeInfo() { InputId = item.ID, FromValue = Math.Ceiling(fromOff), ToValue = Math.Ceiling(toOff) });
+                }
+                else
+                {
+                    cacheBoxRangeInfos.Add(cacheRangeCnt, new InputRangeInfo() { InputId = item.ID, Value = item.Value });
+                }
+                cacheRangeCnt++;
+            }
+
+            CacheBox.SetRanges(cacheBoxRangeInfos.Values);
+            return cacheBoxRangeInfos;
+        }
+
+        private double[][] RebuildCacheBoxRangesGPU(IEnumerable<RlmIOWithValue> inputs, double linearTolerance)
+        {
+            var retVal = new double[][] { new double[inputs.Count()], new double[inputs.Count()] };
+            var ranges = RebuildCacheBoxRanges(inputs, linearTolerance);
+
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                var item = ranges.ElementAt(i);
+                retVal[0][i] = item.Value.FromValue;
+                retVal[1][i] = item.Value.ToValue;
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         /// Sets best solution
         /// </summary>
@@ -636,13 +610,13 @@ namespace RLM.Memory
         /// <param name="outputs"></param>
         /// <param name="bestSolutionId"></param>
         /// <returns></returns>
-        public GetSolutionResult GetRandomSolutionFromOutput(double randomnessCurrVal, IEnumerable<RlmIO> outputs, long? bestSolutionId = null)
+        public GetSolutionResult GetRandomSolutionFromOutput(double randomnessCurrVal, IEnumerable<RlmIO> outputs, long? bestSolutionId = null, IEnumerable<RlmIdea> ideas = null)
         {
             GetSolutionResult retVal = null;
 
             if (outputs.Count() == 1)
             {
-                IEnumerable<RlmIOWithValue> outputWithValues = GetRandomOutputValues(outputs);
+                IEnumerable<RlmIOWithValue> outputWithValues = GetRandomOutputValues(outputs, ideas);
                 retVal = GetSolutionFromOutputs(outputWithValues);
             }
             else
@@ -673,7 +647,11 @@ namespace RLM.Memory
                         }
                         else // get random value
                         {
-                            string value = GetRandomValue(item);
+                            RlmIdea idea = null;
+                            if (ideas != null)
+                                idea = ideas.FirstOrDefault(a => a.RlmIOId == item.ID);
+
+                            string value = GetRandomValue(item, idea);
                             outputsWithVal.Add(new RlmIOWithValue(item, value));
                             cntRandomValues++;
                         }
@@ -685,13 +663,18 @@ namespace RLM.Memory
                     {
                         var index = Util.Randomizer.Next(0, outputsWithVal.Count);
                         var output = outputsWithVal.ElementAt(index);
-                        string value = GetRandomValue(output);
+
+                        RlmIdea idea = null;
+                        if (ideas != null)
+                            idea = ideas.FirstOrDefault(a => a.RlmIOId == output.ID);
+
+                        string value = GetRandomValue(output, idea);
                         output.Value = value;
                     }
                 }
                 else // no best solution, so we give out all random values
                 {
-                    outputsWithVal.AddRange(GetRandomOutputValues(outputs));
+                    outputsWithVal.AddRange(GetRandomOutputValues(outputs, ideas));
                 }
 
                 retVal = GetSolutionFromOutputs(outputsWithVal);
@@ -740,10 +723,6 @@ namespace RLM.Memory
 
                 Solutions.TryAdd(solution.ID, solution);
 
-                //Solutions2.Enqueue(retVal);
-
-                //solution_queue.Add(retVal);
-
                 retVal.Solution = solution;
                 retVal.ExistsInCache = false;
             }
@@ -771,11 +750,14 @@ namespace RLM.Memory
             {
                 // insert into dynamic output collection
                 HashSet<SolutionOutputSet> outputSet = DynamicOutputs[o.Output_ID];
-                outputSet.Add(new SolutionOutputSet()
+                lock (outputSet)
                 {
-                    SolutionId = solutionId,
-                    Value = o.Value
-                });
+                    outputSet.Add(new SolutionOutputSet()
+                    {
+                        SolutionId = solutionId,
+                        Value = o.Value
+                    });
+                }
             }              
         }
 
@@ -786,19 +768,16 @@ namespace RLM.Memory
         public void StartRlmDbWorkers()
         {
             //note: we can start multiple workers later
-            sessionCreateTask = rlmDb.StartSessionWorkerForCreate(session_queue, tokenSessions); //start session thread for create
-            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Session>(Sessions2, session_queue); }); //queue sessions for create to blocking collections
+            rlmDb.StartSessionWorkerForCreate(bcSessionsToCreate, workerTokenSrc.Token); //start session thread for create
+            Task.Factory.StartNew(() => { rlmDbEnqueuer.QueueObjects<Session>(SessionsQueueToCreate, bcSessionsToCreate, workerTokenSrc.Token); }, TaskCreationOptions.LongRunning); //queue sessions for create to blocking collections
 
-            sessionUpdateTask = rlmDb.StartSessionWorkerForUpdate(savedSession_queue, tokenSessions); //start session thread for update
-            Task.Run(() => { rlmDbEnqueuer.QueueObjects<Session>(Sessions3, savedSession_queue); }); //queue sessions for update to blocking collections
+            rlmDb.StartSessionWorkerForUpdate(bcSessionsToUpdate, workerTokenSrc.Token); //start session thread for update
+            Task.Factory.StartNew(() => { rlmDbEnqueuer.QueueObjects<Session>(SessionsQueueToUpdate, bcSessionsToUpdate, workerTokenSrc.Token); }, TaskCreationOptions.LongRunning); //queue sessions for update to blocking collections
 
-            caseTask = rlmDb.StartCaseWorker(case_queue, tokenCases); //start case thread to save (Rneuron, Solution, Case) to db
-            //Task.Run(() => { rlmDbEnqueuer.QueueObjects<Case>(Cases2, case_queue); }); //queue case values to blocking collections                     
-            Task.Run(() => { rlmDbEnqueuer.QueueObjects(MASTER_CASE_QUEUE, case_queue, caseQueue_lock); });
+            rlmDb.StartCaseWorker(bcCasesQueue, workerTokenSrc.Token); //start case thread to save (Rneuron, Solution, Case) to db
+            Task.Factory.StartNew(() => { rlmDbEnqueuer.QueueObjects(MASTER_CASE_QUEUE, bcCasesQueue, caseQueue_lock, workerTokenSrc.Token); }, TaskCreationOptions.LongRunning);
 
             progressUpdater.Start();
-
-            //rnnDb.StartCaseWorker(tokenCases);
         }
 
         /// <summary>
@@ -806,11 +785,9 @@ namespace RLM.Memory
         /// </summary>
         public void StopRlmDbWorkersSessions()
         {
-            session_queue.CompleteAdding();
-            savedSession_queue.CompleteAdding();
-
-            ctSourceSessions.Cancel();
-
+            bcSessionsToCreate?.CompleteAdding();
+            bcSessionsToUpdate?.CompleteAdding();
+            
             sessionsDone = true;
             totalSessionsCount = Sessions.Count;
         }
@@ -819,29 +796,25 @@ namespace RLM.Memory
         /// </summary>
         public void StopRlmDbWorkersCases()
         {
-            case_queue.CompleteAdding();
-            
-            ctSourceCases.Cancel();
+            bcCasesQueue?.CompleteAdding();
 
-            dbSavingTime.Stop();
-
-            RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Data successfully saved to the database in {1}", DateTime.Now, dbSavingTime.Elapsed), Network.DatabaseName);
             if (ConfigFile.DropDb)
             {
-                Task.Delay(5000).Wait();
+                Thread.Sleep(5000);
 
                 rlmDb.DropDB();
 
                 RlmDbLogger.Info("\n" + string.Format("[{0:G}]: {1} database successfully dropped...\n*** END ***\n", DateTime.Now, Network.DatabaseName), Network.DatabaseName);
             }
 
-            // notify parent network that db background workers are done
-            DataPersistenceComplete?.Invoke();
             progressUpdater.Stop();
-            
-            foreach (var item in rlmDb.CaseWorkerQueues)
+
+            if (rlmDb.CaseWorkerQueues != null)
             {
-                item.CompleteAdding();
+                foreach (var item in rlmDb.CaseWorkerQueues)
+                {
+                    item.WorkerQueues.CompleteAdding();
+                }
             }
         }
         /// <summary>
@@ -863,54 +836,53 @@ namespace RLM.Memory
         /// signals that training is done
         /// </summary>
         public void TrainingDone()
-        {
+        {          
             trainingDone = true;
 
             //background thread to stop session db workers when done
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 while (true)
                 {
                     bool processing = Sessions.Any(a => a.Value.CreatedToDb == false || a.Value.UpdatedToDb == false);
                     if (!processing && /*Sessions.Count > 0 &&*/ trainingDone)
                     {
-                        StopRlmDbWorkersSessions();
+                        //StopRlmDbWorkersSessions();
+                        sessionsDone = true;
                         System.Diagnostics.Debug.WriteLine("Worker Session done");
                         break;
                     }
 
-                    Task.Delay(5 * 1000).Wait();
+                    //Task.Delay(5 * 1000).Wait();
+                    Thread.Sleep(5000);
                 }
 
-            });
+            }, TaskCreationOptions.LongRunning);
 
             //background thread to stop case db workers when done
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 while (true)
                 {
-                    ////bool processing = Cases.Any(a => a.SavedToDb == false);
-                    //if (/*!processing &&*/ Cases.Count == 0 && trainingDone && sessionsDone && rlmDb.DistinctCaseSessionsCount() == totalSessionsCount)
-                    //{
-                    //    StopRlmDbWorkersCases();
-                    //    System.Diagnostics.Debug.WriteLine("Worker Cases done");
-                    //    break;
-                    //}
-
                     if (sessionsDone && 
                         //rlmDb.DistinctCaseSessionsCount() == totalSessionsCount && 
                         MASTER_CASE_QUEUE.Count == 1 && 
-                        MASTER_CASE_QUEUE.ElementAt(0).Count == 0)
+                        MASTER_CASE_QUEUE.ElementAt(0).Count == 0 &&
+                        rlmDb.CaseWorkerQueues.All(a=> a.WorkerQueues.Count == 0 && !a.IsBusy))
                     {
-                        StopRlmDbWorkersCases();
+                        // notify parent network that db background workers are done
+                        DataPersistenceComplete?.Invoke();
+                        dbSavingTime.Stop();
+                        RlmDbLogger.Info("\n" + string.Format("[{0:G}]: Data successfully saved to the database in {1}", DateTime.Now, dbSavingTime.Elapsed), Network.DatabaseName);
+
                         System.Diagnostics.Debug.WriteLine("Worker Cases done");
                         break;
                     }
 
-                    Task.Delay(5 * 1000).Wait();
+                    Thread.Sleep(5000);
                 }
 
-            });
+            }, TaskCreationOptions.LongRunning);
         }
 
         public void SetProgressInterval(int interval)
@@ -927,13 +899,17 @@ namespace RLM.Memory
             }
         }
 
-        private IEnumerable<RlmIOWithValue> GetRandomOutputValues(IEnumerable<RlmIO> outputs)
+        private IEnumerable<RlmIOWithValue> GetRandomOutputValues(IEnumerable<RlmIO> outputs, IEnumerable<RlmIdea> ideas = null)
         {
             var retVal = new List<RlmIOWithValue>();
 
             foreach (var item in outputs)
             {
-                string value = GetRandomValue(item);
+                RlmIdea idea = null;
+                if (ideas != null)
+                    idea = ideas.First(a => a.RlmIOId == item.ID);
+
+                string value = GetRandomValue(item, idea);
 
                 var output_with_value = new RlmIOWithValue(item, value);
                 retVal.Add(output_with_value);
@@ -942,7 +918,7 @@ namespace RLM.Memory
             return retVal;
         }
 
-        private string GetRandomValue(RlmIO item)
+        private string GetRandomValue(RlmIO item, RlmIdea idea = null)
         {
             string value = string.Empty;
 
@@ -970,13 +946,14 @@ namespace RLM.Memory
                 default:
                     int min = Convert.ToInt32(item.Min);
                     int max = Convert.ToInt32(item.Max + 1);
-                    if (item.Idea != null)
+                    if (idea != null && idea is RlmOutputLimiter)
                     {
-                        max = item.Idea.IndexMax + 1;
+                        var itemIdea = idea as RlmOutputLimiter;
+                        max = itemIdea.IndexMax + 1;
                         int ideaIndex = Util.Randomizer.Next(min, max);
-                        if (item.Idea.GetIndexEquivalent != null)
+                        if (itemIdea.GetIndexEquivalent != null)
                         {
-                            value = item.Idea.GetIndexEquivalent(ideaIndex).ToString();
+                            value = itemIdea.GetIndexEquivalent(ideaIndex).ToString();
                         }
                         else
                         {
@@ -991,6 +968,63 @@ namespace RLM.Memory
             }
 
             return value;
+        }
+
+        public void Dispose()
+        {
+            workerTokenSrc.Cancel();
+            StopRlmDbWorkersSessions();
+            StopRlmDbWorkersCases();
+
+            BestSolutions?.Clear();
+            BestSolutionStaging?.Clear();
+            Sessions?.Clear();
+            Rneurons?.Clear();
+            Solutions?.Clear();
+
+            if (SessionsQueueToCreate != null && SessionsQueueToCreate.Count > 0)
+            {
+                Session removedSess;
+                foreach (var item in SessionsQueueToCreate)
+                {
+                    SessionsQueueToCreate.TryDequeue(out removedSess);
+                }
+            }
+
+            if (SessionsQueueToUpdate != null && SessionsQueueToUpdate.Count > 0)
+            {
+                Session removedSess;
+                foreach(var item in SessionsQueueToUpdate)
+                {
+                    SessionsQueueToUpdate.TryDequeue(out removedSess);
+                }
+            }
+
+            DynamicInputs?.Clear();
+            DynamicOutputs?.Clear();
+
+            if (GPUMode)
+            {
+                if (rneuronProcessor is IDisposable)
+                {
+                    (rneuronProcessor as IDisposable).Dispose();
+                }
+            }
+        }
+
+        public IEnumerable<long> GetSolutionIdsForOutputs(IDictionary<long, IEnumerable<string>> outputs)
+        {
+            IEnumerable<long> retVal = new List<long>();
+            if (outputs != null && outputs.Values.All(a => a.Count() > 0))
+            {
+                retVal = rlmDb.GetSolutionIdsForOutputs(outputs);
+            }
+            return retVal;
+        }
+
+        public void RemoveSolutionCascade(long solutionId)
+        {
+            rlmDb.CascadeDelete(solutionId);
         }
     }
 }

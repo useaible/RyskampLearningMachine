@@ -10,14 +10,14 @@ namespace RequirementsTool
     {
         const string REGISTRY_BASE_FOR_INSTANCES = @"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL\";
         const string REGISTRY_BASE_FOR_SQLSERVER_INSTANCE_VERSION = @"SOFTWARE\Microsoft\Microsoft SQL Server\{{instanceName}}\MSSQLServer\CurrentVersion";
-        const int SQLSERVER_VERSION_IDENTIFIER = 12; // 2014
+        const int SQLSERVER_VERSION_IDENTIFIER = 13; // 2016
 
         public SQLServerChecker()
         {
             Name = "MS SQL Server";
             Url = "https://www.microsoft.com/en-us/sql-server/sql-server-downloads";
 
-            Versions.Add("SQL Server 2014 or later");
+            Versions.Add("SQL Server 2016 or later");
         }
 
         public string GetInstancesInfo()

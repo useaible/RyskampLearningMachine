@@ -1,6 +1,8 @@
 ﻿using RLM;
+using RLM.SQLServer;
 using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using RLM.PostgreSQLServer;
 
 namespace MazeGameLib
 {
@@ -23,7 +26,7 @@ namespace MazeGameLib
         private const string NETWORK_NAME = "AIMazeTraveler01";
         private const double CORRECT_SCORE = 100;
         private const double WRONG_SCORE = 0;
-        private const int TIMER_TIMEOUT = 5000; // milliseconds
+        private const int TIMER_TIMEOUT = 2000; // milliseconds
         protected RlmNetwork rlmNet;
         private Int64 currentSessionID;
         private Int64 currentCycleID;
@@ -39,10 +42,13 @@ namespace MazeGameLib
 
         public RlmNetwork CurrentNetwork { get; set; }
         public bool DataPersistenceDone { get; private set; } = false;
-        public bool ShowDataPersistenceProgress { get; set; } = false;
+        public bool ShowDataPersistenceProgress { get; set; } = true;
+
+        private Action<double, double> persistentProgressAct;
+        private Action persistentDoneAct;
 
         // for windowless version
-        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1)
+        public RLMMazeTraveler(MazeInfo maze, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, Action<double, double> persistentProgressAct = null, Action persistentDoneAct = null)
         {
             this.maze = maze;
             Learn = learn;
@@ -56,6 +62,8 @@ namespace MazeGameLib
 
             tmr.Elapsed += Tmr_Elapsed;
 
+            this.persistentProgressAct = persistentProgressAct;
+            this.persistentDoneAct = persistentDoneAct;
         }
         // for window version
         public RLMMazeTraveler(MazeInfo maze, IMazeGame gameref, bool learn = false, int numSessions = 1, int startRandomness = 1, int endRandomness = 1, SetRandomnessLeftDelegate setRandomnessLeft = null)
@@ -102,7 +110,9 @@ namespace MazeGameLib
 
         public virtual RlmNetwork CreateOrLoadNetwork(MazeInfo maze)
         {
-            var rlmNet = new RlmNetwork("RLM_maze_" + maze.Name); //+ "_" + Guid.NewGuid().ToString("N"));
+            //IRlmDbData rlmDbData = new RlmDbDataPostgreSqlServer("RLM_maze_" + maze.Name);
+            IRlmDbData rlmDbData = new RlmDbDataSQLServer("RLM_maze_" + maze.Name);
+            var rlmNet = new RlmNetwork(rlmDbData); //+ "_" + Guid.NewGuid().ToString("N"));
             rlmNet.DataPersistenceComplete += RlmNet_DataPersistenceComplete;
             rlmNet.DataPersistenceProgress += RlmNet_DataPersistenceProgress;
 
@@ -137,14 +147,18 @@ namespace MazeGameLib
         {
             if (ShowDataPersistenceProgress)
             {
-                Console.WriteLine($"Data Persistence progress: {processed} / {total}");
+                Console.Write($"Data Persistence progress: {processed} / {total}\r");
+                if(persistentProgressAct != null)
+                    persistentProgressAct(processed, total);
             }
         }
 
         protected virtual void RlmNet_DataPersistenceComplete()
         {
             DataPersistenceDone = true;
-            Console.WriteLine("RLM Data Persistence done.");
+            Console.WriteLine("\nRLM Data Persistence done.");
+            if (persistentDoneAct != null)
+                persistentDoneAct();
         }
 
         public double RandomnessLeft

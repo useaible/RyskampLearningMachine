@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.HashFunction;
+using System.Data.HashFunction.xxHash;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,13 @@ namespace RLM.Memory
 {
     public static class Util
     {
+        static Util()
+        {
+            var factory = xxHashFactory.Instance;
+            _xxHash64 = factory.Create(new xxHashConfig() { HashSizeInBits = 64 });
+        }
+
+
         public static Random Randomizer
         {
             get
@@ -24,8 +32,8 @@ namespace RLM.Memory
             return min + (next * (max - min));
         }
 
-        private static readonly xxHash _xxHash64 = new xxHash(64);
-        public static xxHash xxHash64
+        private static readonly IxxHash _xxHash64;
+        public static IxxHash xxHash64
         {
             get
             {
@@ -45,10 +53,11 @@ namespace RLM.Memory
         public static long GenerateHashKey(params object[] values)
         {
             string aggregatedValues = string.Join("_", values);
-            byte[] hashedKey = xxHash64.ComputeHash(aggregatedValues);
-            return BitConverter.ToInt64(hashedKey, 0);
+
+            var hashValue = xxHash64.ComputeHash(aggregatedValues);
+            return BitConverter.ToInt64(hashValue.Hash, 0);
         }
-                
+
         public static double NextDouble(this Random rand, double minVal, double maxVal)
         {
             return rand.NextDouble() * (maxVal - minVal) + minVal;

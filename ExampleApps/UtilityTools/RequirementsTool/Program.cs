@@ -8,7 +8,75 @@ namespace RequirementsTool
     class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        static int Main(string[] args)
+        {            
+            if (args.Length == 0)
+            {
+                CheckAllWizard();
+            }
+            else
+            {
+                var checkers = new List<FeatureChecker>();
+                foreach (var arg in args)
+                {
+                    FeatureChecker checker = null;
+                    switch (arg.ToLower())
+                    {
+                        case "-sql":
+                            checker = new SQLServerChecker();
+                            break;
+
+                        case "-net":
+                            checker = new NetFrameworkChecker();
+                            break;
+
+                        case "-os":
+                            checker = new OSRequirementChecker();
+                            break;
+
+                        case "-ram":
+                            checker = new RAMRequirementChecker();
+                            break;
+
+                        case "-vs":
+                            checker = new RAMRequirementChecker();
+                            break;
+
+                        case "-py":
+                            checker = new PythonChecker();
+                            break;
+
+                        case "-iis":
+                            checker = new IISChecker();
+                            break;
+
+                        case "-iisexpress":
+                            checker = new IISExpressChecker();
+                            break;
+
+                        default:
+                            throw new ArgumentException($"Invalid argument {arg}");
+                    }
+
+                    if (checker != null)
+                        checkers.Add(checker);
+
+                    foreach(var item in checkers)
+                    {
+                        bool result = item.Check();
+
+                        if (!result)
+                        {
+                            return -1;
+                        }
+                    }
+                }
+            }
+           
+            return 0;
+        }
+
+        private static void CheckAllWizard()
         {
             List<FeatureChecker> systemCheckers = new List<FeatureChecker>()
             {
@@ -33,7 +101,7 @@ namespace RequirementsTool
             getPy:
             Console.Write("\n\nAre you using Python? y/n ");
             ConsoleKeyInfo yesPY = Console.ReadKey();
-            
+
             switch (yesPY.Key)
             {
                 case ConsoleKey.Y:
@@ -51,7 +119,7 @@ namespace RequirementsTool
             getIIS:
             Console.Write("\nAre you using the Ryskamp Learning Machine(RLM) Web API? y/n ");
             ConsoleKeyInfo yesIIS = Console.ReadKey();
-            
+
             switch (yesIIS.Key)
             {
                 case ConsoleKey.Y:
@@ -67,7 +135,7 @@ namespace RequirementsTool
 
 
             var sysStr = string.Format("{0}\n{1}\n{2}\n", getBorder("=", 32), "| System Requirements: |", getBorder("=", 32));
-            Console.WriteLine("\n\n"+ sysStr);
+            Console.WriteLine("\n\n" + sysStr);
             resultsSb.AppendLine(sysStr);
             foreach (var v in systemCheckers)
             {
@@ -133,7 +201,6 @@ namespace RequirementsTool
             Console.WriteLine("{0}\n{1}\n{2}", getBorder("=", 32), "| Results copied to clipboard! |", getBorder("=", 32));
 
             Console.ReadLine();
-
         }
 
         private static string getBorder(string character, int number)

@@ -72,7 +72,7 @@ namespace RLM.Database
 
             //ProcessWrite(path + "\\" + dbName + "_info.txt", msg);
 
-            Task.Delay(150).Wait();
+            //Task.Delay(150).Wait();
         }
 
         public static void Warning(string msg, string dbName, string methodName, Exception ex = null)
@@ -89,6 +89,11 @@ namespace RLM.Database
 
         private static void CreateErrLog(RlmDbLog log, string dbName)
         {
+            if (!Directory.Exists(ConfigFile.RlmLogLocation))
+            {
+                Directory.CreateDirectory(ConfigFile.RlmLogLocation);
+            }
+
             string logStr = "";
 
             string msg = log.Message;
@@ -117,13 +122,13 @@ namespace RLM.Database
                                         "</table>" +
                                         "<hr/><center>*** END ***</center><hr/>" +
                                 "</html>", msg, src, date, exception);
-
-            //string path = AppDomain.CurrentDomain.BaseDirectory;
-            //using (StreamWriter f = File.AppendText(path + "\\" + dbName + "_errlog.html"))
-            //{
-            //    f.WriteAsync(logStr);
-            //    Task.Delay(10).Wait();
-            //}
+            
+            string path = Path.Combine(ConfigFile.RlmLogLocation, $"log_{Guid.NewGuid().ToString("N")}.html");
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes(logStr);
+                fs.Write(info, 0, info.Length);
+            }
         }
     }
 }

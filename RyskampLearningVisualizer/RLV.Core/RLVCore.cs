@@ -1,5 +1,6 @@
 ﻿using RLM;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using RLV.Core.Interfaces;
 using RLV.Core.Models;
 using System;
@@ -21,9 +22,10 @@ namespace RLV.Core
         private long? currentSolutionId = null;
         private double currentScale = 100;
 
-        public RLVCore(string databaseName)
+        public RLVCore(IRlmDbData rlmDb)
         {
-            rlmHistory = new RlmSessionCaseHistory(databaseName);
+            rlmDb.Initialize();
+            rlmHistory = new RlmSessionCaseHistory(rlmDb);
         }
 
         public event LearningComparisonResultsDelegate LearningComparisonResultsEvent;
@@ -35,6 +37,7 @@ namespace RLV.Core
         public event SelectedCaseScaleChangedResultsDelegate SelectedCaseScaleChangedResultsEvent;
         public event SessionBreakdownClickResultsDelegate SessionBreakdownClickResultsEvent;
         public event DataNotAvailableDelegate DataNotAvailableEvent;
+        public event SelectChartDataPointDelegate SelectChartDataPointEvent;
 
         public bool IsComparisonModeOn { get; set; } = false;
 
@@ -121,6 +124,11 @@ namespace RLV.Core
             }
         }
 
+        public void IRLVProgressionChartPantl_SelectChartDataPointHandler(long selectedCaseId)
+        {
+            SelectChartDataPointEvent?.Invoke(selectedCaseId);
+        }
+
         public void IRLVSelectedDetailsPanel_SessionBreakdownClickHandler(long sessionId)
         {
             IEnumerable<RlmLearnedSessionDetails> results = rlmHistory.GetSessionIODetails(sessionId);
@@ -148,6 +156,7 @@ namespace RLV.Core
                         NextPrevCaseChangedResultsEvent += progPanel.IRLVCore_NextPrevCaseChangedResultsHandler;
                         RealTimeUpdateEvent += progPanel.IRLVCore_RealTimeUpdateHandler;
                         SelectedCaseScaleChangedResultsEvent += progPanel.IRLVCore_SelectedCaseScaleChangedResultsHandler;
+                        progPanel.SelectChartDataPointEvent += IRLVProgressionChartPantl_SelectChartDataPointHandler;
                     }
 
                     if (panel is IRLVSelectedDetailsPanel)

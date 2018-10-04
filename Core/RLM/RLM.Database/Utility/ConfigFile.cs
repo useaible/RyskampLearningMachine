@@ -15,7 +15,7 @@ namespace RLM.Database.Utility
             {
                 var retVal = LogLevel.Production;
 
-                string strlogLvl = ConfigurationManager.AppSettings["useAIbleLogLevel"];
+                string strlogLvl = ConfigurationManager.AppSettings["RlmLogLevel"];
                 if (!Enum.TryParse(strlogLvl, true, out retVal))
                 {
                     retVal = LogLevel.Production; // defaults to Production if can't be parsed (due to setting not in config file or wrong value)
@@ -24,18 +24,17 @@ namespace RLM.Database.Utility
                 return retVal;
             }
         }
-        public static LogLevel RlmDbLogLevel
+        
+        public static string RlmLogLocation
         {
             get
             {
-                var retVal = LogLevel.Production;
-
-                string strlogLvl = ConfigurationManager.AppSettings["rnnDbLogLevel"];
-                if (!Enum.TryParse(strlogLvl, true, out retVal))
+                var retVal = string.Empty;
+                retVal = ConfigurationManager.AppSettings["RLMLogLocation"];
+                if (string.IsNullOrEmpty(retVal))
                 {
-                    retVal = LogLevel.Debug; // defaults to Production if can't be parsed (due to setting not in config file or wrong value)
+                    retVal = @"C:\RLM\Logs";
                 }
-
                 return retVal;
             }
         }
@@ -50,6 +49,38 @@ namespace RLM.Database.Utility
                 if (!string.IsNullOrEmpty(strlogLvl))
                 {
                     retVal = Convert.ToBoolean(ConfigurationManager.AppSettings["RLMDropDb"]);
+                }
+
+                return retVal;
+            }
+        }
+
+        public static string BcpConfig
+        {
+            get
+            {
+                var retVal = string.Empty;
+
+                retVal = ConfigurationManager.AppSettings["BcpConfig"];
+                //if (string.IsNullOrEmpty(retVal))
+                //{
+                //    retVal = "-T";
+                //}
+
+                return retVal;
+            }
+        }
+
+        public static string BcpPath
+        {
+            get
+            {
+                var retVal = string.Empty;
+
+                retVal = ConfigurationManager.AppSettings["BcpPath"];
+                if (string.IsNullOrEmpty(retVal))
+                {
+                    retVal = "bcp";
                 }
 
                 return retVal;

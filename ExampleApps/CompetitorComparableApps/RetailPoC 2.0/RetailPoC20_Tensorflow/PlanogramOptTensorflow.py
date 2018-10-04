@@ -46,12 +46,12 @@ class PlanogramOptTensorflow():
 
     def train(self, lr, ui_results_callback, ui_status_callback, ui_logger, tf_settings):        
 
-        lr = 0.001
+        lr = 0.01
 
         NUM_HIDDEN_LAYERS = 3
         HIDDEN_LAYER_NEURONS = 500
-        TF_ACTIVATION = tf.nn.softmax
-        TF_OPTIMIZER = tf.train.AdamOptimizer(learning_rate=lr)
+        TF_ACTIVATION = tf.nn.sigmoid
+        TF_OPTIMIZER = tf.train.GradientDescentOptimizer(learning_rate=lr)
 
         n_nodes_hl1 = HIDDEN_LAYER_NEURONS
         n_nodes_hl2 = HIDDEN_LAYER_NEURONS
@@ -65,17 +65,17 @@ class PlanogramOptTensorflow():
         self.slot_in = tf.placeholder(shape=[1],dtype=tf.int32)
         slot_in_OH = slim.one_hot_encoding(self.slot_in, self.numSlots)
 
-        hidden_1_layer = {'weights':tf.Variable(tf.random_normal([self.numSlots, n_nodes_hl1]), name="hl_w_1"),
-                      'biases':tf.Variable(tf.ones([n_nodes_hl1]), name="hl_b_1")}
+        hidden_1_layer = {'weights':tf.Variable(tf.random_uniform([self.numSlots, n_nodes_hl1], 0.9, 1), name="hl_w_1"),
+                      'biases':tf.Variable(tf.random_normal([n_nodes_hl1]), name="hl_b_1")}
 
-        hidden_2_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl1, n_nodes_hl2]), name="hl_w_2"),
-                          'biases':tf.Variable(tf.ones([n_nodes_hl2]), name="hl_b_2")}
+        hidden_2_layer = {'weights':tf.Variable(tf.random_uniform([n_nodes_hl1, n_nodes_hl2], 0.9, 1), name="hl_w_2"),
+                          'biases':tf.Variable(tf.random_normal([n_nodes_hl2]), name="hl_b_2")}
 
-        hidden_3_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl3, self.numSlots]), name="hl_w_3"),
-                          'biases':tf.Variable(tf.ones([self.numSlots]), name="hl_b_3")}
+        hidden_3_layer = {'weights':tf.Variable(tf.random_uniform([n_nodes_hl3, self.numSlots], 0.9, 1), name="hl_w_3"),
+                          'biases':tf.Variable(tf.random_normal([self.numSlots]), name="hl_b_3")}
 
-        output_layer = {'weights':tf.Variable(tf.random_normal([self.numSlots, self.numOutputs]), name="out_w"),
-                        'biases':tf.Variable(tf.ones([self.numSlots, self.numOutputs]), name="out_b"),}
+        output_layer = {'weights':tf.Variable(tf.random_uniform([self.numSlots, self.numOutputs], 0.9, 1), name="out_w"),
+                        'biases':tf.Variable(tf.random_normal([self.numSlots, self.numOutputs]), name="out_b"),}
 
 
         l1 = tf.add(tf.matmul(slot_in_OH,hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -88,6 +88,7 @@ class PlanogramOptTensorflow():
         l3 = TF_ACTIVATION(l3)
 
         output = tf.matmul(l3,output_layer['weights']) + output_layer['biases']
+        output = TF_ACTIVATION(output)
         
         #self.output = tf.reshape(output,[-1])
 
@@ -95,13 +96,15 @@ class PlanogramOptTensorflow():
         #to compute the loss, and use it to update the network.
         self.reward_holder = tf.placeholder(shape=[1],dtype=tf.float32)
         self.action_holder = tf.placeholder(shape=[1],dtype=tf.int32)        
-        self.chosen_action = tf.argmax(output[self.slot_in[0]], 0)
+        #self.chosen_action = tf.argmin(output[self.slot_in[0]], 0)
         self.responsible_weight = tf.slice(output, [self.slot_in[0],self.action_holder[0]],[1,1])
-        self.loss = -(tf.log(self.responsible_weight[0][0])*self.reward_holder)
+        self.loss = tf.log(self.responsible_weight[0][0]) * self.reward_holder[0]
         optimizer = TF_OPTIMIZER#tf.train.AdamOptimizer(learning_rate=lr)
         self.update = optimizer.minimize(self.loss)     
         weights = tf.trainable_variables()[6] #The weights we will evaluate to look into the network.
  
+        self.chosen_action = tf.argmin(weights[self.slot_in[0]], 0)
+
         #get tensorflow current settings and pass to UI
         optimizerName = optimizer.__class__.__name__
         activationName = TF_ACTIVATION.__name__
@@ -114,22 +117,23 @@ class PlanogramOptTensorflow():
         startTime = time.time()
         sessionCounter = 0                
         init = tf.initialize_all_variables()
-        randomness = 1
+        randomness = 0.05
+        currRandomness = randomness
 
         ui_status_callback("Training...")
 
         trainingNum = -1
         predictNum = 0
         doPredict = False
-        interval = 1 / (self.randomReset - SimulationSettings.NUM_SCORE_HITS)
-
+        interval = randomness / (self.randomReset - SimulationSettings.NUM_SCORE_HITS)
+        
         # Launch the tensorflow graph
         with tf.Session() as sess:
             sess.run(init)
-            highestPossibleSessionScore = self.simSettings.ItemMetricMax * self.numSlots
-            lowestPossibleSessionScore = self.simSettings.ItemMetricMin * self.numSlots
+            highestPossibleSessionScore = self.simSettings.Score  #self.simSettings.ItemMetricMax * self.numSlots
+            lowestPossibleSessionScore = -1 #self.simSettings.ItemMetricMin * self.numSlots
 
-            matrix = {};
+            matrix = None
             while (not self.endTraining(flag)):     
                 totalMetricScore = 0
                 results = PlanogramOptResults()
@@ -142,15 +146,15 @@ class PlanogramOptTensorflow():
                     if (trainingNum != 0 and trainingNum % (self.randomReset - SimulationSettings.NUM_SCORE_HITS) == 0):
                         doPredict = True
                     else:
-                        randomness -= interval;
+                        currRandomness -= interval;
                 
                 if (doPredict):
                     predictNum += 1
-                    randomness = 0
+                    currRandomness = 0
                     if (predictNum > SimulationSettings.NUM_SCORE_HITS):
                         doPredict = False
                         predictNum = 0
-                        randomness = 1
+                        currRandomness = randomness
                         trainingNum = 0
 
                 #Reset facings list
@@ -163,7 +167,7 @@ class PlanogramOptTensorflow():
                 action = 0
                 for sl in range(self.numSlots):                   
                     #get an item randomly
-                    if (np.random.rand(1) <= randomness):
+                    if (np.random.rand(1) <= currRandomness):
                         action = np.random.randint(self.numOutputs)
                     else:
                         action = sess.run(self.chosen_action, feed_dict={self.slot_in:[sl]})
@@ -186,18 +190,29 @@ class PlanogramOptTensorflow():
                         reward = -1
                         hasDupItems = True
 
+
+                if (lowestPossibleSessionScore < 0):
+                    lowestPossibleSessionScore = totalMetricScore;
+
                 #Update network
                 #print (totalMetricScore)
                 if (hasDupItems):
                     totalMetricScore = 0
                     sessionScoreNormalized = -1
                 else:
-                    sessionScoreNormalized = self.normalize(lowestPossibleSessionScore, highestPossibleSessionScore, -1, 1, totalMetricScore)
+                    sessionScoreNormalized = self.normalize(lowestPossibleSessionScore, highestPossibleSessionScore, 0, 1, totalMetricScore)
 
+                previousValue = 0;
+                currentValue = 0;
                 if (not doPredict or (doPredict and predictNum <= 1)):
                     for sl in range(self.numSlots):
                         feed_dict={self.reward_holder:[sessionScoreNormalized],self.action_holder:[actionsPerSlot[sl]],self.slot_in:[sl]}
+                        if (matrix is not None):
+                            previousValue = matrix[sl][actionsPerSlot[sl]];
                         loss,update,matrix = sess.run([self.loss,self.update,weights], feed_dict=feed_dict)
+                        currentValue = matrix[sl][actionsPerSlot[sl]];
+                        if (sl != 0 and (sessionScoreNormalized > 0 and previousValue < currentValue) or (sessionScoreNormalized < 0 and previousValue > currentValue)):
+                            print("BAD: score:", sessionScoreNormalized, "previous:", previousValue, " current:", currentValue)
                     
                 #Reset facings list
                 facingsList = {}
@@ -209,8 +224,8 @@ class PlanogramOptTensorflow():
                 shelfItems = []                
                 for slotIndex in range(self.numSlots):
 
-                    slotArr = matrix[slotIndex]
-                    itemIndex = np.argmax(slotArr)
+                    #slotArr = matrix[slotIndex]
+                    itemIndex = actionsPerSlot[slotIndex] #np.argmin(slotArr)
                     item = self.items[itemIndex]   
                     shelfItems.append(item)
                     #actionsPerSlot[slotIndex] = itemIndex

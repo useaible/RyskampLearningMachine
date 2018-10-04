@@ -37,6 +37,7 @@ namespace WPFVisualizer
     {
         public event SelectedCaseChangedDelegate SelectedCaseChangedEvent;
         public event SelectedCaseScaleChangedDelegate SelectedCaseScaleChangedEvent;
+        public event SelectChartDataPointDelegate SelectChartDataPointEvent;
 
         private List<RlmLearnedCase> learnedCases = new List<RlmLearnedCase>();
         private List<IRLVItemDisplay> displayList = new List<IRLVItemDisplay>();
@@ -301,6 +302,7 @@ namespace WPFVisualizer
                     selectDefaultChartPoint(selectedCaseId);
                     SelectedCaseChangedEvent?.Invoke(selectedCaseId);
                 }
+                SelectChartDataPointEvent?.Invoke(selectedCaseId);
             }
             else
             {
@@ -312,6 +314,7 @@ namespace WPFVisualizer
 
                 //Invoke event for selecting new case
                 SelectedCaseChangedEvent?.Invoke(data.CaseId);
+                SelectChartDataPointEvent?.Invoke(data.CaseId);
             }
 
             ((IRLVProgressionChartVM)ViewModel).CurrentTime = previousSelected.Time;
@@ -424,5 +427,15 @@ namespace WPFVisualizer
         public static readonly DependencyProperty SeriesCollectionProperty =
               DependencyProperty.Register("SeriesCollection", typeof(SeriesCollection),
                 typeof(RLVProgressionChartPanel), new PropertyMetadata(null));
+
+        public void IRLVProgressionChartChangeScale(long caseId, double scale)
+        {
+            SelectedCaseScaleChangedEvent?.Invoke(caseId, scale);
+        }
+
+        public void IRLVProgressionChartSelectCase(long caseId)
+        {
+            SelectedCaseChangedEvent?.Invoke(caseId);
+        }
     }
 }

@@ -22,10 +22,10 @@ namespace RLM.Database
             }
         }
 
-        public void QueueObjects<T>(ConcurrentQueue<T> cache, BlockingCollection<T> bc)
+        public void QueueObjects<T>(ConcurrentQueue<T> cache, BlockingCollection<T> bc, CancellationToken token)
         {
             int index = 0;
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 int batch = 10;
                 int max = batch + index;
@@ -53,21 +53,29 @@ namespace RLM.Database
                     T item;
                     if (cache.TryDequeue(out item))
                     {
-                        if (bc.TryAdd(item))
+                        try
                         {
-                            Interlocked.Increment(ref taskEnqueuedCounter);
+                            if (bc.TryAdd(item))
+                            {
+                                Interlocked.Increment(ref taskEnqueuedCounter);
+                            }
+                        }
+                        catch (InvalidOperationException e)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"TODO must handle this error properly: {e.Message}");
                         }
                     }
                 }
 
-                Task.Delay(DELAY).Wait();
+                //Task.Delay(DELAY).Wait();
+                Thread.Sleep(DELAY);
             }
         }
 
-        public void QueueObjects(ConcurrentQueue<Queue<Case>> cache, BlockingCollection<Case> bc, object queue_lock)
+        public void QueueObjects(ConcurrentQueue<Queue<Case>> cache, BlockingCollection<Case> bc, object queue_lock, CancellationToken token)
         {
             int index = 0;
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 Queue<Case> currentReadQueue;
                 Queue<Case> doneReadQueue;
@@ -105,7 +113,8 @@ namespace RLM.Database
                     }
                 }
 
-                Task.Delay(DELAY).Wait();
+                //Task.Delay(DELAY).Wait();
+                Thread.Sleep(DELAY);
             }
         }
     }

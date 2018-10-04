@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PoCTools.Settings;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
+using RLM.PostgreSQLServer;
 
 namespace RetailPoCSimple
 {
@@ -74,7 +77,9 @@ namespace RetailPoCSimple
             UpdateStatus?.Invoke("Initializing...");
 
             // creates the network (and the underlying DB) with a unique name to have a different network everytime you run a simulation
-            network = new RlmNetwork(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" +  Guid.NewGuid().ToString("N"));
+            IRlmDbData rlmDbData = new RlmDbDataSQLServer(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" + Guid.NewGuid().ToString("N"));
+            //IRlmDbData rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier != null ? dbIdentifier : "RLM_planogram_" + Guid.NewGuid().ToString("N"));
+            network = new RlmNetwork(rlmDbData);
 
             if (dataPersistProgress != null)
             {

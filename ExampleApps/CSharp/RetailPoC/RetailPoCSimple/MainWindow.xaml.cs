@@ -24,6 +24,9 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using WPFVisualizer;
 using PoCTools.Settings;
+using RLM.Models.Interfaces;
+using RLM.SQLServer;
+using RLM.PostgreSQLServer;
 
 namespace RetailPoCSimple
 {
@@ -54,6 +57,7 @@ namespace RetailPoCSimple
         int selectedSlotIndex = -1;
         private IRLVOutputVisualizer visualizer = null;
         private IRLVCore core = null;
+        private IRlmDbData rlmDbData;
         private Random rnd;
         private IDictionary<Color, SolidColorBrush> coloredBrushesDict = new Dictionary<Color, SolidColorBrush>();
         private IDictionary<int, ImageBrush> imageBrushesDict = new Dictionary<int, ImageBrush>();
@@ -158,7 +162,9 @@ namespace RetailPoCSimple
             string dbIdentifier = "RLV_small";
             // instantiate visualizer with this window as its parent reference
             visualizer = new RLVOutputVisualizer(this);
-            core = new RLVCore(dbIdentifier);
+            rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+            //rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+            core = new RLVCore(rlmDbData);
 
             this.Top = 20;
             rlvPanel = new VisualizerWindow(core, visualizer);
@@ -816,7 +822,9 @@ namespace RetailPoCSimple
                 string dbIdentifier = "RLM_planogram_" + Guid.NewGuid().ToString("N");
                 // instantiate visualizer with this window as its parent reference
                 visualizer = new RLVOutputVisualizer(this);
-                core = new RLVCore(dbIdentifier);
+                rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+                //rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+                core = new RLVCore(rlmDbData);
 
                 // open temporary RLV container panel
                 // todo this must be embeded in this Window instead of the temporary container

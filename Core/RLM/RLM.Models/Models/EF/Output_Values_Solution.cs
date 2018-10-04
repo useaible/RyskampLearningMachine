@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class Output_Values_Solution
+    public class _Output_Values_Solution
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Int64 ID { get; set; }
         public String Value { get; set; }
+        [ForeignKey("_Output")]
         public Int64 Output_ID { get; set; }
+        [ForeignKey("_Solution")]
         public Int64 Solution_ID { get; set; }
+    }
 
-        [ForeignKey("Output_ID")]
+    public class Output_Values_Solution : _Output_Values_Solution
+    {
         public virtual Output Output { get; set; }
-        [ForeignKey("Solution_ID")]
         public virtual Solution Solution { get; set; }
 
         //Constructors

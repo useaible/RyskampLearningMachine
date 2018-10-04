@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RLM.Models
 {
-    public class Rnetwork
+    public class _Rnetwork
     {
         //Core Fields
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -15,7 +12,10 @@ namespace RLM.Models
         public String Name { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public short MFactor { get; set; }
-        
+    }
+
+    public class Rnetwork : _Rnetwork
+    {   
         //Navigation Properties
         //public virtual ICollection<Rneuron> Rneurons { get; set; }
         public virtual ICollection<Session> Sessions { get; set; }

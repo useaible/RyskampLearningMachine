@@ -2,14 +2,17 @@
 using MazeGameLib;
 using PoCTools.Settings;
 using RLM;
+using RLM.SQLServer;
 using RLM.Enums;
 using RLM.Models;
+using RLM.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RLM.PostgreSQLServer;
 
 namespace ChallengerLib.RLM
 {
@@ -46,7 +49,9 @@ namespace ChallengerLib.RLM
         
         public void CreateOrLoadNetwork(string dbIdentifier, int numSessions = 1, int startRandomness = 1, int endRandomness = 1)
         {
-            network = new RlmNetwork(dbIdentifier);
+            //IRlmDbData rlmDbData = new RlmDbDataPostgreSqlServer(dbIdentifier);
+            IRlmDbData rlmDbData = new RlmDbDataSQLServer(dbIdentifier);
+            network = new RlmNetwork(rlmDbData);
 
             network.NumSessions = numSessions;
             network.StartRandomness = startRandomness;

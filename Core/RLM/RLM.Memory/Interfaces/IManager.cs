@@ -1,4 +1,4 @@
-﻿using RNN.Models;
+﻿using RLM.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace RNN.Memory.Interfaces
         string DabaseName { get; set; }
         ConcurrentDictionary<long, Rneuron> Rneurons { get; set; }
         //key: Input.ID
-        SortedList<RnnInputKey, RnnInputValue> DynamicLinearInputs { get; set; }
+        SortedList<RlmInputKey, RlmInputValue> DynamicLinearInputs { get; set; }
         //ConcurrentDictionary<long, SortedList<double, HashSet<long>>> DynamicLinearInputs { get; set; }
         ConcurrentDictionary<long, Dictionary<string, HashSet<long>>> DynamicDistinctInputs { get; set; }
         //key: Ouput.ID
@@ -28,10 +28,10 @@ namespace RNN.Memory.Interfaces
         bool AddSessionToQueue(long key, Session session);
         bool AddSessionUpdateToQueue(Session session);
         void AddCaseToQueue(long key, Case c_case);
-        Solution GetBestSolution(IEnumerable<rnn_io_with_value> inputs, double linearTolerance = 0, bool predict = false);
-        GetRneuronResult GetRneuronFromInputs(IEnumerable<rnn_io_with_value> inputs, long rnetworkID);
-        GetSolutionResult GetRandomSolutionFromOutput(double randomnessCurrVal, IEnumerable<rnn_io> outputs, long? bestSolutionId = null);
-        GetSolutionResult GetSolutionFromOutputs(IEnumerable<rnn_io_with_value> outputs);
+        Solution GetBestSolution(IEnumerable<RlmIOWithValue> inputs, double linearTolerance = 0, bool predict = false);
+        GetRneuronResult GetRneuronFromInputs(IEnumerable<RlmIOWithValue> inputs, long rnetworkID);
+        GetSolutionResult GetRandomSolutionFromOutput(double randomnessCurrVal, IEnumerable<RlmIO> outputs, long? bestSolutionId = null);
+        GetSolutionResult GetSolutionFromOutputs(IEnumerable<RlmIOWithValue> outputs);
 
         //todo: Manage  Collections, garbage collect?
     }
